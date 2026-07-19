@@ -45,7 +45,7 @@ export default function DashboardPage() {
             <div className="p-3 bg-success/10 rounded-lg text-success"><TrendingUp size={24} /></div>
             <div>
               <div className="text-sm text-base-content/70">Total Stock Value</div>
-              <div className="text-2xl font-bold">${data.totalStockValue}</div>
+              <div className="text-2xl font-bold">৳{data.totalStockValue}</div>
             </div>
           </div>
         </div>
