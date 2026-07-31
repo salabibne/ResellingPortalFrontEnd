@@ -22,12 +22,12 @@ export default function Home() {
               Discover the latest trends in apparel. Our exclusive collection brings you the finest quality clothing designed for comfort and elegance. Elevate your everyday look with Aarham Apparel.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="btn btn-primary btn-lg gap-2 rounded-full px-8">
+              <Link href="/shop" className="btn btn-primary btn-lg gap-2 rounded-full px-8">
                 Shop Collection <ChevronRight size={20} />
-              </button>
-              <button className="btn btn-outline btn-lg rounded-full px-8">
+              </Link>
+              <Link href="/shop" className="btn btn-outline btn-lg rounded-full px-8">
                 Explore Categories
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -39,7 +39,7 @@ export default function Home() {
           <div className="flex-1">
             <h2 className="text-3xl font-bold mb-4">New Arrivals</h2>
             <p className="text-base-content/70 mb-6">Minimalistic, premium, and designed for every day. Browse our latest pieces that guarantee a fresh aesthetic.</p>
-            <button className="btn btn-secondary rounded-full px-8">View Collection</button>
+            <Link href="/shop" className="btn btn-secondary rounded-full px-8">View Collection</Link>
           </div>
           <div className="flex-1 rounded-2xl overflow-hidden shadow-xl">
              <img src="/api/image?name=category" alt="New Arrivals" className="w-full h-auto object-cover" />

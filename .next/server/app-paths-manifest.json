@@ -1,7 +1,8 @@
 {
-  "/page": "app/page.js",
+  "/my-orders/[id]/page": "app/my-orders/[id]/page.js",
+  "/shop/page": "app/shop/page.js",
+  "/my-orders/page": "app/my-orders/page.js",
   "/(auth)/login/page": "app/(auth)/login/page.js",
-  "/(dashboard)/product-attributes/[type]/page": "app/(dashboard)/product-attributes/[type]/page.js",
-  "/(dashboard)/products/page": "app/(dashboard)/products/page.js",
-  "/(dashboard)/inventory/page": "app/(dashboard)/inventory/page.js"
+  "/page": "app/page.js",
+  "/(dashboard)/orders/page": "app/(dashboard)/orders/page.js"
 }

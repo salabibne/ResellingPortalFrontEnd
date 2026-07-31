@@ -7,14 +7,34 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
+}
+
+/* Global Form Input & Dropdown Option Styling */
+input,
+select,
+textarea {
+  color: #000000 !important;
+  background-color: #ffffff;
+}
+
+option {
+  color: #000000 !important;
+  background-color: #ffffff;
+}
+
+/* Dropdown Option Selection & Hover State */
+option:checked,
+option:hover,
+option:focus {
+  background-color: #2563eb !important; /* Blue background */
+  color: #ffffff !important; /* White text */
+}
+
+/* Global Text Selection */
+::selection {
+  background-color: #2563eb;
+  color: #ffffff;
 }

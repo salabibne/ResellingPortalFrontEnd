@@ -36,13 +36,13 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       const { refreshToken, logout, updateToken } = useAuthStore.getState();
-      
+
       if (refreshToken) {
         try {
           const res = await axios.post(`${API_BASE_URL}/auth/refresh`, {
             refreshToken,
           });
-          
+
           if (res.data && res.data.accessToken) {
             updateToken(res.data.accessToken, res.data.refreshToken);
             originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
@@ -50,12 +50,24 @@ api.interceptors.response.use(
           }
         } catch (refreshError) {
           logout();
-          window.location.href = "/login";
+          if (
+            typeof window !== "undefined" &&
+            window.location.pathname.startsWith("/dashboard") &&
+            window.location.pathname !== "/login"
+          ) {
+            window.location.href = "/login";
+          }
           return Promise.reject(refreshError);
         }
       } else {
         logout();
-        window.location.href = "/login";
+        if (
+          typeof window !== "undefined" &&
+          window.location.pathname.startsWith("/dashboard") &&
+          window.location.pathname !== "/login"
+        ) {
+          window.location.href = "/login";
+        }
       }
     }
     return Promise.reject(error);

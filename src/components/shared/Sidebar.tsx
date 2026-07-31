@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, RefreshCw, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, RefreshCw, Activity, ShoppingBag, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function Sidebar() {
@@ -26,7 +26,7 @@ export default function Sidebar() {
           </Link>
         </li>
         <li>
-          <Link href="/products" className={getLinkClass("/products")}>
+          <Link href="/dashboard/products" className={getLinkClass("/dashboard/products")}>
             <Package size={20} /> Products
           </Link>
         </li>
@@ -49,6 +49,16 @@ export default function Sidebar() {
         <li>
           <Link href="/inventory" className={getLinkClass("/inventory")}>
             <RefreshCw size={20} /> Inventory Adjust
+          </Link>
+        </li>
+        <li>
+          <Link href="/inventory-monitor" className={getLinkClass("/inventory-monitor")}>
+            <Activity size={20} /> Inventory Monitor
+          </Link>
+        </li>
+        <li>
+          <Link href="/orders" className={getLinkClass("/orders")}>
+            <ShoppingBag size={20} /> Orders & Sales
           </Link>
         </li>
       </ul>

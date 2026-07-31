@@ -55,6 +55,21 @@ function RegisterForm() {
       const res = await authApi.register(data);
       setAuth(res.user, res.accessToken, res.refreshToken);
       setIsSuccess(true);
+
+      const redirectParam = searchParams.get("redirect");
+      const userRole = (res.user?.role || "").toUpperCase();
+
+      setTimeout(() => {
+        if (redirectParam && redirectParam.startsWith("/")) {
+          router.push(redirectParam);
+          return;
+        }
+        if (userRole === "USER" || userRole === "RESELLER") {
+          router.push("/");
+        } else {
+          router.push("/dashboard");
+        }
+      }, 1500);
     } catch (err: any) {
       setError(err.response?.data?.message || "Registration failed");
     }
