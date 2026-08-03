@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, RefreshCw, Activity, ShoppingBag, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, RefreshCw, Activity, ShoppingBag, LogOut, FileText } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function Sidebar() {
@@ -59,6 +59,11 @@ export default function Sidebar() {
         <li>
           <Link href="/orders" className={getLinkClass("/orders")}>
             <ShoppingBag size={20} /> Orders & Sales
+          </Link>
+        </li>
+        <li>
+          <Link href="/cms" className={getLinkClass("/cms")}>
+            <FileText size={20} /> CMS Management
           </Link>
         </li>
       </ul>

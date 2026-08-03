@@ -13,10 +13,13 @@ import {
   Search,
   LogOut,
   SlidersHorizontal,
+  Phone,
+  Mail,
 } from "lucide-react";
 import { useCategoryStore } from "@/store/useCategoryStore";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useCMSStore } from "@/store/useCMSStore";
 import CartDrawer from "./CartDrawer";
 
 export default function Navbar() {
@@ -29,6 +32,7 @@ export default function Navbar() {
     useCategoryStore();
   const { cart, toggleCart, fetchCart } = useCartStore();
   const { user, logout } = useAuthStore();
+  const contactInfo = useCMSStore((state) => state.contactInfo);
 
   const activeCategoryId = searchParams.get("categoryId");
   const activeSubcategoryId = searchParams.get("subcategoryId");
@@ -62,6 +66,31 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Top Banner Contact Info from CMS */}
+      {contactInfo && (contactInfo.phone || contactInfo.email) && (
+        <div className="bg-[#001266] text-white/90 text-xs py-1.5 px-4 border-b border-white/10">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              {contactInfo.phone && (
+                <a href={`tel:${contactInfo.phone}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
+                  <Phone size={12} className="text-secondary" />
+                  <span>{contactInfo.phone}</span>
+                </a>
+              )}
+              {contactInfo.email && (
+                <a href={`mailto:${contactInfo.email}`} className="hidden sm:flex items-center gap-1.5 hover:text-white transition-colors">
+                  <Mail size={12} className="text-secondary" />
+                  <span>{contactInfo.email}</span>
+                </a>
+              )}
+            </div>
+            <div className="text-[11px] text-white/70">
+              Welcome to <span className="font-semibold text-white">Aarham Apparel</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="sticky top-0 z-40 bg-[#001C94] text-white shadow-lg border-b border-primary-content/10">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16 gap-4">
