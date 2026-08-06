@@ -63,8 +63,21 @@ export default function Sidebar() {
         </li>
         <li>
           <Link href="/cms" className={getLinkClass("/cms")}>
-            <FileText size={20} /> CMS Management
+            <FileText size={20} /> Base CMS Management
           </Link>
+        </li>
+        <li>
+          <details open={pathname.includes("/admin/")}>
+            <summary className={`flex items-center gap-2 ${pathname.includes("/admin/") ? "text-primary font-semibold" : "text-black hover:bg-base-200"}`}>
+              <FileText size={20} /> Advanced Admin & CMS
+            </summary>
+            <ul>
+              <li><Link href="/admin/custom-pages" className={getLinkClass("/admin/custom-pages")}>Custom Pages Builder</Link></li>
+              <li><Link href="/admin/product-pages" className={getLinkClass("/admin/product-pages")}>Product Landing CMS</Link></li>
+              <li><Link href="/admin/external-apis" className={getLinkClass("/admin/external-apis")}>External API Integrations</Link></li>
+              <li><Link href="/admin/legal-documents" className={getLinkClass("/admin/legal-documents")}>Legal Documents</Link></li>
+            </ul>
+          </details>
         </li>
       </ul>
       <div className="p-4 border-t border-base-300">

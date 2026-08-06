@@ -94,20 +94,50 @@ export default function Footer() {
           <Link href="/about" className="link link-hover">About Us</Link>
           <Link href="/shop" className="link link-hover">Shop Collection</Link>
           <Link href="/checkout" className="link link-hover">Checkout</Link>
-          <Link href="/cms" className="link link-hover">CMS Admin</Link>
+          <Link href="/admin/custom-pages" className="link link-hover">Admin Panel</Link>
         </nav>
 
-        <nav>
-          <h6 className="footer-title text-black">Legal</h6>
-          <Link href="#" className="link link-hover">Terms of use</Link>
-          <Link href="#" className="link link-hover">Privacy policy</Link>
-          <Link href="#" className="link link-hover">Cookie policy</Link>
-        </nav>
+        <FooterLegalNav />
       </div>
 
       <div className="border-t border-base-300 py-4 px-10 text-center text-xs text-base-content/60">
         &copy; {new Date().getFullYear()} Aarham Apparel Ltd. All rights reserved.
       </div>
     </footer>
+  );
+}
+
+function FooterLegalNav() {
+  const [docs, setDocs] = React.useState<{ id: string; title: string; slug: string }[]>([]);
+
+  React.useEffect(() => {
+    import("@/services/legalDocuments.api").then(({ legalDocumentsApi }) => {
+      legalDocumentsApi
+        .getAll()
+        .then((data) => {
+          const published = data.filter((d) => d.status === "PUBLISHED");
+          setDocs(published);
+        })
+        .catch(() => setDocs([]));
+    });
+  }, []);
+
+  return (
+    <nav>
+      <h6 className="footer-title text-black">Legal & Compliance</h6>
+      {docs.length > 0 ? (
+        docs.map((doc) => (
+          <Link key={doc.id} href={`/legal/${doc.slug}`} className="link link-hover">
+            {doc.title}
+          </Link>
+        ))
+      ) : (
+        <>
+          <Link href="/legal/terms-and-conditions" className="link link-hover">Terms of use</Link>
+          <Link href="/legal/privacy-policy" className="link link-hover">Privacy policy</Link>
+          <Link href="/legal/return-refund-policy" className="link link-hover">Return policy</Link>
+        </>
+      )}
+    </nav>
   );
 }

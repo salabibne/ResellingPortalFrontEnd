@@ -1,3 +1,7 @@
 {
-  "/page": "app/page.js"
+  "/(dashboard)/cms/page": "app/(dashboard)/cms/page.js",
+  "/(dashboard)/admin/legal-documents/page": "app/(dashboard)/admin/legal-documents/page.js",
+  "/(dashboard)/admin/external-apis/page": "app/(dashboard)/admin/external-apis/page.js",
+  "/(dashboard)/admin/custom-pages/page": "app/(dashboard)/admin/custom-pages/page.js",
+  "/(dashboard)/admin/product-pages/page": "app/(dashboard)/admin/product-pages/page.js"
 }

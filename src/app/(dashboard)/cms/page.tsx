@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import CmsManager, { MODULE_CONFIGS } from "@/components/cms/CmsManager";
 import { CMSModuleType } from "@/services/cms.api";
 import {
@@ -12,6 +13,11 @@ import {
   UserCheck,
   BookOpen,
   Video,
+  Layers,
+  ShoppingBag,
+  Globe,
+  FileText as FileTextIcon,
+  ArrowRight,
 } from "lucide-react";
 
 const MODULE_TABS: { id: CMSModuleType; label: string; icon: any }[] = [
@@ -36,6 +42,73 @@ export default function CMSDashboardPage() {
         <p className="text-sm text-base-content/70 mt-1">
           Configure site content, banners, videos, founder updates, and contact information.
         </p>
+      </div>
+
+      {/* Quick Access Modules Navigation Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Link
+          href="/admin/custom-pages"
+          className="p-4 rounded-xl bg-white border border-gray-200 shadow-xs hover:border-primary hover:shadow-md transition flex flex-col justify-between group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
+              <Layers size={20} />
+            </div>
+            <ArrowRight size={16} className="text-gray-400 group-hover:text-primary transition-transform group-hover:translate-x-1" />
+          </div>
+          <div className="mt-3">
+            <h3 className="font-bold text-sm text-black">Custom Pages Builder</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Build landing pages & dynamic sections</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/product-pages"
+          className="p-4 rounded-xl bg-white border border-gray-200 shadow-xs hover:border-primary hover:shadow-md transition flex flex-col justify-between group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-600">
+              <ShoppingBag size={20} />
+            </div>
+            <ArrowRight size={16} className="text-gray-400 group-hover:text-primary transition-transform group-hover:translate-x-1" />
+          </div>
+          <div className="mt-3">
+            <h3 className="font-bold text-sm text-black">Product Page CMS</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Customize landing mode & videos</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/external-apis"
+          className="p-4 rounded-xl bg-white border border-gray-200 shadow-xs hover:border-primary hover:shadow-md transition flex flex-col justify-between group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-600">
+              <Globe size={20} />
+            </div>
+            <ArrowRight size={16} className="text-gray-400 group-hover:text-primary transition-transform group-hover:translate-x-1" />
+          </div>
+          <div className="mt-3">
+            <h3 className="font-bold text-sm text-black">External API Integrations</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Manage bKash, Steadfast & Pixels</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/legal-documents"
+          className="p-4 rounded-xl bg-white border border-gray-200 shadow-xs hover:border-primary hover:shadow-md transition flex flex-col justify-between group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="p-2.5 rounded-lg bg-purple-500/10 text-purple-600">
+              <FileTextIcon size={20} />
+            </div>
+            <ArrowRight size={16} className="text-gray-400 group-hover:text-primary transition-transform group-hover:translate-x-1" />
+          </div>
+          <div className="mt-3">
+            <h3 className="font-bold text-sm text-black">Legal Documents</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Terms, Privacy & Return policies</p>
+          </div>
+        </Link>
       </div>
 
       {/* Tabs Navigation */}

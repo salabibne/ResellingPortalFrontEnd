@@ -22,7 +22,9 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/shared/Footer";
 import { productApi, Product } from "@/services/product.api";
+import productPageConfigsApi, { ProductPageConfig } from "@/services/productPageConfigs.api";
 import { useCartStore } from "@/store/useCartStore";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -30,6 +32,7 @@ export default function ProductDetailPage() {
   const productId = params?.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [pageConfig, setPageConfig] = useState<ProductPageConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,30 +51,41 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (!productId) return;
     setLoading(true);
-    productApi
-      .getOne(productId)
-      .then((data) => {
-        setProduct(data);
+
+    Promise.allSettled([
+      productApi.getOne(productId),
+      productPageConfigsApi.getByProductId(productId),
+    ])
+      .then(([prodRes, configRes]) => {
+        if (prodRes.status === "fulfilled") {
+          const data = prodRes.value;
+          setProduct(data);
+
+          if (data.colors && data.colors.length > 0) {
+            setSelectedColorId(data.colors[0].id);
+          }
+          if (data.sizes && data.sizes.length > 0) {
+            const inStockSize = data.sizes.find((s) => {
+              const stock = getStockForSize(data, s.id);
+              return stock > 0;
+            });
+            setSelectedSizeId(inStockSize ? inStockSize.id : data.sizes[0].id);
+          }
+          if (data.ages && data.ages.length > 0) {
+            setSelectedAgeId(data.ages[0].id);
+          }
+        } else {
+          setError("Product not found or failed to load details.");
+        }
+
+        if (configRes.status === "fulfilled") {
+          setPageConfig(configRes.value);
+        }
         setLoading(false);
-        // Pre-select first color & size if available
-        if (data.colors && data.colors.length > 0) {
-          setSelectedColorId(data.colors[0].id);
-        }
-        if (data.sizes && data.sizes.length > 0) {
-          // Find first size in stock
-          const inStockSize = data.sizes.find((s) => {
-            const stock = getStockForSize(data, s.id);
-            return stock > 0;
-          });
-          setSelectedSizeId(inStockSize ? inStockSize.id : data.sizes[0].id);
-        }
-        if (data.ages && data.ages.length > 0) {
-          setSelectedAgeId(data.ages[0].id);
-        }
       })
       .catch((err) => {
         console.error("Failed to load product details:", err);
-        setError("Product not found or failed to load details.");
+        setError("Product not found.");
         setLoading(false);
       });
   }, [productId]);

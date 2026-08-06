@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"components\\\\shared\\\\Footer.tsx -> @/services/legalDocuments.api\":{\"id\":\"components\\\\shared\\\\Footer.tsx -> @/services/legalDocuments.api\",\"files\":[\"static/chunks/_app-pages-browser_src_services_legalDocuments_api_ts.js\"]}}"
