@@ -125,7 +125,7 @@ export default function AdminProductsPage() {
 
       setLoadingProgress(85);
 
-      setProducts(Array.isArray(prodsData) ? prodsData : prodsData?.data || []);
+      setProducts(prodsData);
       setCategories(Array.isArray(catsData) ? catsData : catsData?.data || []);
       setSubcategories(Array.isArray(subCatsData) ? subCatsData : subCatsData?.data || []);
       setChildCategories(Array.isArray(childCatsData) ? childCatsData : childCatsData?.data || []);
@@ -513,7 +513,7 @@ export default function AdminProductsPage() {
               ) : filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="text-center py-12 text-gray-500">
-                    No products found. Click "Add New Product" to create one.
+                    No products found. Click &ldquo;Add New Product&rdquo; to create one.
                   </td>
                 </tr>
               ) : (
@@ -1390,7 +1390,7 @@ export default function AdminProductsPage() {
               <Trash2 className="text-error" size={20} /> Delete Product
             </h3>
             <p className="py-4 text-sm text-black">
-              Are you sure you want to delete <strong>"{productToDelete.name}"</strong>? This action will remove it from active lists.
+              Are you sure you want to delete <strong>&ldquo;{productToDelete.name}&rdquo;</strong>? This action will remove it from active lists.
             </p>
             <div className="flex justify-end gap-3">
               <button

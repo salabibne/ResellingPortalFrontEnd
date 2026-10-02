@@ -90,7 +90,7 @@ export default async function PublicCustomPage({ params }: PageProps) {
               key={sec.id || idx}
               className={`rounded-2xl p-6 sm:p-10 border transition ${
                 isHero
-                  ? "bg-gradient-to-br from-gray-900 to-indigo-950 text-white border-indigo-900/50 shadow-xl"
+                  ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-xl"
                   : isBanner
                   ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm"
                   : "bg-base-200/50 border-base-300 dark:bg-gray-800/40 dark:border-gray-700"
@@ -103,11 +103,11 @@ export default async function PublicCustomPage({ params }: PageProps) {
                       {sec.subtitle}
                     </span>
                   )}
-                  <h2 className={`text-2xl sm:text-4xl font-bold ${isHero ? "text-white" : "text-gray-900 dark:text-white"}`}>
+                  <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 dark:text-white">
                     {sec.title}
                   </h2>
                   {sec.description && (
-                    <p className={`text-sm sm:text-base leading-relaxed ${isHero ? "text-gray-300" : "text-gray-600 dark:text-gray-300"}`}>
+                    <p className="text-sm sm:text-base leading-relaxed text-gray-600 dark:text-gray-300">
                       {sec.description}
                     </p>
                   )}
@@ -116,9 +116,7 @@ export default async function PublicCustomPage({ params }: PageProps) {
                     <div className="pt-2">
                       <a
                         href={sec.buttonLink || "/shop"}
-                        className={`btn ${
-                          isHero ? "btn-primary text-white" : "btn-outline border-primary text-primary hover:bg-primary hover:text-white"
-                        } inline-flex items-center gap-2`}
+                        className="btn bg-blue-600 hover:bg-blue-700 text-white border-none shadow-md inline-flex items-center gap-2"
                       >
                         {sec.buttonText} <ArrowRight className="w-4 h-4" />
                       </a>

@@ -14,6 +14,7 @@ export default function DashboardLayout({
   const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -24,8 +25,9 @@ export default function DashboardLayout({
     }
 
     const role = (user?.role || "").toUpperCase();
-    if (role === "USER" || role === "RESELLER") {
-      // Non-staff users do not have access to admin dashboard
+    if (role === "RESELLER") {
+      router.push("/reseller");
+    } else if (role === "USER") {
       router.push("/");
     }
   }, [isAuthenticated, user, router]);
@@ -44,11 +46,18 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-6">
+    <div className="flex h-screen overflow-hidden bg-base-200/40">
+      {/* Mobile Drawer Backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs transition-opacity"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-4 md:p-6">
           {children}
         </main>
       </div>

@@ -6,6 +6,7 @@ import cmsApi, {
   FounderProfileItem,
   FounderBlogItem,
   FounderVideoItem,
+  TeamMemberItem,
   ContactInfoItem,
   SocialMediaItem,
 } from "@/services/cms.api";
@@ -17,6 +18,7 @@ interface CMSState {
   founderProfile: FounderProfileItem | null;
   founderBlogs: FounderBlogItem[];
   founderVideos: FounderVideoItem[];
+  team: TeamMemberItem[];
   contactInfo: ContactInfoItem | null;
   socialMedia: SocialMediaItem[];
   loading: boolean;
@@ -32,6 +34,7 @@ export const useCMSStore = create<CMSState>((set, get) => ({
   founderProfile: null,
   founderBlogs: [],
   founderVideos: [],
+  team: [],
   contactInfo: null,
   socialMedia: [],
   loading: false,
@@ -53,6 +56,7 @@ export const useCMSStore = create<CMSState>((set, get) => ({
         founderProfile: cmsData.founderProfile,
         founderBlogs: cmsData.founderBlogs,
         founderVideos: cmsData.founderVideos,
+        team: cmsData.team,
         contactInfo: cmsData.contactInfo,
         socialMedia: cmsData.socialMedia,
         loading: false,

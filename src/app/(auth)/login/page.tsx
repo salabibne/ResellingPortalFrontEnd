@@ -49,7 +49,9 @@ function LoginForm() {
       }
 
       // 2. Role-based redirect default:
-      if (userRole === "USER" || userRole === "RESELLER") {
+      if (userRole === "RESELLER") {
+        router.push("/reseller");
+      } else if (userRole === "USER") {
         router.push("/");
       } else {
         // SUPER_ADMIN, ADMIN, MANAGER, SALES_EXECUTIVE, INVENTOR
@@ -137,7 +139,7 @@ function LoginForm() {
             <div className="divider mt-6">OR</div>
 
             <div className="text-center mt-2">
-              <span className="text-base-content/70">Haven't registered yet? </span>
+              <span className="text-base-content/70">Haven&apos;t registered yet? </span>
               <Link
                 href={
                   redirectParam

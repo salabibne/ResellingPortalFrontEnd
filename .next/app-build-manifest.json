@@ -31,55 +31,35 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(dashboard)/layout.js"
     ],
-    "/(dashboard)/cms/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/cms/page.js"
-    ],
     "/(dashboard)/orders/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(dashboard)/orders/page.js"
-    ],
-    "/(dashboard)/dashboard/products/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/dashboard/products/page.js"
-    ],
-    "/(dashboard)/inventory/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/inventory/page.js"
-    ],
-    "/(dashboard)/inventory-monitor/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/inventory-monitor/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/_not-found/page.js"
     ],
-    "/(dashboard)/admin/external-apis/page": [
+    "/reseller/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/admin/external-apis/page.js"
+      "static/chunks/app/reseller/page.js"
     ],
-    "/(dashboard)/admin/legal-documents/page": [
+    "/reseller/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/admin/legal-documents/page.js"
+      "static/chunks/app/reseller/layout.js"
     ],
-    "/(dashboard)/admin/custom-pages/page": [
+    "/reseller/payouts/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/admin/custom-pages/page.js"
+      "static/chunks/app/reseller/payouts/page.js"
     ],
-    "/(dashboard)/admin/product-pages/page": [
+    "/reseller/orders/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/admin/product-pages/page.js"
+      "static/chunks/app/reseller/orders/page.js"
     ]
   }
 }

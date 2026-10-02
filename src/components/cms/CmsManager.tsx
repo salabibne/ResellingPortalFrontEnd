@@ -33,14 +33,14 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
   },
   contact: {
     module: "contact",
-    title: "Contact Information",
-    description: "Manage public phone numbers, emails, physical address, and messaging links.",
+    title: "Contact Information & WhatsApp Live Chat",
+    description: "Manage public phone numbers, emails, office address, and bottom-right floating WhatsApp button number/link.",
     fields: [
-      { name: "phone", label: "Phone Number", type: "text", required: true, placeholder: 'e.g. "+8801700000000"' },
+      { name: "whatsapp", label: "WhatsApp Floating Button (Mobile Number, Username, or Link)", type: "text", required: false, placeholder: 'e.g. "01701474332", "+8801701474332", or "wa.me/..."' },
+      { name: "phone", label: "Customer Service Phone Number", type: "text", required: true, placeholder: 'e.g. "+8801700000000"' },
       { name: "email", label: "Email Address", type: "email", required: true, placeholder: 'e.g. "support@aarhamapparel.com"' },
       { name: "address", label: "Physical Address", type: "textarea", required: true, placeholder: "Full office or store address..." },
       { name: "telegram", label: "Telegram Link / Handle", type: "text", required: false, placeholder: 'e.g. "https://t.me/aarham"' },
-      { name: "whatsapp", label: "WhatsApp Number / Link", type: "text", required: false, placeholder: 'e.g. "+8801700000000"' },
       { name: "facebook", label: "Facebook Page URL", type: "url", required: false, placeholder: "https://facebook.com/aarhamapparel" },
     ],
   },
@@ -115,6 +115,17 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
       { name: "title", label: "Video Title", type: "text", required: true, placeholder: 'e.g. "Keynote Presentation 2024"' },
       { name: "videoLink", label: "Video Streaming / YouTube URL", type: "url", required: true, placeholder: "https://www.youtube.com/watch?v=..." },
       { name: "description", label: "Summary Description", type: "textarea", required: true, placeholder: "Video highlights and summary..." },
+    ],
+  },
+  team: {
+    module: "team",
+    title: "Our Team",
+    description: "Manage team member profiles, designations, photos, and messages displayed on the homepage.",
+    fields: [
+      { name: "name", label: "Full Name", type: "text", required: true, placeholder: 'e.g. "Sarah Jenkins"' },
+      { name: "designation", label: "Designation / Role", type: "text", required: true, placeholder: 'e.g. "Head of Design"' },
+      { name: "imageUrl", label: "Profile Picture URL", type: "url", required: true, placeholder: "https://images.unsplash.com/... or profile image link" },
+      { name: "message", label: "Personal Message / Statement", type: "textarea", required: true, placeholder: "Brief bio, message, or quote from the team member..." },
     ],
   },
 };
@@ -331,7 +342,7 @@ export default function CmsManager({ module }: Props) {
                     colSpan={config.fields.length + 3}
                     className="text-center py-12 text-base-content/60"
                   >
-                    No content entries found for {config.title}. Click "Add Entry" to create one.
+                    No content entries found for {config.title}. Click &ldquo;Add Entry&rdquo; to create one.
                   </td>
                 </tr>
               ) : (
@@ -446,7 +457,7 @@ export default function CmsManager({ module }: Props) {
                       />
                     ) : (
                       <input
-                        type={field.type}
+                        type={field.type === "url" ? "text" : field.type}
                         className="input input-bordered w-full text-black bg-white focus:input-primary"
                         placeholder={field.placeholder}
                         value={formData[field.name] || ""}

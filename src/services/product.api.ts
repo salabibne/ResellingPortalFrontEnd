@@ -97,6 +97,31 @@ export interface Product {
   colors?: ProductColorRelation[];
   sizes?: ProductSizeRelation[];
   ages?: ProductAgeRelation[];
+  pageConfig?: {
+    id: string;
+    productId: string;
+    isLandingPage: boolean;
+  } | null;
+  inventories?: {
+    id: string;
+    productId: string;
+    productSizeId?: string | null;
+    currentStock: number;
+    costPerUnit: number;
+    supplierName: string;
+    supplierMobile: string;
+    stockLimitAlert: number;
+    notes?: string | null;
+    createdAt: string;
+    updatedAt: string;
+    productSize?: {
+      id: string;
+      size: {
+        id: string;
+        name: string;
+      };
+    } | null;
+  }[];
 }
 
 export const productApi = {

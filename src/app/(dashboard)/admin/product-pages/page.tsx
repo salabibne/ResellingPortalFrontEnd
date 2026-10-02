@@ -12,12 +12,13 @@ import {
   Sparkles,
   ToggleRight,
   Film,
+  Eye,
 } from "lucide-react";
 import productPageConfigsApi, {
   ProductPageSection,
   SaveProductPageConfigDto,
 } from "@/services/productPageConfigs.api";
-import productApi from "@/services/product.api";
+import { productApi } from "@/services/product.api";
 
 export default function AdminProductPagesPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -39,9 +40,8 @@ export default function AdminProductPagesPage() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await productApi.getProducts({ limit: 50 });
-      const items = Array.isArray(res) ? res : res?.items || res?.data || [];
-      setProducts(items);
+      const res = await productApi.getAll();
+      setProducts(res);
     } catch (err) {
       console.error("Failed to fetch products", err);
     } finally {
@@ -143,6 +143,29 @@ export default function AdminProductPagesPage() {
     }
   };
 
+  const handleOpenCreateLanding = async () => {
+    let currentProducts = products;
+    if (currentProducts.length === 0) {
+      setLoading(true);
+      try {
+        const res = await productApi.getAll();
+        currentProducts = res;
+        setProducts(currentProducts);
+      } catch (err) {
+        console.error("Failed to fetch products", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (currentProducts.length > 0) {
+      const unconfigured = currentProducts.find((p) => !p.pageConfig?.isLandingPage) || currentProducts[0];
+      handleOpenConfigEditor(unconfigured);
+    } else {
+      alert("No products available to configure. Please add a product to your catalog first from the Products tab.");
+    }
+  };
+
   const getEmbedVideoUrl = (url?: string) => {
     if (!url) return null;
     if (url.includes("youtube.com/watch?v=")) {
@@ -161,14 +184,22 @@ export default function AdminProductPagesPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 bg-white text-black">
-      {/* Page Title Header - NO Add Button */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-black flex items-center gap-2">
-          <ShoppingBag className="w-7 h-7 text-primary" /> Product Page CMS Config Builder
-        </h1>
-        <p className="text-sm text-gray-600 mt-1">
-          Customize product details, add hero video showcases, and convert high-performing items into standalone landing pages.
-        </p>
+      {/* Page Title Header with Add Button */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-black flex items-center gap-2">
+            <ShoppingBag className="w-7 h-7 text-primary" /> Product Page CMS Config Builder
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Customize product details, add hero video showcases, and convert high-performing items into standalone landing pages.
+          </p>
+        </div>
+        <button
+          onClick={handleOpenCreateLanding}
+          className="btn btn-primary text-white flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" /> Create Product Landing Page
+        </button>
       </div>
 
       {/* Search Bar */}
@@ -210,7 +241,7 @@ export default function AdminProductPagesPage() {
                       <div className="flex items-center gap-3">
                         <img
                           src={
-                            prod.images?.[0] ||
+                            prod.images?.[0]?.imageUrl ||
                             prod.imageUrl ||
                             "https://via.placeholder.com/80"
                           }
@@ -230,7 +261,7 @@ export default function AdminProductPagesPage() {
                       ৳{prod.price || prod.resellerPrice || "0"}
                     </td>
                     <td>
-                      {prod.isLandingPage ? (
+                      {prod.pageConfig?.isLandingPage ? (
                         <span className="badge badge-success gap-1 text-white text-xs">
                           <Check className="w-3 h-3" /> Landing Page Active
                         </span>
@@ -238,10 +269,19 @@ export default function AdminProductPagesPage() {
                         <span className="badge badge-ghost text-xs text-gray-400">Standard Product</span>
                       )}
                     </td>
-                    <td className="text-right">
+                    <td className="text-right space-x-2">
+                      <a
+                        href={`/products/${prod.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn btn-ghost btn-sm text-info inline-flex items-center gap-1.5"
+                        title="Preview Public Page"
+                      >
+                        <Eye className="w-4 h-4" /> Preview
+                      </a>
                       <button
                         onClick={() => handleOpenConfigEditor(prod)}
-                        className="btn btn-outline btn-sm btn-primary flex items-center gap-1.5 ml-auto"
+                        className="btn btn-outline btn-sm btn-primary inline-flex items-center gap-1.5"
                       >
                         <Edit3 className="w-4 h-4" /> Configure CMS
                       </button>
@@ -254,10 +294,10 @@ export default function AdminProductPagesPage() {
         )}
       </div>
 
-      {/* Editor Drawer Modal */}
+      {/* Editor Modal */}
       {isDrawerOpen && selectedProduct && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs flex justify-end">
-          <div className="w-full max-w-3xl bg-white text-black h-full shadow-2xl overflow-y-auto flex flex-col">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-3xl bg-white text-black rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col my-auto border border-gray-200">
             {/* Drawer Header */}
             <div className="p-5 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
               <div>
@@ -276,6 +316,24 @@ export default function AdminProductPagesPage() {
 
             {/* Editor Body */}
             <form onSubmit={handleSaveConfig} className="p-6 space-y-6 flex-1 bg-white">
+              {/* Product Selection Dropdown inside Form */}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-1">
+                <label className="label-text text-xs font-semibold text-black">Target Product *</label>
+                <select
+                  value={selectedProduct?.id || ""}
+                  onChange={(e) => {
+                    const p = products.find((prod) => prod.id === e.target.value);
+                    if (p) handleOpenConfigEditor(p);
+                  }}
+                  className="select select-bordered w-full text-sm bg-white text-black"
+                >
+                  {products.map((prod) => (
+                    <option key={prod.id} value={prod.id}>
+                      {prod.name} ({prod.sku || prod.id.slice(0, 8)})
+                    </option>
+                  ))}
+                </select>
+              </div>
               {/* Feature Toggles Card */}
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
                 <h3 className="font-semibold text-sm text-black flex items-center gap-2">
@@ -538,21 +596,33 @@ export default function AdminProductPagesPage() {
               </div>
 
               {/* Drawer Footer Buttons */}
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-200 sticky bottom-0 bg-white p-4">
-                <button
-                  type="button"
-                  onClick={() => setIsDrawerOpen(false)}
-                  className="btn btn-ghost text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="btn btn-primary text-white text-xs px-6"
-                >
-                  {saving ? "Saving Config..." : "Save Product CMS Config"}
-                </button>
+              <div className="pt-4 flex items-center justify-between border-t border-gray-200 sticky bottom-0 bg-white p-4">
+                {selectedProduct && (
+                  <a
+                    href={`/products/${selectedProduct.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-ghost btn-xs text-info flex items-center gap-1"
+                  >
+                    <Eye className="w-3.5 h-3.5" /> Preview Page
+                  </a>
+                )}
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsDrawerOpen(false)}
+                    className="btn btn-ghost text-xs"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="btn btn-primary text-white text-xs px-6"
+                  >
+                    {saving ? "Saving Config..." : "Save Product CMS Config"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

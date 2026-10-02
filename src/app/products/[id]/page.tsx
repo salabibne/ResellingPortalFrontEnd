@@ -18,6 +18,8 @@ import {
   Truck,
   RotateCcw,
   Sparkles,
+  Star,
+  CheckCircle2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/shared/Footer";
@@ -33,6 +35,7 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [pageConfig, setPageConfig] = useState<ProductPageConfig | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,8 +58,9 @@ export default function ProductDetailPage() {
     Promise.allSettled([
       productApi.getOne(productId),
       productPageConfigsApi.getByProductId(productId),
+      productApi.getAll(),
     ])
-      .then(([prodRes, configRes]) => {
+      .then(([prodRes, configRes, allProdsRes]) => {
         if (prodRes.status === "fulfilled") {
           const data = prodRes.value;
           setProduct(data);
@@ -81,6 +85,11 @@ export default function ProductDetailPage() {
         if (configRes.status === "fulfilled") {
           setPageConfig(configRes.value);
         }
+
+        if (allProdsRes.status === "fulfilled") {
+          setRelatedProducts(allProdsRes.value.filter((p: any) => p.id !== productId).slice(0, 4));
+        }
+
         setLoading(false);
       })
       .catch((err) => {
@@ -90,10 +99,19 @@ export default function ProductDetailPage() {
       });
   }, [productId]);
 
+  useEffect(() => {
+    if (pageConfig || product) {
+      const title = pageConfig?.metaTitle || pageConfig?.customTitle || product?.name;
+      if (title) {
+        document.title = `${title} - Aarham Apparel`;
+      }
+    }
+  }, [pageConfig, product]);
+
   // Helper for YouTube embed
   const youtubeEmbedUrl = useMemo(() => {
-    if (!product?.videoUrl) return null;
-    const url = product.videoUrl;
+    const url = pageConfig?.videoUrl || product?.videoUrl;
+    if (!url) return null;
     if (url.includes("embed/")) return url;
     const match = url.match(
       /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/
@@ -102,7 +120,7 @@ export default function ProductDetailPage() {
       return `https://www.youtube.com/embed/${match[1]}`;
     }
     return url;
-  }, [product?.videoUrl]);
+  }, [product?.videoUrl, pageConfig?.videoUrl]);
 
   // Calculate stock for a given size relation id
   function getStockForSize(prod: Product, sizeRelationId?: string | null): number {
@@ -251,7 +269,41 @@ export default function ProductDetailPage() {
 
       {/* Main Detail Section */}
       <main className="max-w-7xl mx-auto w-full px-4 md:px-6 py-8 flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        {/* Landing Page Hero Banner */}
+        {pageConfig?.isLandingPage && pageConfig?.bannerImageUrl && (
+          <div className="relative w-full h-[350px] md:h-[480px] rounded-3xl overflow-hidden mb-12 shadow-xl border border-base-200">
+            <img
+              src={pageConfig.bannerImageUrl}
+              alt={pageConfig.customTitle || product.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex flex-col justify-end p-6 md:p-12 text-white">
+              <span className="text-primary font-bold text-xs uppercase tracking-widest bg-white/20 backdrop-blur-xs px-3 py-1 rounded-full w-max mb-3">
+                Reseller Exclusive Special
+              </span>
+              <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+                {pageConfig.customTitle || product.name}
+              </h1>
+              {pageConfig.customDescription && (
+                <p className="text-sm md:text-base text-gray-200 mt-2 max-w-2xl line-clamp-2 md:line-clamp-none">
+                  {pageConfig.customDescription}
+                </p>
+              )}
+              <div className="mt-6 flex gap-4">
+                <button
+                  onClick={() => {
+                    document.getElementById("purchase-section")?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="btn bg-blue-600 hover:bg-blue-700 text-white px-8 rounded-xl shadow-lg border-none animate-bounce"
+                >
+                  Order Now
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div id="purchase-section" className="grid grid-cols-1 lg:grid-cols-12 gap-10 scroll-mt-24">
           {/* Left Column: Image Gallery & Video Player */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Preview Container */}
@@ -339,7 +391,7 @@ export default function ProductDetailPage() {
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight leading-tight">
-                {product.name}
+                {pageConfig?.customTitle || product.name}
               </h1>
 
               {/* Price Breakdown */}
@@ -495,20 +547,20 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-2">
                 <button
                   disabled={isOutOfStock || cartLoading}
                   onClick={handleAddToCart}
-                  className="btn btn-primary flex-1 btn-lg rounded-2xl gap-2 text-primary-content shadow-lg shadow-primary/20"
+                  className="btn btn-primary flex-1 btn-md sm:btn-lg rounded-xl sm:rounded-2xl gap-2 text-primary-content shadow-lg shadow-primary/20 text-sm sm:text-base"
                 >
-                  <ShoppingCart size={20} /> Add to Cart
+                  <ShoppingCart size={18} className="sm:w-5 sm:h-5" /> Add to Cart
                 </button>
                 <button
                   disabled={isOutOfStock || cartLoading}
                   onClick={handleBuyNow}
-                  className="btn btn-secondary flex-1 btn-lg rounded-2xl gap-2 shadow-md"
+                  className="btn btn-secondary flex-1 btn-md sm:btn-lg rounded-xl sm:rounded-2xl gap-2 shadow-md text-sm sm:text-base"
                 >
-                  <Zap size={20} /> Buy Now
+                  <Zap size={18} className="sm:w-5 sm:h-5" /> Buy Now
                 </button>
               </div>
             </div>
@@ -557,7 +609,7 @@ export default function ProductDetailPage() {
               {activeTab === "description" && (
                 <div
                   className="prose prose-sm text-base-content/80 text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: product.description || "No description available for this item." }}
+                  dangerouslySetInnerHTML={{ __html: pageConfig?.customDescription || product.description || "No description available for this item." }}
                 />
               )}
 
@@ -571,6 +623,226 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Landing Page Showcase Sections */}
+        {pageConfig?.isLandingPage && pageConfig.sections && pageConfig.sections.length > 0 && (
+          <div className="space-y-16 py-12 border-t border-base-200 mt-16">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <h2 className="text-3xl font-extrabold text-base-content tracking-tight">
+                Premium Features & Craftsmanship
+              </h2>
+              <p className="text-sm text-base-content/70">
+                Explore what makes the {product.name} stand out in style, quality, and design.
+              </p>
+            </div>
+
+            <div className="space-y-16">
+              {[...pageConfig.sections]
+                .sort((a, b) => a.sortOrder - b.sortOrder)
+                .map((sec, idx) => {
+                  const isEven = idx % 2 === 0;
+                  return (
+                    <div
+                      key={sec.id || idx}
+                      className={`flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} gap-8 md:gap-12 items-center bg-base-100 rounded-3xl p-6 sm:p-8 border border-base-200 shadow-xs hover:shadow-md transition-shadow`}
+                    >
+                      {sec.imageUrl && (
+                        <div className="w-full md:w-1/2 overflow-hidden rounded-2xl aspect-[4/3] border border-base-200 shadow-sm group">
+                          <img
+                            src={sec.imageUrl}
+                            alt={sec.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        </div>
+                      )}
+                      <div className={`w-full ${sec.imageUrl ? "md:w-1/2" : "w-full"} space-y-4`}>
+                        {sec.subtitle && (
+                          <span className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold text-xs rounded-full uppercase tracking-wider">
+                            {sec.subtitle}
+                          </span>
+                        )}
+                        <h3 className="text-2xl sm:text-3xl font-bold text-base-content leading-tight">
+                          {sec.title}
+                        </h3>
+                        {sec.description && (
+                          <p className="text-sm sm:text-base text-base-content/80 leading-relaxed">
+                            {sec.description}
+                          </p>
+                        )}
+                        {sec.buttonText && (
+                          <div className="pt-2">
+                            <a
+                              href={sec.buttonLink || "#purchase-section"}
+                              className="btn bg-blue-600 hover:bg-blue-700 text-white border-none shadow-md inline-flex items-center gap-2"
+                              onClick={(e) => {
+                                if (!sec.buttonLink || sec.buttonLink.startsWith("#")) {
+                                  e.preventDefault();
+                                  document.getElementById("purchase-section")?.scrollIntoView({ behavior: "smooth" });
+                                }
+                              }}
+                            >
+                              {sec.buttonText}
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
+        {/* Testimonials/Reviews Section */}
+        {pageConfig?.isLandingPage && pageConfig.showReviews && (
+          <div className="space-y-6 py-12 border-t border-base-200 mt-16">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <h2 className="text-3xl font-extrabold text-base-content tracking-tight">
+                What Verified Buyers Say
+              </h2>
+              <p className="text-sm text-base-content/70">
+                Resellers and retail customers share their experience with our products.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {[
+                {
+                  name: "Tanvir Ahmed",
+                  rating: 5,
+                  comment: "Aarham Apparel has the best premium fabrics. Sizing matches the chart exactly, and shipping was completed within 2 days.",
+                  date: "3 days ago"
+                },
+                {
+                  name: "Rezaul Karim",
+                  rating: 5,
+                  comment: "The markup I get as a reseller is amazing, and the quality keeps my customers coming back. High quality finishing and stitching.",
+                  date: "1 week ago"
+                },
+                {
+                  name: "Nusrat Jahan",
+                  rating: 5,
+                  comment: "Excellent stitching and premium design. Gifted it to my brother and he absolutely loved it. Highly recommended!",
+                  date: "2 weeks ago"
+                }
+              ].map((rev, idx) => (
+                <div key={idx} className="bg-base-200/30 border border-base-200 p-6 rounded-2xl flex flex-col justify-between hover:shadow-md transition-shadow">
+                  <div className="space-y-3">
+                    <div className="flex text-amber-400 gap-0.5">
+                      {Array.from({ length: rev.rating }).map((_, i) => (
+                        <Star key={i} size={16} fill="currentColor" />
+                      ))}
+                    </div>
+                    <p className="text-sm text-base-content/95 italic leading-relaxed">
+                      &ldquo;{rev.comment}&rdquo;
+                    </p>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-base-200 pt-3">
+                    <div>
+                      <span className="block text-xs font-bold text-base-content">{rev.name}</span>
+                      <span className="text-[10px] text-success font-medium flex items-center gap-0.5 mt-0.5">
+                        <CheckCircle2 size={12} /> Verified Buyer
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-base-content/50">{rev.date}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* FAQ Section */}
+        {pageConfig?.isLandingPage && pageConfig.showFaq && (
+          <div className="space-y-6 py-12 border-t border-base-200 mt-16">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <h2 className="text-3xl font-extrabold text-base-content tracking-tight">
+                Frequently Asked Questions
+              </h2>
+              <p className="text-sm text-base-content/70">
+                Find quick answers to common queries regarding ordering, shipping, and sizing.
+              </p>
+            </div>
+
+            <div className="max-w-3xl mx-auto space-y-4">
+              {[
+                {
+                  q: "What makes Aarham Apparel products premium?",
+                  a: "Our products undergo strict quality checks. We select top-grade fabrics, execute precision stitching, and use durable color dyes that prevent fading after washes."
+                },
+                {
+                  q: "Can I exchange a product if it does not fit?",
+                  a: "Yes! We offer a hassle-free 7-day exchange window. Keep tags intact and the product unworn to qualify for replacement."
+                },
+                {
+                  q: "Is Cash on Delivery available nationwide?",
+                  a: "Absolutely. We ship with trustworthy logistics partners that deliver with Cash on Delivery options available in Dhaka and all outer districts."
+                },
+                {
+                  q: "How can I join as a reseller?",
+                  a: "Create an account on our platform and register under user settings or contact support to get special wholesale pricing configs."
+                }
+              ].map((faq, idx) => (
+                <div key={idx} className="collapse collapse-plus bg-base-200/50 border border-base-200 rounded-2xl">
+                  <input type="radio" name="faq-accordion" defaultChecked={idx === 0} />
+                  <div className="collapse-title text-base font-bold text-base-content">
+                    {faq.q}
+                  </div>
+                  <div className="collapse-content text-sm text-base-content/80 leading-relaxed">
+                    <p>{faq.a}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Related Items Section */}
+        {pageConfig?.isLandingPage && pageConfig.showRelatedItems && relatedProducts.length > 0 && (
+          <div className="space-y-6 py-12 border-t border-base-200 mt-16">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
+              <h2 className="text-3xl font-extrabold text-base-content tracking-tight">
+                Explore More Collections
+              </h2>
+              <p className="text-sm text-base-content/70">
+                Customers also bought these top trending catalog arrivals.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+              {relatedProducts.map((p) => {
+                const pPrice = Number(p.newPrice || p.price || 0);
+                const pOldPrice = Number(p.oldPrice || 0);
+                return (
+                  <Link
+                    key={p.id}
+                    href={`/products/${p.id}`}
+                    className="group block bg-base-100 border border-base-200 rounded-2xl overflow-hidden hover:shadow-md transition-all"
+                  >
+                    <div className="aspect-[4/5] bg-base-200 relative overflow-hidden">
+                      <img
+                        src={p.images?.[0]?.imageUrl || p.imageUrl || "/placeholder.png"}
+                        alt={p.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="p-4 space-y-1">
+                      <h3 className="font-bold text-xs text-base-content truncate group-hover:text-primary transition-colors">
+                        {p.name}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-extrabold text-primary">৳{pPrice.toLocaleString()}</span>
+                        {pOldPrice > pPrice && (
+                          <span className="text-xs text-base-content/50 line-through">৳{pOldPrice.toLocaleString()}</span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />

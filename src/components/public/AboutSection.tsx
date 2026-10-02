@@ -31,27 +31,27 @@ export default function AboutSection() {
   const embedUrl = getYouTubeEmbedUrl(about.youtubeLink);
 
   return (
-    <section className="py-20 px-4 md:px-8 bg-base-100 border-b border-base-200">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 md:px-8 bg-base-100 border-b border-base-200">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
         {/* Content Column */}
         <div className="flex-1 text-left">
           <span className="badge badge-primary badge-outline text-xs uppercase font-semibold tracking-wider mb-3">
             About Us
           </span>
-          <h2 className="text-3xl md:text-5xl font-extrabold text-base-content mb-6 leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-base-content mb-4 sm:mb-6 leading-tight">
             {about.title || "About Aarham Apparel"}
           </h2>
-          <p className="text-base-content/80 text-base md:text-lg mb-8 leading-relaxed whitespace-pre-line">
+          <p className="text-base-content/80 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed whitespace-pre-line">
             {about.description}
           </p>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
             {about.buttonText1 && (
-              <Link href={about.buttonLink1 || "/about"} className="btn btn-primary rounded-full px-8">
+              <Link href={about.buttonLink1 || "/about"} className="btn btn-primary rounded-full px-6 sm:px-8 w-full sm:w-auto text-center justify-center">
                 {about.buttonText1}
               </Link>
             )}
             {about.buttonText2 && (
-              <Link href={about.buttonLink2 || "#"} className="btn btn-outline rounded-full px-8">
+              <Link href={about.buttonLink2 || "#"} className="btn btn-outline rounded-full px-6 sm:px-8 w-full sm:w-auto text-center justify-center">
                 {about.buttonText2}
               </Link>
             )}

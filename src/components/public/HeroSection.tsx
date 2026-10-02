@@ -30,8 +30,8 @@ export default function HeroSection() {
 
   return (
     <div className="hero bg-base-200 relative overflow-hidden transition-all duration-300">
-      <div className="hero-content flex-col lg:flex-row-reverse w-full py-16 px-4 md:px-8 gap-10 max-w-7xl mx-auto">
-        <div className="flex-1 w-full lg:w-1/2 rounded-2xl overflow-hidden shadow-2xl relative aspect-4/3 max-h-[460px]">
+      <div className="hero-content flex-col lg:flex-row-reverse w-full py-10 sm:py-16 px-4 sm:px-6 md:px-8 gap-8 lg:gap-12 max-w-7xl mx-auto">
+        <div className="flex-1 w-full lg:w-1/2 rounded-2xl overflow-hidden shadow-2xl relative aspect-video sm:aspect-[4/3] max-h-[460px]">
           <img
             src={image}
             alt={title}
@@ -42,20 +42,20 @@ export default function HeroSection() {
           />
         </div>
         <div className="flex-1 text-left">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-base-content mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-base-content mb-4 sm:mb-6 leading-tight">
             {title}
           </h1>
-          <p className="py-4 text-base md:text-lg text-base-content/80 mb-8 leading-relaxed">
+          <p className="py-2 sm:py-4 text-sm sm:text-base md:text-lg text-base-content/80 mb-6 sm:mb-8 leading-relaxed">
             {subtitle}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             {btn1Text && (
-              <Link href={btn1Link} className="btn btn-primary btn-lg gap-2 rounded-full px-8">
-                {btn1Text} <ChevronRight size={20} />
+              <Link href={btn1Link} className="btn btn-primary btn-md sm:btn-lg gap-2 rounded-full px-6 sm:px-8 w-full sm:w-auto justify-center">
+                {btn1Text} <ChevronRight size={18} />
               </Link>
             )}
             {btn2Text && (
-              <Link href={btn2Link} className="btn btn-outline btn-lg rounded-full px-8">
+              <Link href={btn2Link} className="btn btn-outline btn-md sm:btn-lg rounded-full px-6 sm:px-8 w-full sm:w-auto justify-center">
                 {btn2Text}
               </Link>
             )}

@@ -72,6 +72,14 @@ export interface FounderVideoItem extends CMSBaseItem {
   description: string;
 }
 
+export interface TeamMemberItem extends CMSBaseItem {
+  name: string;
+  designation: string;
+  imageUrl: string;
+  message: string;
+  sortOrder?: number;
+}
+
 export type CMSModuleType =
   | "social-media"
   | "contact"
@@ -80,7 +88,8 @@ export type CMSModuleType =
   | "section"
   | "founder"
   | "founder-blog"
-  | "founder-video";
+  | "founder-video"
+  | "team";
 
 export interface PublicCMSData {
   hero: HeroSectionItem | null;
@@ -89,6 +98,7 @@ export interface PublicCMSData {
   founderProfile: FounderProfileItem | null;
   founderBlogs: FounderBlogItem[];
   founderVideos: FounderVideoItem[];
+  team: TeamMemberItem[];
   contactInfo: ContactInfoItem | null;
   socialMedia: SocialMediaItem[];
 }
@@ -136,6 +146,11 @@ export const cmsApi = {
     return items.filter((i) => i.status === "ACTIVE");
   },
 
+  getTeamMembers: async (): Promise<TeamMemberItem[]> => {
+    const items = await cmsApi.getAll<TeamMemberItem>("team");
+    return items.filter((i) => i.status === "ACTIVE");
+  },
+
   getContactInfo: async (): Promise<ContactInfoItem[]> => {
     const items = await cmsApi.getAll<ContactInfoItem>("contact");
     return items.filter((i) => i.status === "ACTIVE");
@@ -146,7 +161,7 @@ export const cmsApi = {
     return items.filter((i) => i.status === "ACTIVE");
   },
 
-  // Fetch all 8 CMS modules concurrently on website launch
+  // Fetch all 9 CMS modules concurrently on website launch
   fetchAllPublicCMS: async (): Promise<PublicCMSData> => {
     const [
       heroRes,
@@ -155,6 +170,7 @@ export const cmsApi = {
       founderProfileRes,
       founderBlogRes,
       founderVideoRes,
+      teamRes,
       contactRes,
       socialRes,
     ] = await Promise.allSettled([
@@ -164,6 +180,7 @@ export const cmsApi = {
       cmsApi.getAll<FounderProfileItem>("founder"),
       cmsApi.getAll<FounderBlogItem>("founder-blog"),
       cmsApi.getAll<FounderVideoItem>("founder-video"),
+      cmsApi.getAll<TeamMemberItem>("team"),
       cmsApi.getAll<ContactInfoItem>("contact"),
       cmsApi.getAll<SocialMediaItem>("social-media"),
     ]);
@@ -182,6 +199,7 @@ export const cmsApi = {
     const founderProfiles = activeFilter(founderProfileRes);
     const founderBlogs = activeFilter(founderBlogRes);
     const founderVideos = activeFilter(founderVideoRes);
+    const team = activeFilter(teamRes);
     const contacts = activeFilter(contactRes);
     const socials = activeFilter(socialRes);
 
@@ -192,6 +210,7 @@ export const cmsApi = {
       founderProfile: founderProfiles[0] || null,
       founderBlogs,
       founderVideos,
+      team,
       contactInfo: contacts[0] || null,
       socialMedia: socials,
     };

@@ -20,13 +20,13 @@ export interface InventoryRecord {
   productId: string;
   productSizeId?: string | null;
   currentStock: number;
-  costPerUnit: number;
+  costPerUnit?: number;
   supplierName?: string;
   supplierMobile?: string;
   stockLimitAlert: number;
   createdAt: string;
   updatedAt: string;
-  product?: { id: string; name: string };
+  product?: { id: string; name: string; purchasePrice?: number | string };
   productSize?: {
     id: string;
     size: { id: string; name: string };
@@ -92,7 +92,7 @@ export interface LowStockItem {
   costPerUnit: number;
   supplierName?: string;
   supplierMobile?: string;
-  product?: { id: string; name: string };
+  product?: { id: string; name: string; purchasePrice?: number | string };
   productSize?: { id: string; size: { id: string; name: string } } | null;
   status: "OUT_OF_STOCK" | "LOW_STOCK";
 }
@@ -144,6 +144,7 @@ export interface ProductSummaryQueryDto {
 export interface ProductSummaryItem {
   productId: string;
   productName: string;
+  purchasePrice?: string;
   totalStockUnits: number;
   totalStockValue: string;
   avgCostPerUnit: string;
@@ -152,6 +153,7 @@ export interface ProductSummaryItem {
     sizeName: string | null;
     currentStock: number;
     costPerUnit: number;
+    purchasePrice?: number;
   }>;
   periodMovement: {
     totalPurchased: number;

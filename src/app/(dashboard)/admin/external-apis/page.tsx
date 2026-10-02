@@ -178,7 +178,7 @@ export default function AdminExternalApisPage() {
         <div className="p-8 text-center text-gray-500">Loading API integrations...</div>
       ) : integrations.length === 0 ? (
         <div className="bg-white p-12 text-center text-gray-500 rounded-xl border border-gray-200">
-          No external integrations configured yet. Click "+ Add Integration" to connect your first third-party API.
+          No external integrations configured yet. Click &ldquo;+ Add Integration&rdquo; to connect your first third-party API.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -256,8 +256,8 @@ export default function AdminExternalApisPage() {
 
       {/* Secure Credentials Modal */}
       {isModalOpen && editingApi && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-black">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-black border border-gray-200">
             {/* Modal Header */}
             <div className="p-5 border-b border-gray-200 flex items-center justify-between bg-white">
               <h2 className="text-lg font-bold text-black flex items-center gap-2">

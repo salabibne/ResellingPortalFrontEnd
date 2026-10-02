@@ -1,7 +1,10 @@
 {
-  "/(dashboard)/cms/page": "app/(dashboard)/cms/page.js",
-  "/(dashboard)/admin/legal-documents/page": "app/(dashboard)/admin/legal-documents/page.js",
-  "/(dashboard)/admin/external-apis/page": "app/(dashboard)/admin/external-apis/page.js",
-  "/(dashboard)/admin/custom-pages/page": "app/(dashboard)/admin/custom-pages/page.js",
-  "/(dashboard)/admin/product-pages/page": "app/(dashboard)/admin/product-pages/page.js"
+  "/page": "app/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(dashboard)/dashboard/page": "app/(dashboard)/dashboard/page.js",
+  "/(dashboard)/orders/page": "app/(dashboard)/orders/page.js",
+  "/reseller/page": "app/reseller/page.js",
+  "/reseller/orders/page": "app/reseller/orders/page.js",
+  "/reseller/payouts/page": "app/reseller/payouts/page.js"
 }

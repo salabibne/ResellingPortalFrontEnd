@@ -103,6 +103,11 @@ export const customPagesApi = {
     const res = await api.post(`/custom-pages/${pageId}/sections/reorder`, { sectionOrders });
     return res.data?.data || res.data;
   },
+
+  resetHomePage: async (): Promise<CustomPage> => {
+    const res = await api.post("/custom-pages/reset-home");
+    return res.data?.data || res.data;
+  },
 };
 
 export default customPagesApi;

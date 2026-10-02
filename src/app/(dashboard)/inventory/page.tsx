@@ -27,6 +27,8 @@ import {
   Image as ImageIcon,
   SlidersHorizontal,
   Filter,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react";
 import api from "@/services/axios";
 import { productApi, Product } from "@/services/product.api";
@@ -38,6 +40,11 @@ import {
   InventoryRecord,
   InventoryTransaction,
 } from "@/services/inventory.api";
+import {
+  exportInventoryStockToCSV,
+  exportInventoryTransactionsToCSV,
+  exportLowStockAlertsToCSV,
+} from "@/utils/csvExporter";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function InventoryPage() {
@@ -71,7 +78,6 @@ export default function InventoryPage() {
     purpose: InventoryTxPurpose;
     reference: string;
     notes: string;
-    incomingCostPerUnit: string;
   }>({
     productSizeId: "",
     transactionQuantity: 1,
@@ -79,7 +85,6 @@ export default function InventoryPage() {
     purpose: "PURCHASE",
     reference: "",
     notes: "",
-    incomingCostPerUnit: "",
   });
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -94,17 +99,17 @@ export default function InventoryPage() {
         productApi.getAll().catch(() => []),
         api.get("/categories").then((r) => r.data).catch(() => []),
         inventoryApi.getTransactions().catch(() => []),
-        inventoryApi.getLowStock(1, 50).catch(() => []),
+        inventoryApi.getLowStock(1, 50).catch(() => ({ data: [], meta: { total: 0, page: 1, limit: 50, totalPages: 0 } })),
       ]);
 
       setLoadingProgress(75);
 
-      setProducts(Array.isArray(prodsData) ? prodsData : prodsData?.data || []);
+      setProducts(prodsData);
       setCategories(Array.isArray(catsData) ? catsData : catsData?.data || []);
       setTransactions(Array.isArray(txsData) ? txsData : txsData?.data || []);
       setLowStockItems(
-        Array.isArray(lowStockData?.items)
-          ? lowStockData.items
+        Array.isArray(lowStockData.data)
+          ? lowStockData.data
           : Array.isArray(lowStockData)
           ? lowStockData
           : []
@@ -129,11 +134,8 @@ export default function InventoryPage() {
   }, 0);
 
   const totalStoreValue = products.reduce((acc, p) => {
-    const pValue =
-      p.inventories?.reduce(
-        (sum, inv) => sum + (inv.currentStock || 0) * Number(inv.costPerUnit || p.purchasePrice || 0),
-        0
-      ) ?? 0;
+    const pStock = p.inventories?.reduce((sum, inv) => sum + (inv.currentStock || 0), 0) ?? 0;
+    const pValue = pStock * Number(p.purchasePrice || 0);
     return acc + pValue;
   }, 0);
 
@@ -178,7 +180,6 @@ export default function InventoryPage() {
       purpose: "PURCHASE",
       reference: "",
       notes: "",
-      incomingCostPerUnit: "",
     });
     setIsModalOpen(true);
   };
@@ -211,15 +212,6 @@ export default function InventoryPage() {
       return;
     }
 
-    if (
-      formData.stockType === "STOCK_IN" &&
-      formData.purpose === "PURCHASE" &&
-      (!formData.incomingCostPerUnit || Number(formData.incomingCostPerUnit) < 0)
-    ) {
-      alert("Incoming Cost Per Unit (৳) is required for Purchase operations.");
-      return;
-    }
-
     try {
       setIsSubmitting(true);
 
@@ -232,10 +224,6 @@ export default function InventoryPage() {
         performedBy: user.id,
         reference: formData.reference?.trim() || undefined,
         notes: formData.notes?.trim() || undefined,
-        incomingCostPerUnit:
-          formData.stockType === "STOCK_IN" && formData.purpose === "PURCHASE"
-            ? Number(formData.incomingCostPerUnit)
-            : undefined,
       };
 
       await inventoryApi.adjustStock(dto);
@@ -256,6 +244,7 @@ export default function InventoryPage() {
   const selectedInventory = productInventories.find((inv) =>
     formData.productSizeId ? inv.productSizeId === formData.productSizeId : !inv.productSizeId
   );
+  const selectedProduct = products.find((p) => p.id === selectedProductId);
 
   // Filtered Products for Overview Table
   const filteredProducts = products.filter((p) => {
@@ -310,13 +299,23 @@ export default function InventoryPage() {
             Real-time stock monitoring per size variant, purchase additions, and audit logging
           </p>
         </div>
-        <button
-          onClick={() => handleOpenModal()}
-          className="btn btn-primary text-white shadow-lg hover:shadow-primary/30 transition-all gap-2 rounded-xl"
-          disabled={isLoading}
-        >
-          <Plus size={20} /> Adjust Stock
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => exportInventoryStockToCSV(filteredProducts, "master_inventory_stock")}
+            className="btn btn-outline btn-success shadow-sm hover:shadow-success/30 transition-all gap-2 rounded-xl text-black hover:text-white font-bold"
+            disabled={isLoading || products.length === 0}
+            title="Download Complete 22-Column Inventory Master Stock CSV with Financials & Margins"
+          >
+            <Download size={18} /> Export Master CSV
+          </button>
+          <button
+            onClick={() => handleOpenModal()}
+            className="btn btn-primary text-white shadow-lg hover:shadow-primary/30 transition-all gap-2 rounded-xl"
+            disabled={isLoading}
+          >
+            <Plus size={20} /> Adjust Stock
+          </button>
+        </div>
       </div>
 
       {/* RICH METRIC SUMMARY CARDS */}
@@ -456,6 +455,16 @@ export default function InventoryPage() {
                   <option value="low-stock">Low Stock</option>
                   <option value="out-of-stock">Out of Stock</option>
                 </select>
+
+                <button
+                  type="button"
+                  onClick={() => exportInventoryStockToCSV(filteredProducts, "inventory_stock_overview")}
+                  className="btn btn-sm btn-outline btn-success rounded-xl gap-1.5 font-bold"
+                  disabled={filteredProducts.length === 0}
+                  title="Export filtered stock list to CSV"
+                >
+                  <Download size={14} /> Export CSV ({filteredProducts.length})
+                </button>
               </div>
             </div>
 
@@ -656,13 +665,7 @@ export default function InventoryPage() {
                                       <strong className="text-emerald-600 font-bold">
                                         ৳
                                         {(
-                                          productInventoriesList.reduce(
-                                            (sum, inv) =>
-                                              sum +
-                                              (inv.currentStock || 0) *
-                                                Number(inv.costPerUnit || p.purchasePrice || 0),
-                                            0
-                                          )
+                                          totalProductStock * Number(p.purchasePrice || 0)
                                         ).toLocaleString()}
                                       </strong>
                                     </span>
@@ -678,8 +681,7 @@ export default function InventoryPage() {
                                         const sizeName =
                                           inv.productSize?.size?.name || "Free Size / Standard";
                                         const totalVal =
-                                          inv.currentStock *
-                                          Number(inv.costPerUnit || p.purchasePrice || 0);
+                                          inv.currentStock * Number(p.purchasePrice || 0);
 
                                         return (
                                           <div
@@ -705,9 +707,9 @@ export default function InventoryPage() {
 
                                             <div className="text-xs text-gray-600 space-y-1.5">
                                               <div className="flex justify-between">
-                                                <span>Unit Cost:</span>
+                                                <span>Unit Purchase Price:</span>
                                                 <strong className="text-black">
-                                                  ৳{Number(inv.costPerUnit || 0).toFixed(2)}
+                                                  ৳{Number(p.purchasePrice || 0).toFixed(2)}
                                                 </strong>
                                               </div>
                                               <div className="flex justify-between">
@@ -760,103 +762,136 @@ export default function InventoryPage() {
 
         {/* TAB 2: AUDIT LOG / TRANSACTIONS TABLE */}
         {activeTab === "history" && (
-          <div className="overflow-x-auto">
-            <table className="table w-full">
-              <thead>
-                <tr className="bg-base-200/70 text-black text-xs uppercase tracking-wider">
-                  <th className="py-3 px-4 font-bold">Date & Time</th>
-                  <th className="py-3 px-4 font-bold">Type & Purpose</th>
-                  <th className="py-3 px-4 font-bold">Product / Size</th>
-                  <th className="py-3 px-4 font-bold text-center">Quantity Delta</th>
-                  <th className="py-3 px-4 font-bold text-center">Stock Change</th>
-                  <th className="py-3 px-4 font-bold">Reference & Notes</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-base-200">
-                {transactions.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-16 text-gray-500">
-                      No stock transactions recorded yet.
-                    </td>
-                  </tr>
-                ) : (
-                  transactions.map((tx) => {
-                    const isStockIn = tx.stockType === "STOCK_IN";
-                    const sizeName = tx.inventory?.productSize?.size?.name;
+          <div className="flex flex-col">
+            <div className="p-4 border-b border-base-200 bg-base-100/50 flex flex-wrap items-center justify-between gap-4">
+              <div className="text-xs font-semibold text-gray-600">
+                Audit Trail ({transactions.length} total inventory transactions)
+              </div>
+              <button
+                type="button"
+                onClick={() => exportInventoryTransactionsToCSV(transactions, "inventory_audit_log")}
+                className="btn btn-sm btn-outline btn-success rounded-xl gap-1.5 font-bold"
+                disabled={transactions.length === 0}
+                title="Export stock in/out audit history to CSV"
+              >
+                <Download size={14} /> Export Audit Log CSV
+              </button>
+            </div>
 
-                    return (
-                      <tr key={tx.id} className="hover:bg-base-100/80 transition-colors">
-                        <td className="py-3.5 px-4 text-xs text-gray-600 font-mono">
-                          {new Date(tx.createdAt).toLocaleString()}
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-2">
-                            {isStockIn ? (
-                              <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white flex items-center gap-1 shadow-sm">
-                                <ArrowUpRight size={14} /> STOCK IN
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead>
+                  <tr className="bg-base-200/70 text-black text-xs uppercase tracking-wider">
+                    <th className="py-3 px-4 font-bold">Date & Time</th>
+                    <th className="py-3 px-4 font-bold">Type & Purpose</th>
+                    <th className="py-3 px-4 font-bold">Product / Size</th>
+                    <th className="py-3 px-4 font-bold text-center">Quantity Delta</th>
+                    <th className="py-3 px-4 font-bold text-center">Stock Change</th>
+                    <th className="py-3 px-4 font-bold">Reference & Notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-base-200">
+                  {transactions.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="text-center py-16 text-gray-500">
+                        No stock transactions recorded yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    transactions.map((tx) => {
+                      const isStockIn = tx.stockType === "STOCK_IN";
+                      const sizeName = tx.inventory?.productSize?.size?.name;
+
+                      return (
+                        <tr key={tx.id} className="hover:bg-base-100/80 transition-colors">
+                          <td className="py-3.5 px-4 text-xs text-gray-600 font-mono">
+                            {new Date(tx.createdAt).toLocaleString()}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-2">
+                              {isStockIn ? (
+                                <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-600 text-white flex items-center gap-1 shadow-sm">
+                                  <ArrowUpRight size={14} /> STOCK IN
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-600 text-white flex items-center gap-1 shadow-sm">
+                                  <ArrowDownLeft size={14} /> STOCK OUT
+                                </span>
+                              )}
+                              <span className="px-2 py-0.5 text-xs font-bold rounded-md bg-base-200 text-black border uppercase">
+                                {tx.purpose}
                               </span>
-                            ) : (
-                              <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-600 text-white flex items-center gap-1 shadow-sm">
-                                <ArrowDownLeft size={14} /> STOCK OUT
-                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <div className="font-semibold text-black text-sm">
+                              {tx.inventory?.product?.name || "Product"}
+                            </div>
+                            {sizeName && (
+                              <span className="text-xs text-gray-500">Size: {sizeName}</span>
                             )}
-                            <span className="px-2 py-0.5 text-xs font-bold rounded-md bg-base-200 text-black border uppercase">
-                              {tx.purpose}
+                          </td>
+                          <td className="py-3.5 px-4 text-center font-extrabold text-sm">
+                            <span className={isStockIn ? "text-emerald-600" : "text-rose-600"}>
+                              {isStockIn ? `+${tx.transactionQuantity}` : `-${tx.transactionQuantity}`}
                             </span>
-                          </div>
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="font-semibold text-black text-sm">
-                            {tx.inventory?.product?.name || "Product"}
-                          </div>
-                          {sizeName && (
-                            <span className="text-xs text-gray-500">Size: {sizeName}</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center font-extrabold text-sm">
-                          <span className={isStockIn ? "text-emerald-600" : "text-rose-600"}>
-                            {isStockIn ? `+${tx.transactionQuantity}` : `-${tx.transactionQuantity}`}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4 text-center text-sm font-mono">
-                          <span className="text-gray-500">{tx.stockBefore}</span> &rarr;{" "}
-                          <strong className="text-black font-bold">{tx.stockAfter}</strong>
-                        </td>
-                        <td className="py-3.5 px-4">
-                          <div className="text-xs text-gray-700">
-                            {tx.reference ? (
-                              <span className="font-bold text-black">Ref: {tx.reference}</span>
-                            ) : (
-                              <span className="text-gray-400 italic">No Reference</span>
+                          </td>
+                          <td className="py-3.5 px-4 text-center text-sm font-mono">
+                            <span className="text-gray-500">{tx.stockBefore}</span> &rarr;{" "}
+                            <strong className="text-black font-bold">{tx.stockAfter}</strong>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <div className="text-xs text-gray-700">
+                              {tx.reference ? (
+                                <span className="font-bold text-black">Ref: {tx.reference}</span>
+                              ) : (
+                                <span className="text-gray-400 italic">No Reference</span>
+                              )}
+                            </div>
+                            {tx.notes && (
+                              <div className="text-xs text-gray-500 italic mt-0.5">{tx.notes}</div>
                             )}
-                          </div>
-                          {tx.notes && (
-                            <div className="text-xs text-gray-500 italic mt-0.5">{tx.notes}</div>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
         {/* TAB 3: LOW STOCK ALERTS TABLE */}
         {activeTab === "low-stock" && (
-          <div className="overflow-x-auto">
-            <table className="table w-full">
-              <thead>
-                <tr className="bg-base-200/70 text-black text-xs uppercase tracking-wider">
-                  <th className="py-3 px-4 font-bold">Product Item</th>
-                  <th className="py-3 px-4 font-bold">Size</th>
-                  <th className="py-3 px-4 font-bold text-center">Current Stock</th>
-                  <th className="py-3 px-4 font-bold text-center">Alert Limit</th>
-                  <th className="py-3 px-4 font-bold text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-base-200">
+          <div className="flex flex-col">
+            <div className="p-4 border-b border-base-200 bg-base-100/50 flex flex-wrap items-center justify-between gap-4">
+              <div className="text-xs font-semibold text-gray-600">
+                Low Stock Reorder Alerts ({lowStockItems.length} items needing attention)
+              </div>
+              <button
+                type="button"
+                onClick={() => exportLowStockAlertsToCSV(lowStockItems, "low_stock_reorder_sheet")}
+                className="btn btn-sm btn-outline btn-success rounded-xl gap-1.5 font-bold"
+                disabled={lowStockItems.length === 0}
+                title="Export low stock reorder checklist to CSV"
+              >
+                <Download size={14} /> Export Reorder Sheet CSV
+              </button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="table w-full">
+                <thead>
+                  <tr className="bg-base-200/70 text-black text-xs uppercase tracking-wider">
+                    <th className="py-3 px-4 font-bold">Product Item</th>
+                    <th className="py-3 px-4 font-bold">Size</th>
+                    <th className="py-3 px-4 font-bold text-center">Current Stock</th>
+                    <th className="py-3 px-4 font-bold text-center">Alert Limit</th>
+                    <th className="py-3 px-4 font-bold text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-base-200">
                 {lowStockItems.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="text-center py-16 text-gray-500">
@@ -894,8 +929,9 @@ export default function InventoryPage() {
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+    </div>
 
       {/* STOCK ADJUSTMENT MODAL */}
       {isModalOpen && (
@@ -988,9 +1024,9 @@ export default function InventoryPage() {
                     <strong className="text-lg text-black">{selectedInventory.currentStock} units</strong>
                   </div>
                   <div className="text-right">
-                    <span className="text-gray-500 block text-xs font-semibold">Current Cost/Unit</span>
+                    <span className="text-gray-500 block text-xs font-semibold">Purchase Price (Valuation Unit)</span>
                     <strong className="text-lg text-emerald-600">
-                      ৳{Number(selectedInventory.costPerUnit).toFixed(2)}
+                      ৳{Number(selectedProduct?.purchasePrice ?? selectedInventory.product?.purchasePrice ?? 0).toFixed(2)}
                     </strong>
                   </div>
                 </div>
@@ -1071,30 +1107,6 @@ export default function InventoryPage() {
                   required
                 />
               </div>
-
-              {/* Incoming Cost Per Unit */}
-              {formData.stockType === "STOCK_IN" && formData.purpose === "PURCHASE" && (
-                <div className="form-control">
-                  <label className="label font-semibold text-black">
-                    Incoming Cost Per Unit (৳) *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="e.g. 450.00"
-                    className="input input-bordered w-full bg-white text-black rounded-xl"
-                    value={formData.incomingCostPerUnit}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, incomingCostPerUnit: e.target.value }))
-                    }
-                    required
-                  />
-                  <span className="text-xs text-gray-500 mt-1">
-                    Used for weighted moving average cost calculation.
-                  </span>
-                </div>
-              )}
 
               {/* Reference */}
               <div className="form-control">

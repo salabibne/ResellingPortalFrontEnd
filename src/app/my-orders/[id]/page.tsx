@@ -20,6 +20,9 @@ import {
   Mail,
   Ruler,
   Palette,
+  Copy,
+  Check,
+  RefreshCw,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/shared/Footer";
@@ -35,13 +38,10 @@ export default function CustomerOrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedTrackingCode, setCopiedTrackingCode] = useState<string | null>(null);
+  const [isSyncingCourier, setIsSyncingCourier] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push(`/login?redirect=/my-orders/${orderId}`);
-      return;
-    }
-
+  const fetchOrderDetail = () => {
     if (orderId) {
       setLoading(true);
       orderApi
@@ -56,7 +56,34 @@ export default function CustomerOrderDetailPage() {
         })
         .finally(() => setLoading(false));
     }
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=/my-orders/${orderId}`);
+      return;
+    }
+    fetchOrderDetail();
   }, [orderId, isAuthenticated, router]);
+
+  const handleCopyTracking = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedTrackingCode(code);
+    setTimeout(() => setCopiedTrackingCode(null), 2000);
+  };
+
+  const handleSyncCourier = async () => {
+    if (!orderId) return;
+    try {
+      setIsSyncingCourier(true);
+      const res = await orderApi.syncCourierStatus(orderId);
+      setOrder(res.order);
+    } catch (err: any) {
+      console.error("Failed to sync courier tracking:", err);
+    } finally {
+      setIsSyncingCourier(false);
+    }
+  };
 
   const steps: OrderProcessingStatus[] = [
     "PENDING",
@@ -87,6 +114,40 @@ export default function CustomerOrderDetailPage() {
     }
   };
 
+  const renderCourierBadge = (status?: string | null) => {
+    if (!status) return null;
+    const s = status.toLowerCase();
+    switch (s) {
+      case "delivered":
+        return (
+          <span className="badge badge-success text-white font-bold text-xs py-2 px-3 gap-1">
+            <Check size={12} /> Delivered
+          </span>
+        );
+      case "in_review":
+        return (
+          <span className="badge badge-warning text-slate-900 font-bold text-xs py-2 px-3 gap-1">
+            <Clock size={12} /> In Review
+          </span>
+        );
+      case "pending":
+      case "in_transit":
+        return (
+          <span className="badge badge-info text-white font-bold text-xs py-2 px-3 gap-1">
+            <Truck size={12} /> In Transit
+          </span>
+        );
+      case "cancelled":
+        return (
+          <span className="badge badge-error text-white font-bold text-xs py-2 px-3 gap-1">
+            <XCircle size={12} /> Courier Cancelled
+          </span>
+        );
+      default:
+        return <span className="badge badge-neutral text-white font-bold text-xs py-2 px-3">{status}</span>;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
       <div className="print:hidden">
@@ -95,10 +156,10 @@ export default function CustomerOrderDetailPage() {
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8 md:py-12">
         {/* Top Back Navigation & Actions */}
-        <div className="flex items-center justify-between gap-4 mb-6 print:hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 print:hidden">
           <Link
             href="/my-orders"
-            className="btn btn-sm btn-ghost gap-2 text-slate-600 hover:text-slate-900 font-medium"
+            className="btn btn-sm btn-ghost gap-2 text-slate-600 hover:text-slate-900 font-medium self-start"
           >
             <ArrowLeft size={16} /> Back to My Orders
           </Link>
@@ -106,7 +167,7 @@ export default function CustomerOrderDetailPage() {
           {order && (
             <button
               onClick={() => window.print()}
-              className="btn btn-sm btn-outline btn-primary rounded-xl gap-2 font-bold"
+              className="btn btn-sm btn-outline btn-primary rounded-xl gap-2 font-bold w-full sm:w-auto"
             >
               <Printer size={16} /> Print / Save Invoice
             </button>
@@ -128,9 +189,9 @@ export default function CustomerOrderDetailPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {/* Header Box */}
-            <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/80 shadow-sm space-y-6">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-200/80 shadow-sm space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-6 gap-4">
                 <div>
                   <div className="flex items-center gap-2">
@@ -138,8 +199,8 @@ export default function CustomerOrderDetailPage() {
                       Invoice & Order Reference
                     </span>
                   </div>
-                  <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">
-                    #{order.id.toUpperCase()}
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 break-all">
+                    {order.orderRef || `#${order.id.toUpperCase()}`}
                   </h1>
                   <p className="text-xs text-slate-500 mt-1">
                     Placed on{" "}
@@ -149,9 +210,9 @@ export default function CustomerOrderDetailPage() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   {renderPaymentBadge(order.paymentStatus)}
-                  <span className="badge badge-lg bg-slate-900 text-white font-extrabold px-4 py-3">
+                  <span className="badge badge-md sm:badge-lg bg-slate-900 text-white font-extrabold px-3 sm:px-4 py-2 sm:py-3">
                     {order.processingStatus}
                   </span>
                 </div>
@@ -169,40 +230,42 @@ export default function CustomerOrderDetailPage() {
                   </div>
                 </div>
               ) : (
-                <div className="py-4">
+                <div className="py-2 sm:py-4">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
                     Fulfillment Progress Tracker
                   </h4>
-                  <div className="grid grid-cols-5 gap-2 relative">
-                    {steps.map((stepName, idx) => {
-                      const isCompleted = idx <= currentStepIndex;
-                      const isCurrent = idx === currentStepIndex;
+                  <div className="overflow-x-auto no-scrollbar pb-2">
+                    <div className="flex items-center justify-between min-w-[340px] sm:min-w-0 sm:grid sm:grid-cols-5 gap-2 relative">
+                      {steps.map((stepName, idx) => {
+                        const isCompleted = idx <= currentStepIndex;
+                        const isCurrent = idx === currentStepIndex;
 
-                      return (
-                        <div key={stepName} className="flex flex-col items-center text-center">
-                          <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
-                              isCompleted
-                                ? "bg-primary text-white shadow-md shadow-primary/20 scale-105"
-                                : "bg-slate-100 text-slate-400 border border-slate-200"
-                            }`}
-                          >
-                            {idx + 1}
+                        return (
+                          <div key={stepName} className="flex flex-col items-center text-center flex-1">
+                            <div
+                              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-[10px] sm:text-xs transition-all ${
+                                isCompleted
+                                  ? "bg-primary text-white shadow-md shadow-primary/20 scale-105"
+                                  : "bg-slate-100 text-slate-400 border border-slate-200"
+                              }`}
+                            >
+                              {idx + 1}
+                            </div>
+                            <span
+                              className={`text-[10px] sm:text-xs mt-1.5 sm:mt-2 font-bold leading-tight ${
+                                isCurrent
+                                  ? "text-primary"
+                                  : isCompleted
+                                  ? "text-slate-800"
+                                  : "text-slate-400"
+                              }`}
+                            >
+                              {stepName}
+                            </span>
                           </div>
-                          <span
-                            className={`text-xs mt-2 font-bold ${
-                              isCurrent
-                                ? "text-primary"
-                                : isCompleted
-                                ? "text-slate-800"
-                                : "text-slate-400"
-                            }`}
-                          >
-                            {stepName}
-                          </span>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
@@ -270,6 +333,67 @@ export default function CustomerOrderDetailPage() {
 
               {/* Right Column: Order & Customer Summary Sidebar */}
               <div className="lg:col-span-4 space-y-6">
+                {/* Steadfast Courier Live Tracking Card */}
+                {order.courierTrackingCode && (
+                  <div className="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-3xl p-6 shadow-xl border border-indigo-500/30 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Truck size={18} className="text-primary" />
+                        <span className="text-xs font-black uppercase tracking-wider text-indigo-300">
+                          Steadfast Courier
+                        </span>
+                      </div>
+                      {renderCourierBadge(order.courierStatus)}
+                    </div>
+
+                    <div className="bg-white/10 backdrop-blur-xs p-4 rounded-2xl border border-white/10 space-y-2">
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-200 block uppercase tracking-wider">
+                          Parcel Tracking Code
+                        </span>
+                        <div className="flex items-center justify-between mt-0.5">
+                          <span className="font-mono text-base font-black text-white tracking-wide">
+                            {order.courierTrackingCode}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyTracking(order.courierTrackingCode!)}
+                            className="btn btn-ghost btn-xs text-indigo-300 hover:text-white px-2 rounded-lg"
+                            title="Copy Tracking Code"
+                          >
+                            {copiedTrackingCode === order.courierTrackingCode ? (
+                              <Check size={14} className="text-success" />
+                            ) : (
+                              <Copy size={14} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {order.courierConsignmentId && (
+                        <div className="pt-2 border-t border-white/10 text-xs flex items-center justify-between text-indigo-200">
+                          <span>Consignment:</span>
+                          <span className="font-mono font-bold text-white">#{order.courierConsignmentId}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleSyncCourier}
+                      disabled={isSyncingCourier}
+                      className="btn btn-sm btn-outline text-white border-white/30 hover:bg-white/10 rounded-xl font-bold w-full gap-2 text-xs"
+                    >
+                      {isSyncingCourier ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : (
+                        <RefreshCw size={14} />
+                      )}
+                      Refresh Live Tracking Status
+                    </button>
+                  </div>
+                )}
+
                 {/* Cost Summary Box */}
                 <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-3">
                   <h3 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3">
@@ -328,7 +452,7 @@ export default function CustomerOrderDetailPage() {
                         <FileText size={14} className="text-indigo-600" /> Customer Notes
                       </div>
                       <p className="text-xs italic text-slate-600 bg-amber-50/50 p-3 rounded-xl border border-amber-100">
-                        "{order.notes}"
+                        &ldquo;{order.notes}&rdquo;
                       </p>
                     </div>
                   )}

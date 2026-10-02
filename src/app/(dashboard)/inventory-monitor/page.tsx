@@ -28,6 +28,7 @@ import {
   SlidersHorizontal,
   ChevronDown,
   ChevronUp,
+  Download,
 } from "lucide-react";
 import {
   inventoryApi,
@@ -39,6 +40,12 @@ import {
   InventoryTxPurpose,
 } from "@/services/inventory.api";
 import { productApi, Product } from "@/services/product.api";
+import {
+  exportInventoryStockToCSV,
+  exportInventoryTransactionsToCSV,
+  exportLowStockAlertsToCSV,
+  exportProductInventorySummaryToCSV,
+} from "@/utils/csvExporter";
 
 type TabType = "dashboard" | "low-stock" | "transactions" | "product-summary";
 
@@ -258,6 +265,16 @@ export default function InventoryMonitorPage() {
 
         <div className="flex items-center gap-3">
           <button
+            type="button"
+            onClick={() => exportInventoryStockToCSV(productsList, "master_inventory_stock")}
+            className="btn btn-sm btn-outline btn-success text-white border-emerald-500 hover:bg-emerald-600 gap-2 font-bold"
+            disabled={productsList.length === 0}
+            title="Download Complete 22-Column Inventory Master CSV"
+          >
+            <Download size={16} />
+            Export Master CSV
+          </button>
+          <button
             onClick={handleRefresh}
             className="btn btn-sm btn-ghost text-white border border-slate-700 hover:bg-slate-800 gap-2"
           >
@@ -401,7 +418,7 @@ export default function InventoryMonitorPage() {
                     </div>
                   </div>
                   <div className="text-2xl font-black text-slate-800 mt-3">
-                    ${Number(dashboardData.totalStockValue).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    ৳{Number(dashboardData.totalStockValue).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </div>
                   <p className="text-xs text-slate-500 mt-1">Total current stock value</p>
                 </div>
@@ -526,8 +543,19 @@ export default function InventoryMonitorPage() {
               </label>
             </div>
 
-            <div className="text-xs font-semibold text-slate-500">
-              Showing {lowStockItems.length} of {lowStockMeta.total} alerts
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-slate-500">
+                Showing {lowStockItems.length} of {lowStockMeta.total} alerts
+              </span>
+              <button
+                type="button"
+                onClick={() => exportLowStockAlertsToCSV(lowStockItems, "monitor_low_stock_alerts")}
+                className="btn btn-sm btn-outline btn-success rounded-lg gap-1.5 font-bold"
+                disabled={lowStockItems.length === 0}
+                title="Export low stock reorder alerts to CSV"
+              >
+                <Download size={14} /> Export Low Stock CSV
+              </button>
             </div>
           </div>
 
@@ -552,7 +580,7 @@ export default function InventoryMonitorPage() {
                       <th>Size</th>
                       <th>Current Stock</th>
                       <th>Alert Limit</th>
-                      <th>Cost / Unit</th>
+                      <th>Purchase Price (Unit)</th>
                       <th>Supplier</th>
                     </tr>
                   </thead>
@@ -586,7 +614,9 @@ export default function InventoryMonitorPage() {
                             </span>
                           </td>
                           <td className="text-slate-600 font-medium">{item.stockLimitAlert}</td>
-                          <td className="text-slate-700 font-semibold">${Number(item.costPerUnit).toFixed(2)}</td>
+                          <td className="text-slate-700 font-semibold">
+                            ৳{Number(item.product?.purchasePrice ?? item.costPerUnit ?? 0).toFixed(2)}
+                          </td>
                           <td className="text-xs text-slate-600 space-y-0.5">
                             {item.supplierName && (
                               <div className="flex items-center gap-1 font-medium text-slate-800">
@@ -647,22 +677,33 @@ export default function InventoryMonitorPage() {
               <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                 <Filter size={16} className="text-primary" /> Filter Transactions
               </h3>
-              <button
-                onClick={() => {
-                  setTxProductId("");
-                  setTxStockType("");
-                  setTxPurpose("");
-                  setTxReference("");
-                  setTxStartDate("");
-                  setTxEndDate("");
-                  setTxSortBy("createdAt");
-                  setTxSortOrder("desc");
-                  setTxPage(1);
-                }}
-                className="btn btn-xs btn-ghost text-slate-500 hover:text-error"
-              >
-                Reset All Filters
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => exportInventoryTransactionsToCSV(transactions, "monitor_transactions_log")}
+                  className="btn btn-xs btn-outline btn-success gap-1 font-bold"
+                  disabled={transactions.length === 0}
+                  title="Export filtered transactions log to CSV"
+                >
+                  <Download size={13} /> Export Audit Log CSV ({transactions.length})
+                </button>
+                <button
+                  onClick={() => {
+                    setTxProductId("");
+                    setTxStockType("");
+                    setTxPurpose("");
+                    setTxReference("");
+                    setTxStartDate("");
+                    setTxEndDate("");
+                    setTxSortBy("createdAt");
+                    setTxSortOrder("desc");
+                    setTxPage(1);
+                  }}
+                  className="btn btn-xs btn-ghost text-slate-500 hover:text-error"
+                >
+                  Reset All Filters
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -969,8 +1010,19 @@ export default function InventoryMonitorPage() {
               )}
             </div>
 
-            <div className="text-xs font-semibold text-slate-500">
-              Showing {productSummaries.length} of {summaryMeta.total} products
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-slate-500">
+                Showing {productSummaries.length} of {summaryMeta.total} products
+              </span>
+              <button
+                type="button"
+                onClick={() => exportProductInventorySummaryToCSV(productSummaries, "product_inventory_summary")}
+                className="btn btn-sm btn-outline btn-success rounded-lg gap-1.5 font-bold"
+                disabled={productSummaries.length === 0}
+                title="Export product movement and stock summary to CSV"
+              >
+                <Download size={14} /> Export Summary CSV
+              </button>
             </div>
           </div>
 
@@ -1008,13 +1060,13 @@ export default function InventoryMonitorPage() {
                         <div className="bg-white px-3 py-2 rounded-xl border border-base-200">
                           <span className="text-xs text-slate-400 uppercase font-bold">Stock Value</span>
                           <div className="text-lg font-black text-slate-800">
-                            ${Number(item.totalStockValue).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            ৳{Number(item.totalStockValue).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </div>
                         </div>
 
                         <div className="bg-white px-3 py-2 rounded-xl border border-base-200">
-                          <span className="text-xs text-slate-400 uppercase font-bold">Avg Cost / Unit</span>
-                          <div className="text-lg font-black text-indigo-600">${item.avgCostPerUnit}</div>
+                          <span className="text-xs text-slate-400 uppercase font-bold">Purchase Price / Unit</span>
+                          <div className="text-lg font-black text-indigo-600">৳{item.purchasePrice || item.avgCostPerUnit}</div>
                         </div>
 
                         <div className="bg-white px-3 py-2 rounded-xl border border-base-200 flex items-center justify-center">
@@ -1060,7 +1112,7 @@ export default function InventoryMonitorPage() {
                               <tr className="bg-slate-100 text-slate-700 text-xs">
                                 <th>Size</th>
                                 <th>Current Stock</th>
-                                <th>Cost Per Unit</th>
+                                <th>Unit Purchase Price</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -1072,7 +1124,9 @@ export default function InventoryMonitorPage() {
                                   <td>
                                     <span className="font-bold text-slate-900">{sb.currentStock}</span>
                                   </td>
-                                  <td className="text-slate-700">${Number(sb.costPerUnit).toFixed(2)}</td>
+                                  <td className="text-slate-700">
+                                    ৳{Number(sb.purchasePrice ?? sb.costPerUnit ?? 0).toFixed(2)}
+                                  </td>
                                 </tr>
                               ))}
                             </tbody>

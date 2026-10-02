@@ -113,17 +113,17 @@ export default function BulkAddToCartModal({ product, isOpen, onClose }: BulkAdd
   const primaryImg = product.images?.[0]?.imageUrl || "/placeholder.png";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-      <div className="bg-base-100 rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden border border-base-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-2 sm:p-4 animate-in fade-in duration-200">
+      <div className="bg-base-100 rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden border border-base-200">
         {/* Header */}
-        <div className="p-5 border-b border-base-200 flex items-center justify-between bg-primary text-primary-content">
-          <div className="flex items-center gap-3">
-            <div className="bg-white/20 p-2 rounded-xl">
-              <Layers size={22} />
+        <div className="p-4 sm:p-5 border-b border-base-200 flex items-center justify-between bg-primary text-primary-content">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="bg-white/20 p-1.5 sm:p-2 rounded-xl shrink-0">
+              <Layers size={20} className="sm:w-[22px] sm:h-[22px]" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">Wholesale / Reseller Batch Add-to-Cart</h2>
-              <p className="text-xs text-white/80">Select quantities across multiple sizes in one order</p>
+              <h2 className="text-base sm:text-lg font-bold leading-tight">Batch Add-to-Cart</h2>
+              <p className="text-[11px] sm:text-xs text-white/80">Select quantities across multiple sizes in one order</p>
             </div>
           </div>
           <button
@@ -135,20 +135,20 @@ export default function BulkAddToCartModal({ product, isOpen, onClose }: BulkAdd
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4 sm:space-y-6">
           {/* Product Overview Card */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-base-200/60 rounded-2xl border border-base-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-4 bg-base-200/60 rounded-2xl border border-base-200">
             <div className="flex items-center gap-3">
               <img
                 src={primaryImg}
                 alt={product.name}
-                className="w-16 h-16 rounded-xl object-cover border border-base-300 shrink-0"
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border border-base-300 shrink-0"
               />
               <div>
                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
                   {product.brand?.name || "Aarham Apparel"}
                 </span>
-                <h3 className="font-bold text-base text-base-content leading-tight">
+                <h3 className="font-bold text-sm sm:text-base text-base-content leading-tight">
                   {product.name}
                 </h3>
                 <div className="text-xs text-base-content/70 mt-1">
@@ -171,7 +171,7 @@ export default function BulkAddToCartModal({ product, isOpen, onClose }: BulkAdd
                 <select
                   value={selectedGlobalColorId}
                   onChange={(e) => handleGlobalColorChange(e.target.value)}
-                  className="select select-sm select-bordered rounded-xl text-xs font-semibold bg-base-100"
+                  className="select select-sm select-bordered rounded-xl text-xs font-semibold bg-base-100 w-full sm:w-auto"
                 >
                   {product.colors.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -190,8 +190,8 @@ export default function BulkAddToCartModal({ product, isOpen, onClose }: BulkAdd
               <p className="text-sm font-medium">No sizes configured for this product.</p>
             </div>
           ) : (
-            <div className="border border-base-200 rounded-2xl overflow-hidden shadow-xs">
-              <table className="table table-sm w-full">
+            <div className="border border-base-200 rounded-2xl overflow-x-auto shadow-xs">
+              <table className="table table-xs sm:table-sm w-full min-w-[500px]">
                 <thead>
                   <tr className="bg-base-200 text-base-content text-xs uppercase">
                     <th>Size</th>

@@ -33,12 +33,12 @@ export default function FounderSection() {
   }
 
   return (
-    <section className="py-20 px-4 md:px-8 bg-base-100 border-t border-base-200">
-      <div className="max-w-7xl mx-auto flex flex-col gap-16">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 md:px-8 bg-base-100 border-t border-base-200">
+      <div className="max-w-7xl mx-auto flex flex-col gap-12 sm:gap-16">
         {/* Founder Profile & Vision Statement */}
         {profile && (
-          <div className="flex flex-col lg:flex-row items-center gap-12 bg-base-200/50 p-8 md:p-12 rounded-3xl border border-base-300">
-            <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden shadow-2xl border-4 border-primary/20 shrink-0">
+          <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-10 lg:gap-12 bg-base-200/50 p-5 sm:p-8 md:p-12 rounded-3xl border border-base-300">
+            <div className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 rounded-full overflow-hidden shadow-2xl border-4 border-primary/20 shrink-0">
               <img
                 src={profile.imageUrl || "/api/image?name=founder"}
                 alt={profile.title}
@@ -48,18 +48,18 @@ export default function FounderSection() {
                 }}
               />
             </div>
-            <div className="flex-1 text-left">
-              <div className="flex items-center gap-2 text-primary mb-3">
-                <Quote size={28} className="rotate-180 opacity-80" />
+            <div className="flex-1 text-center lg:text-left">
+              <div className="flex items-center justify-center lg:justify-start gap-2 text-primary mb-3">
+                <Quote size={24} className="rotate-180 opacity-80" />
                 <span className="badge badge-primary badge-outline text-xs uppercase font-semibold">
                   Founder Spotlight
                 </span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-base-content mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-base-content mb-3 sm:mb-4">
                 {profile.title}
               </h2>
-              <p className="text-base-content/80 text-base md:text-lg italic leading-relaxed whitespace-pre-line">
-                "{profile.description}"
+              <p className="text-base-content/80 text-sm sm:text-base md:text-lg italic leading-relaxed whitespace-pre-line">
+                &ldquo;{profile.description}&rdquo;
               </p>
             </div>
           </div>

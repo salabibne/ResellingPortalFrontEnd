@@ -182,7 +182,7 @@ export default function AttributeManager({ config }: Props) {
                 ) : records.length === 0 ? (
                   <tr>
                     <td colSpan={config.fields.length + 2} className="text-center py-8 text-black/50">
-                      No records found. Click "Create New" to add one.
+                      No records found. Click &ldquo;Create New&rdquo; to add one.
                     </td>
                   </tr>
                 ) : (

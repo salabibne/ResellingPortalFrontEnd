@@ -11,7 +11,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-base-200 text-base-content mt-auto border-t border-base-300">
-      <div className="footer p-10 max-w-7xl mx-auto">
+      <div className="footer p-6 sm:p-10 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         <aside className="max-w-xs">
           <Link href="/" className="flex items-center gap-2 text-2xl font-bold mb-3 text-black">
             <ShoppingBag className="text-primary" size={28} />

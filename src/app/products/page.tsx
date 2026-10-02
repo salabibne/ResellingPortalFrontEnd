@@ -226,26 +226,26 @@ export default function ProductsPage() {
       <Navbar />
 
       {/* Category Banner Header */}
-      <div className="bg-gradient-to-r from-primary to-[#001777] text-primary-content py-10 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-2 text-xs font-semibold text-white/80 uppercase tracking-widest">
+      <div className="bg-gradient-to-r from-primary to-[#001777] text-primary-content py-6 sm:py-10 px-4 sm:px-6 md:px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+          <div className="space-y-1.5 sm:space-y-2 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-2 text-[11px] sm:text-xs font-semibold text-white/80 uppercase tracking-widest">
               <Layers size={14} /> E-Commerce Collection
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-white">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white">
               {activeCategory ? activeCategory.name : searchQueryParam ? `Search: "${searchQueryParam}"` : "All Products"}
             </h1>
-            <p className="text-white/80 text-sm max-w-xl">
+            <p className="text-white/80 text-xs sm:text-sm max-w-xl">
               {activeCategory
                 ? `Explore our high quality ${activeCategory.name} collection tailored for modern comfort and style.`
                 : "Browse our entire apparel line up. Filter by subcategory, price, colors, and sizes."}
             </p>
           </div>
-          <div className="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20 text-center">
-            <span className="block text-2xl font-bold text-white">
+          <div className="bg-white/10 backdrop-blur-md px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl border border-white/20 text-center shrink-0">
+            <span className="block text-xl sm:text-2xl font-bold text-white">
               {filteredProducts.length}
             </span>
-            <span className="text-xs text-white/80 uppercase font-medium tracking-wider">
+            <span className="text-[10px] sm:text-xs text-white/80 uppercase font-medium tracking-wider">
               Items Available
             </span>
           </div>
@@ -454,27 +454,27 @@ export default function ProductsPage() {
           <div className="flex-1">
             {loading ? (
               /* Skeleton Loader Grid */
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                  <div key={n} className="flex flex-col gap-4 bg-base-100 p-4 rounded-2xl border border-base-200 shadow-xs">
+                  <div key={n} className="flex flex-col gap-3 sm:gap-4 bg-base-100 p-3 sm:p-4 rounded-2xl border border-base-200 shadow-xs">
                     <div className="skeleton w-full aspect-[4/5] rounded-xl" />
-                    <div className="skeleton h-4 w-28 rounded" />
-                    <div className="skeleton h-5 w-full rounded" />
+                    <div className="skeleton h-3 sm:h-4 w-20 sm:w-28 rounded" />
+                    <div className="skeleton h-4 sm:h-5 w-full rounded" />
                     <div className="flex justify-between items-center pt-2">
-                      <div className="skeleton h-6 w-20 rounded" />
-                      <div className="skeleton h-8 w-24 rounded-xl" />
+                      <div className="skeleton h-5 sm:h-6 w-14 sm:w-20 rounded" />
+                      <div className="skeleton h-7 sm:h-8 w-16 sm:w-24 rounded-xl" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : filteredProducts.length === 0 ? (
               /* Empty State */
-              <div className="bg-base-200/40 border border-dashed border-base-300 rounded-3xl p-12 text-center flex flex-col items-center justify-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-base-200 flex items-center justify-center text-base-content/50">
-                  <Filter size={32} />
+              <div className="bg-base-200/40 border border-dashed border-base-300 rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center justify-center space-y-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-base-200 flex items-center justify-center text-base-content/50">
+                  <Filter size={28} />
                 </div>
-                <h3 className="text-xl font-bold text-base-content">No products match your criteria</h3>
-                <p className="text-sm text-base-content/60 max-w-md">
+                <h3 className="text-lg sm:text-xl font-bold text-base-content">No products match your criteria</h3>
+                <p className="text-xs sm:text-sm text-base-content/60 max-w-md">
                   Try adjusting your filter preferences, changing your price range, or searching for another term.
                 </p>
                 <button onClick={resetAllFilters} className="btn btn-primary rounded-full px-6 btn-sm">
@@ -483,7 +483,7 @@ export default function ProductsPage() {
               </div>
             ) : (
               /* Product Cards Grid */
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -495,19 +495,47 @@ export default function ProductsPage() {
 
       {/* Mobile Filters Slide-over Modal */}
       {mobileFilterOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs lg:hidden">
-          <div className="w-full max-w-xs bg-base-100 h-full shadow-2xl flex flex-col p-5 overflow-y-auto space-y-6">
+        <div className="fixed inset-0 z-[60] flex justify-end bg-black/60 backdrop-blur-xs lg:hidden">
+          <div className="w-full max-w-xs bg-base-100 h-full shadow-2xl flex flex-col p-5 overflow-y-auto space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-base-200">
-              <h3 className="font-bold text-lg flex items-center gap-2">
-                <Filter size={20} className="text-primary" /> Filters
+              <h3 className="font-bold text-base sm:text-lg flex items-center gap-2">
+                <Filter size={18} className="text-primary" /> Filters
               </h3>
               <button onClick={() => setMobileFilterOpen(false)} className="btn btn-ghost btn-sm btn-circle">
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
+            {/* Subcategories in Mobile Filter */}
+            {activeCategory && activeCategory.subcategories && activeCategory.subcategories.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold text-base-content/70 uppercase">Subcategories</h4>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => handleSubcategorySelect(null)}
+                    className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      !selectedSubcategoryId ? "bg-primary text-white font-bold" : "bg-base-200 hover:bg-base-300"
+                    }`}
+                  >
+                    All {activeCategory.name}
+                  </button>
+                  {activeCategory.subcategories.map((sub) => (
+                    <button
+                      key={sub.id}
+                      onClick={() => handleSubcategorySelect(sub.id)}
+                      className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        selectedSubcategoryId === sub.id ? "bg-primary text-white font-bold" : "bg-base-200 hover:bg-base-300"
+                      }`}
+                    >
+                      {sub.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Price Filter Mobile */}
-            <div className="space-y-3">
+            <div className="space-y-3 pt-2 border-t border-base-200">
               <h4 className="text-xs font-bold text-base-content/70 uppercase">Max Price</h4>
               <input
                 type="range"
@@ -522,6 +550,21 @@ export default function ProductsPage() {
                 <span>৳ 0</span>
                 <span className="text-primary font-bold">৳ {priceRange.max.toLocaleString()}</span>
               </div>
+            </div>
+
+            {/* In-Stock Only Mobile */}
+            <div className="form-control pt-2 border-t border-base-200">
+              <label className="label cursor-pointer justify-start gap-3 py-1">
+                <input
+                  type="checkbox"
+                  checked={inStockOnly}
+                  onChange={(e) => setInStockOnly(e.target.checked)}
+                  className="checkbox checkbox-xs checkbox-primary rounded"
+                />
+                <span className="label-text text-xs font-medium text-base-content">
+                  In Stock Only
+                </span>
+              </label>
             </div>
 
             {/* Colors Mobile */}
@@ -572,13 +615,13 @@ export default function ProductsPage() {
             <div className="pt-4 border-t border-base-200 flex flex-col gap-2">
               <button
                 onClick={() => setMobileFilterOpen(false)}
-                className="btn btn-primary w-full rounded-xl"
+                className="btn btn-primary w-full rounded-xl btn-sm"
               >
                 Apply Filters ({filteredProducts.length})
               </button>
               <button
                 onClick={resetAllFilters}
-                className="btn btn-ghost btn-sm text-xs"
+                className="btn btn-ghost btn-xs text-xs"
               >
                 Reset All
               </button>

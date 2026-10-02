@@ -23,7 +23,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/shared/Footer";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { orderApi } from "@/services/order.api";
+import { orderApi, CourierPolicy } from "@/services/order.api";
 
 const checkoutSchema = z.object({
   paymentMethod: z.enum(["CASH_ON_DELIVERY", "BKASH", "NAGAD", "BANK_TRANSFER"], {
@@ -46,6 +46,7 @@ export default function CheckoutPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [courierPolicy, setCourierPolicy] = useState<CourierPolicy | null>(null);
 
   const {
     register,
@@ -67,6 +68,17 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     fetchCart();
+    async function loadPolicy() {
+      try {
+        const policy = await orderApi.getCourierPolicy();
+        if (policy) {
+          setCourierPolicy(policy);
+        }
+      } catch (err) {
+        console.error("Failed to load courier policy:", err);
+      }
+    }
+    loadPolicy();
   }, [fetchCart]);
 
   useEffect(() => {
@@ -77,7 +89,7 @@ export default function CheckoutPage() {
 
   const cartItems = cart?.cartItems || [];
   const subtotal = cartItems.reduce((sum, item) => sum + Number(item.subtotal), 0);
-  const courierCharge = 120;
+  const courierCharge = Number(courierPolicy?.defaultCharge || 120);
   const discount = subtotal > 0 ? 50 : 0;
   const grandTotal = Math.max(0, subtotal + courierCharge - discount);
 
@@ -133,40 +145,40 @@ export default function CheckoutPage() {
           <span className="text-slate-900 font-semibold">Checkout</span>
         </div>
 
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-6 sm:mb-8">
           Complete Your Order
         </h1>
 
         {errorMessage && (
-          <div className="alert alert-error shadow-md text-white mb-6 flex items-start gap-3 rounded-2xl p-4">
-            <AlertCircle size={24} className="shrink-0 mt-0.5" />
+          <div className="alert alert-error shadow-md text-white mb-6 flex items-start gap-3 rounded-2xl p-3.5 sm:p-4">
+            <AlertCircle size={22} className="shrink-0 mt-0.5" />
             <div>
               <h3 className="font-bold text-sm">Checkout Error</h3>
-              <p className="text-sm font-medium mt-0.5">{errorMessage}</p>
+              <p className="text-xs sm:text-sm font-medium mt-0.5">{errorMessage}</p>
             </div>
           </div>
         )}
 
         {cartItems.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm max-w-xl mx-auto my-12">
-            <ShoppingBag size={56} className="mx-auto text-slate-300 mb-4" />
-            <h2 className="text-xl font-bold text-slate-800">Your Cart is Empty</h2>
-            <p className="text-slate-500 text-sm mt-2 mb-6">
-              You don't have any items in your shopping cart to check out.
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center border border-slate-200 shadow-sm max-w-xl mx-auto my-8 sm:my-12">
+            <ShoppingBag size={48} className="mx-auto text-slate-300 mb-4" />
+            <h2 className="text-lg sm:text-xl font-bold text-slate-800">Your Cart is Empty</h2>
+            <p className="text-slate-500 text-xs sm:text-sm mt-2 mb-6">
+              You don&apos;t have any items in your shopping cart to check out.
             </p>
             <button
               onClick={() => router.push("/shop")}
-              className="btn btn-primary rounded-full px-8 font-bold"
+              className="btn btn-primary rounded-full px-8 font-bold btn-sm sm:btn-md"
             >
               Browse Products
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {/* Left Column: Form Controls */}
             <div className="lg:col-span-7 space-y-6">
               {/* Shipping Address */}
-              <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+              <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
                 <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                   <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
                     <MapPin size={20} />
@@ -196,6 +208,18 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
+                {/* Courier Charge Policy Info (Text Format from Admin Settings) */}
+                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20 space-y-1.5">
+                  <div className="flex items-center gap-2 font-bold text-xs text-primary">
+                    <Truck size={16} />
+                    <span>{courierPolicy?.title || "Courier Charge Policy"}</span>
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                    {courierPolicy?.chargeText ||
+                      "Inside Dhaka City: ৳70 | Sub-Urban Dhaka: ৳100 | Outside Dhaka: ৳130. Courier charge is collected upon delivery."}
+                  </p>
+                </div>
+
                 <div className="space-y-2 pt-2">
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
                     Special Delivery Instructions (Optional)
@@ -210,14 +234,14 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Method Selection */}
-              <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+              <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
                 <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                   <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
                     <CreditCard size={20} />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-slate-900">Payment Method</h2>
-                    <p className="text-xs text-slate-500">Choose how you'd like to pay for your order</p>
+                    <p className="text-xs text-slate-500">Choose how you&apos;d like to pay for your order</p>
                   </div>
                 </div>
 
@@ -329,7 +353,7 @@ export default function CheckoutPage() {
 
             {/* Right Column: Summary Breakdown */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-6 sticky top-24">
+              <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-6 sticky top-24">
                 <h2 className="text-xl font-extrabold text-slate-900 border-b border-slate-100 pb-4">
                   Order Summary
                 </h2>

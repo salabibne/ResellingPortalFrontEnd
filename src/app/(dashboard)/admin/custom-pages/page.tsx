@@ -220,7 +220,7 @@ export default function AdminCustomPagesPage() {
           <div className="p-8 text-center text-gray-500">Loading custom pages...</div>
         ) : pages.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
-            No custom pages found. Click "+ Create Custom Page" to get started.
+            No custom pages found. Click &ldquo;+ Create Custom Page&rdquo; to get started.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -305,10 +305,10 @@ export default function AdminCustomPagesPage() {
         )}
       </div>
 
-      {/* Visual Section Builder Drawer */}
+      {/* Visual Section Builder Modal */}
       {isDrawerOpen && editingPage && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs flex justify-end">
-          <div className="w-full max-w-3xl bg-white text-black h-full shadow-2xl overflow-y-auto flex flex-col">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-3xl bg-white text-black rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col my-auto border border-gray-200">
             {/* Drawer Header */}
             <div className="p-5 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
               <h2 className="text-lg font-bold text-black flex items-center gap-2">
@@ -445,7 +445,7 @@ export default function AdminCustomPagesPage() {
                     Dynamic Page Sections ({sections.length})
                   </h3>
                   <div className="dropdown dropdown-end">
-                    <label tabIndex={0} className="btn btn-outline btn-xs flex items-center gap-1">
+                    <label tabIndex={0} className="btn btn-outline btn-xs flex items-center gap-1 cursor-pointer">
                       <Plus className="w-3.5 h-3.5" /> Add Section
                     </label>
                     <ul
@@ -453,27 +453,67 @@ export default function AdminCustomPagesPage() {
                       className="dropdown-content z-20 menu p-2 shadow-lg bg-white text-black rounded-box w-52 text-xs border border-gray-200"
                     >
                       <li>
-                        <button type="button" onClick={() => handleAddSection("Hero Header")}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleAddSection("Hero Header");
+                            (document.activeElement as HTMLElement)?.blur();
+                          }}
+                          onClick={() => handleAddSection("Hero Header")}
+                        >
                           Hero Header Section
                         </button>
                       </li>
                       <li>
-                        <button type="button" onClick={() => handleAddSection("Rich Text Block")}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleAddSection("Rich Text Block");
+                            (document.activeElement as HTMLElement)?.blur();
+                          }}
+                          onClick={() => handleAddSection("Rich Text Block")}
+                        >
                           Rich Text Content Section
                         </button>
                       </li>
                       <li>
-                        <button type="button" onClick={() => handleAddSection("Feature Cards Grid")}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleAddSection("Feature Cards Grid");
+                            (document.activeElement as HTMLElement)?.blur();
+                          }}
+                          onClick={() => handleAddSection("Feature Cards Grid")}
+                        >
                           Feature Cards Grid
                         </button>
                       </li>
                       <li>
-                        <button type="button" onClick={() => handleAddSection("Image Text Banner")}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleAddSection("Image Text Banner");
+                            (document.activeElement as HTMLElement)?.blur();
+                          }}
+                          onClick={() => handleAddSection("Image Text Banner")}
+                        >
                           Image + Text Banner
                         </button>
                       </li>
                       <li>
-                        <button type="button" onClick={() => handleAddSection("Action Button Block")}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            handleAddSection("Action Button Block");
+                            (document.activeElement as HTMLElement)?.blur();
+                          }}
+                          onClick={() => handleAddSection("Action Button Block")}
+                        >
                           Action Button Section
                         </button>
                       </li>
@@ -483,7 +523,7 @@ export default function AdminCustomPagesPage() {
 
                 {sections.length === 0 ? (
                   <div className="p-6 text-center text-xs text-gray-400 border border-dashed border-gray-300 rounded-lg">
-                    No sections added yet. Click "+ Add Section" to customize this page layout.
+                    No sections added yet. Click &ldquo;+ Add Section&rdquo; to customize this page layout.
                   </div>
                 ) : (
                   <div className="space-y-4">

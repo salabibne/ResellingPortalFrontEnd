@@ -93,7 +93,7 @@ export default function CartDrawer() {
                   <ShoppingBag size={56} className="stroke-1 mb-4 opacity-40" />
                   <p className="text-lg font-medium text-base-content mb-2">Your cart is empty</p>
                   <p className="text-sm text-base-content/70 max-w-xs mb-6">
-                    Looks like you haven't added anything to your cart yet.
+                    Looks like you haven&apos;t added anything to your cart yet.
                   </p>
                   <button
                     type="button"

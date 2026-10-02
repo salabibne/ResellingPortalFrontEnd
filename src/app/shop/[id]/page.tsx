@@ -470,21 +470,21 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col gap-3 pt-2">
-                <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-col gap-2.5 sm:gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
                   <button
                     disabled={isOutOfStock || cartLoading}
                     onClick={handleAddToCart}
-                    className="btn btn-primary flex-1 btn-lg rounded-2xl gap-2 text-primary-content shadow-lg shadow-primary/20"
+                    className="btn btn-primary flex-1 btn-md sm:btn-lg rounded-xl sm:rounded-2xl gap-2 text-primary-content shadow-lg shadow-primary/20 text-sm sm:text-base"
                   >
-                    <ShoppingCart size={20} /> Add to Cart
+                    <ShoppingCart size={18} className="sm:w-5 sm:h-5" /> Add to Cart
                   </button>
                   <button
                     disabled={isOutOfStock || cartLoading}
                     onClick={handleBuyNow}
-                    className="btn btn-secondary flex-1 btn-lg rounded-2xl gap-2 shadow-md"
+                    className="btn btn-secondary flex-1 btn-md sm:btn-lg rounded-xl sm:rounded-2xl gap-2 shadow-md text-sm sm:text-base"
                   >
-                    <Zap size={20} /> Buy Now
+                    <Zap size={18} className="sm:w-5 sm:h-5" /> Buy Now
                   </button>
                 </div>
 
@@ -492,9 +492,9 @@ export default function ProductDetailPage() {
                 {product.sizes && product.sizes.length > 0 && (
                   <button
                     onClick={() => setIsBulkModalOpen(true)}
-                    className="btn btn-outline border-primary/40 text-primary hover:bg-primary hover:text-white rounded-2xl gap-2 font-bold w-full"
+                    className="btn btn-outline btn-sm sm:btn-md border-primary/40 text-primary hover:bg-primary hover:text-white rounded-xl sm:rounded-2xl gap-2 font-bold w-full text-xs sm:text-sm"
                   >
-                    <Sparkles size={18} /> Wholesale / Reseller Bulk Order (Multi-Size Matrix)
+                    <Sparkles size={16} /> Wholesale / Reseller Multi-Size Matrix
                   </button>
                 )}
               </div>

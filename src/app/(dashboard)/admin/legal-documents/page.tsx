@@ -141,7 +141,7 @@ export default function AdminLegalDocumentsPage() {
           <div className="p-8 text-center text-gray-500">Loading legal documents...</div>
         ) : documents.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
-            No legal documents found. Click "+ Create Legal Document" to add compliance documents.
+            No legal documents found. Click &ldquo;+ Create Legal Document&rdquo; to add compliance documents.
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -237,10 +237,10 @@ export default function AdminLegalDocumentsPage() {
         )}
       </div>
 
-      {/* Editor Drawer Modal */}
+      {/* Editor Modal */}
       {isDrawerOpen && editingDoc && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-xs flex justify-end">
-          <div className="w-full max-w-3xl bg-white text-black h-full shadow-2xl overflow-y-auto flex flex-col">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-3xl bg-white text-black rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col my-auto border border-gray-200">
             {/* Drawer Header */}
             <div className="p-5 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
               <h2 className="text-lg font-bold text-black flex items-center gap-2">
