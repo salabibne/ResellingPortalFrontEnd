@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { Suspense, useEffect, useState, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Filter,
@@ -19,7 +19,7 @@ import { useCategoryStore } from "@/store/useCategoryStore";
 
 type SortOption = "newest" | "price-asc" | "price-desc" | "name-asc";
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -632,5 +632,19 @@ export default function ProductsPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <span className="loading loading-spinner text-primary"></span>
+        </div>
+      }
+    >
+      <ProductsPageContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -22,7 +22,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useCMSStore } from "@/store/useCMSStore";
 import CartDrawer from "./CartDrawer";
 
-export default function Navbar() {
+function NavbarContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -382,5 +382,13 @@ export default function Navbar() {
       {/* Slide-over Cart Drawer */}
       <CartDrawer />
     </>
+  );
+}
+
+export default function Navbar() {
+  return (
+    <Suspense fallback={<div className="h-16 bg-[#001C94]" />}>
+      <NavbarContent />
+    </Suspense>
   );
 }

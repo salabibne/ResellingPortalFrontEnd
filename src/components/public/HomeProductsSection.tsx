@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
-import productApi, { Product } from "@/services/product.api";
+import { productApi, Product } from "@/services/product.api";
 import ProductCard from "@/components/ProductCard";
 
 interface HomeProductsSectionProps {
@@ -31,9 +31,9 @@ export default function HomeProductsSection({
     const loadProducts = async () => {
       try {
         setLoading(true);
-        const res = await productApi.getProducts({ page: 1, limit });
+        const res = await productApi.getAll();
         if (isMounted) {
-          setProducts(res.data || []);
+          setProducts((res || []).slice(0, limit));
         }
       } catch (err) {
         console.error("Failed to load homepage products:", err);
