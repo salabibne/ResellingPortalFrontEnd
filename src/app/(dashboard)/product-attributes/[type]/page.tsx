@@ -3,8 +3,8 @@ import AttributeManager, { AttributeConfig } from "@/components/shared/Attribute
 
 export default function ProductAttributePage({ params }: { params: { type: string } }) {
   const configs: Record<string, AttributeConfig> = {
-    category: {
-      type: "category",
+    categories: {
+      type: "categories",
       title: "Category",
       apiEndpoint: "/categories",
       fields: [
@@ -12,8 +12,8 @@ export default function ProductAttributePage({ params }: { params: { type: strin
         { name: "imageUrl", label: "Image URL", type: "text" },
       ],
     },
-    "sub-category": {
-      type: "sub-category",
+    subcategories: {
+      type: "subcategories",
       title: "Sub Category",
       apiEndpoint: "/subcategories",
       fields: [
@@ -26,8 +26,8 @@ export default function ProductAttributePage({ params }: { params: { type: strin
         },
       ],
     },
-    "children-category": {
-      type: "children-category",
+    "child-categories": {
+      type: "child-categories",
       title: "Children Category",
       apiEndpoint: "/child-categories",
       fields: [
