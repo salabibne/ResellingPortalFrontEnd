@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Package, RefreshCw, Activity, ShoppingBag, LogOut, FileText, Layout } from "lucide-react";
+import { LayoutDashboard, Package, FileText, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 
 interface SidebarProps {
@@ -28,6 +28,18 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
       onClose();
     }
   };
+
+  const adminSectionPaths = [
+    "/admin/",
+    "/inventory",
+    "/inventory-monitor",
+    "/orders",
+    "/reseller",
+    "/cms",
+  ];
+  const isAdminSection = adminSectionPaths.some((path) =>
+    pathname.startsWith(path)
+  );
 
   return (
     <aside
@@ -73,12 +85,17 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           </details>
         </li>
         <li>
-          <details open={pathname.includes("/admin/")}>
-            <summary className={`flex items-center gap-2 ${pathname.includes("/admin/") ? "text-white font-semibold !bg-white/10" : "text-white/80 hover:!bg-white/10 hover:text-white"}`}>
+          <details open={isAdminSection}>
+            <summary className={`flex items-center gap-2 ${isAdminSection ? "text-white font-semibold !bg-white/10" : "text-white/80 hover:!bg-white/10 hover:text-white"}`}>
               <FileText size={20} /> Advanced Admin & CMS
             </summary>
             <ul>
-              <li><Link href="/admin/homepage" className={getLinkClass("/admin/homepage")} onClick={handleLinkClick}>Homepage Sections & Order</Link></li>
+              <li><Link href="/inventory" className={getLinkClass("/inventory")} onClick={handleLinkClick}>Inventory Adjust</Link></li>
+              <li><Link href="/inventory-monitor" className={getLinkClass("/inventory-monitor")} onClick={handleLinkClick}>Inventory Monitor</Link></li>
+              <li><Link href="/orders" className={getLinkClass("/orders")} onClick={handleLinkClick}>Orders & Sales</Link></li>
+              <li><Link href="/reseller" className={getLinkClass("/reseller")} onClick={handleLinkClick}>Reseller Portal</Link></li>
+              <li><Link href="/cms" className={getLinkClass("/cms")} onClick={handleLinkClick}>Base CMS Management</Link></li>
+              <li><Link href="/admin/homepage" className={getLinkClass("/admin/homepage")} onClick={handleLinkClick}>Homepage Customizer</Link></li>
               <li><Link href="/admin/users" className={getLinkClass("/admin/users")} onClick={handleLinkClick}>User Management</Link></li>
               <li><Link href="/admin/withdrawals" className={getLinkClass("/admin/withdrawals")} onClick={handleLinkClick}>Reseller Withdrawals</Link></li>
               <li><Link href="/admin/courier" className={getLinkClass("/admin/courier")} onClick={handleLinkClick}>Courier Policy Settings</Link></li>
@@ -88,36 +105,6 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               <li><Link href="/admin/legal-documents" className={getLinkClass("/admin/legal-documents")} onClick={handleLinkClick}>Legal Documents</Link></li>
             </ul>
           </details>
-        </li>
-        <li>
-          <Link href="/inventory" className={getLinkClass("/inventory")} onClick={handleLinkClick}>
-            <RefreshCw size={20} /> Inventory Adjust
-          </Link>
-        </li>
-        <li>
-          <Link href="/inventory-monitor" className={getLinkClass("/inventory-monitor")} onClick={handleLinkClick}>
-            <Activity size={20} /> Inventory Monitor
-          </Link>
-        </li>
-        <li>
-          <Link href="/orders" className={getLinkClass("/orders")} onClick={handleLinkClick}>
-            <ShoppingBag size={20} /> Orders & Sales
-          </Link>
-        </li>
-        <li>
-          <Link href="/reseller" className={getLinkClass("/reseller")} onClick={handleLinkClick}>
-            <Package size={20} /> Reseller Portal
-          </Link>
-        </li>
-        <li>
-          <Link href="/cms" className={getLinkClass("/cms")} onClick={handleLinkClick}>
-            <FileText size={20} /> Base CMS Management
-          </Link>
-        </li>
-        <li>
-          <Link href="/admin/homepage" className={getLinkClass("/admin/homepage")} onClick={handleLinkClick}>
-            <Layout size={20} /> Homepage Customizer
-          </Link>
         </li>
       </ul>
       <div className="p-4 border-t border-white/10">
