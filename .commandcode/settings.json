@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Shell(npx tsc --noEmit)",
-      "Shell(npm:*)"
+      "Shell(npm:*)",
+      "Shell(node -e \"const p=require('./package.json'); console.log(JSON.stringify({deps:p.dependencies, dev:p.devDependencies}, null, 1))\")",
+      "Shell(node -e \" const fs=require('fs'); const css=fs.readFileSync('node_modules/daisyui/dist/styled.css','utf8'); // print rules mentioning details const rules=css.split('}').filter(r=>r.includes('details')); rules.forEach(r=>{console.log(r.trim()+'}');console.log('---')}); \")",
+      "Shell(node -e \" const fs=require('fs'); const files=fs.readdirSync('node_modules/daisyui/dist'); console.log(files.join('\\n')); \")"
     ],
     "deny": [],
     "defaultMode": "default"

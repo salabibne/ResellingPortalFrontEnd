@@ -5,3 +5,4 @@
 - Deploys the Next.js frontend to Render as a web service. Confidence: 0.6
 - Wants changes fully verified (lint + production build, not just typecheck) before being called done. Confidence: 0.45
 - Debugs by pasting the full raw build/deploy log and asking a short, low-context question; wants the root cause diagnosed and explained in plain language before fixes are applied. Confidence: 0.5
+- Explicitly asks for step-by-step work: "think step by step and fix step by step" when assigning a bug fix. Confidence: 0.6

@@ -61,7 +61,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         </button>
       </div>
 
-      <ul className="menu p-4 w-full gap-1 overflow-y-auto flex-1 min-h-0 font-medium text-sm">
+      <ul className="menu flex-nowrap p-4 w-full gap-1 overflow-y-auto overflow-x-hidden flex-1 min-h-0 font-medium text-sm">
         <li>
           <Link href="/dashboard" className={getLinkClass("/dashboard")} onClick={handleLinkClick}>
             <LayoutDashboard size={20} /> Dashboard
