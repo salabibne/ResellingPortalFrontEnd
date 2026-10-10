@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST='{"components\\\\shared\\\\Footer.tsx -> @/services/legalDocuments.api":{"id":7060,"files":["static/chunks/7060.f8d5d915d62da9cb.js"]}}';
