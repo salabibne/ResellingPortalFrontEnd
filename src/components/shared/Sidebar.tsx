@@ -73,6 +73,23 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           </details>
         </li>
         <li>
+          <details open={pathname.includes("/admin/")}>
+            <summary className={`flex items-center gap-2 ${pathname.includes("/admin/") ? "text-white font-semibold !bg-white/10" : "text-white/80 hover:!bg-white/10 hover:text-white"}`}>
+              <FileText size={20} /> Advanced Admin & CMS
+            </summary>
+            <ul>
+              <li><Link href="/admin/homepage" className={getLinkClass("/admin/homepage")} onClick={handleLinkClick}>Homepage Sections & Order</Link></li>
+              <li><Link href="/admin/users" className={getLinkClass("/admin/users")} onClick={handleLinkClick}>User Management</Link></li>
+              <li><Link href="/admin/withdrawals" className={getLinkClass("/admin/withdrawals")} onClick={handleLinkClick}>Reseller Withdrawals</Link></li>
+              <li><Link href="/admin/courier" className={getLinkClass("/admin/courier")} onClick={handleLinkClick}>Courier Policy Settings</Link></li>
+              <li><Link href="/admin/custom-pages" className={getLinkClass("/admin/custom-pages")} onClick={handleLinkClick}>Custom Pages Builder</Link></li>
+              <li><Link href="/admin/product-pages" className={getLinkClass("/admin/product-pages")} onClick={handleLinkClick}>Product Landing CMS</Link></li>
+              <li><Link href="/admin/external-apis" className={getLinkClass("/admin/external-apis")} onClick={handleLinkClick}>External API Integrations</Link></li>
+              <li><Link href="/admin/legal-documents" className={getLinkClass("/admin/legal-documents")} onClick={handleLinkClick}>Legal Documents</Link></li>
+            </ul>
+          </details>
+        </li>
+        <li>
           <Link href="/inventory" className={getLinkClass("/inventory")} onClick={handleLinkClick}>
             <RefreshCw size={20} /> Inventory Adjust
           </Link>
@@ -101,23 +118,6 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           <Link href="/admin/homepage" className={getLinkClass("/admin/homepage")} onClick={handleLinkClick}>
             <Layout size={20} /> Homepage Customizer
           </Link>
-        </li>
-        <li>
-          <details open={pathname.includes("/admin/")}>
-            <summary className={`flex items-center gap-2 ${pathname.includes("/admin/") ? "text-white font-semibold !bg-white/10" : "text-white/80 hover:!bg-white/10 hover:text-white"}`}>
-              <FileText size={20} /> Advanced Admin & CMS
-            </summary>
-            <ul>
-              <li><Link href="/admin/homepage" className={getLinkClass("/admin/homepage")} onClick={handleLinkClick}>Homepage Sections & Order</Link></li>
-              <li><Link href="/admin/users" className={getLinkClass("/admin/users")} onClick={handleLinkClick}>User Management</Link></li>
-              <li><Link href="/admin/withdrawals" className={getLinkClass("/admin/withdrawals")} onClick={handleLinkClick}>Reseller Withdrawals</Link></li>
-              <li><Link href="/admin/courier" className={getLinkClass("/admin/courier")} onClick={handleLinkClick}>Courier Policy Settings</Link></li>
-              <li><Link href="/admin/custom-pages" className={getLinkClass("/admin/custom-pages")} onClick={handleLinkClick}>Custom Pages Builder</Link></li>
-              <li><Link href="/admin/product-pages" className={getLinkClass("/admin/product-pages")} onClick={handleLinkClick}>Product Landing CMS</Link></li>
-              <li><Link href="/admin/external-apis" className={getLinkClass("/admin/external-apis")} onClick={handleLinkClick}>External API Integrations</Link></li>
-              <li><Link href="/admin/legal-documents" className={getLinkClass("/admin/legal-documents")} onClick={handleLinkClick}>Legal Documents</Link></li>
-            </ul>
-          </details>
         </li>
       </ul>
       <div className="p-4 border-t border-white/10">
