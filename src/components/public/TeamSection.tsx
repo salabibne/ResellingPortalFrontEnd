@@ -4,7 +4,12 @@ import React from "react";
 import { Users, Quote, Sparkles } from "lucide-react";
 import { useCMSStore } from "@/store/useCMSStore";
 
-export default function TeamSection() {
+interface TeamSectionProps {
+  title?: string;
+  description?: string;
+}
+
+export default function TeamSection({ title: overrideTitle, description: overrideDescription }: TeamSectionProps) {
   const team = useCMSStore((state) => state.team);
   const loading = useCMSStore((state) => state.loading && !state.initialized);
 
@@ -28,10 +33,10 @@ export default function TeamSection() {
             <Users size={14} /> Our Dedicated Team
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-base-content tracking-tight">
-            Meet The Minds Behind Aarham
+            {overrideTitle || "Meet The Minds Behind Aarham"}
           </h2>
           <p className="text-base-content/70 text-sm sm:text-base md:text-lg leading-relaxed">
-            Passionate visionaries, dedicated designers, and experienced leaders committed to delivering exceptional craftsmanship.
+            {overrideDescription || "Passionate visionaries, dedicated designers, and experienced leaders committed to delivering exceptional craftsmanship."}
           </p>
         </div>
 

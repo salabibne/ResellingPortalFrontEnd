@@ -36,7 +36,7 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
     title: "Contact Information & WhatsApp Live Chat",
     description: "Manage public phone numbers, emails, office address, and bottom-right floating WhatsApp button number/link.",
     fields: [
-      { name: "whatsapp", label: "WhatsApp Floating Button (Mobile Number, Username, or Link)", type: "text", required: false, placeholder: 'e.g. "01701474332", "+8801701474332", or "wa.me/..."' },
+      { name: "whatsapp", label: "WhatsApp Floating Button (Mobile Number, Username, or Link)", type: "text", required: false, placeholder: 'e.g. "01577276367", "+8801577276367", or "wa.me/..."' },
       { name: "phone", label: "Customer Service Phone Number", type: "text", required: true, placeholder: 'e.g. "+8801700000000"' },
       { name: "email", label: "Email Address", type: "email", required: true, placeholder: 'e.g. "support@aarhamapparel.com"' },
       { name: "address", label: "Physical Address", type: "textarea", required: true, placeholder: "Full office or store address..." },

@@ -7,7 +7,7 @@ import { useCMSStore } from "@/store/useCMSStore";
  * Formats a raw WhatsApp input (phone number, username, or link) into a valid wa.me URL
  */
 export function formatWhatsAppUrl(rawInput?: string | null): string {
-  const fallback = "01701474332";
+  const fallback = "01577276367";
   const input = (rawInput && rawInput.trim()) || fallback;
 
   // Case 1: Full URL already provided
@@ -21,7 +21,7 @@ export function formatWhatsAppUrl(rawInput?: string | null): string {
   // Case 2: Number with leading '+' or country code
   let cleaned = input.replace(/[\s\-\(\)]/g, "");
 
-  // If local Bangladesh number starting with 01 (11 digits: e.g. 01701474332)
+  // If local Bangladesh number starting with 01 (11 digits: e.g. 01577276367)
   if (/^01[3-9]\d{8}$/.test(cleaned)) {
     cleaned = `88${cleaned}`;
   } else if (cleaned.startsWith("+")) {
@@ -51,7 +51,7 @@ export default function WhatsAppButton() {
 
   if (!mounted) return null;
 
-  const rawWhatsapp = contactInfo?.whatsapp || "01701474332";
+  const rawWhatsapp = contactInfo?.whatsapp || "01577276367";
   const whatsappUrl = formatWhatsAppUrl(rawWhatsapp);
 
   return (

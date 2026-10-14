@@ -62,7 +62,7 @@ export default function CMSDashboardPage() {
               <span className="badge badge-success badge-xs font-bold text-white px-2 py-1">Active</span>
             </div>
             <p className="text-xs text-slate-600 mt-0.5">
-              Live button displayed at bottom-right corner across all customer devices. Currently configured with <span className="font-mono font-bold text-slate-900">01701474332</span>.
+              Live button displayed at bottom-right corner across all customer devices. Currently configured with <span className="font-mono font-bold text-slate-900">01577276367</span>.
             </p>
           </div>
         </div>

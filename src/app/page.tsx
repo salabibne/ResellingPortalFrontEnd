@@ -38,7 +38,17 @@ export default async function Home() {
     const key = sec.id || `home-sec-${index}`;
 
     if (secType.includes("hero")) {
-      return <HeroSection key={key} />;
+      return (
+        <HeroSection
+          key={key}
+          title={sec.title}
+          description={sec.description}
+          imageUrl={sec.imageUrl}
+          buttonText={sec.buttonText}
+          buttonLink={sec.buttonLink}
+          content={content}
+        />
+      );
     }
 
     if (secType.includes("product")) {
@@ -56,19 +66,29 @@ export default async function Home() {
     }
 
     if (secType.includes("feature")) {
-      return <FeatureGrid key={key} />;
+      return <FeatureGrid key={key} title={sec.title} description={sec.description} />;
     }
 
     if (secType.includes("about")) {
-      return <AboutSection key={key} />;
+      return (
+        <AboutSection
+          key={key}
+          title={sec.title}
+          description={sec.description}
+          imageUrl={sec.imageUrl}
+          buttonText={sec.buttonText}
+          buttonLink={sec.buttonLink}
+          content={content}
+        />
+      );
     }
 
     if (secType.includes("team")) {
-      return <TeamSection key={key} />;
+      return <TeamSection key={key} title={sec.title} description={sec.description} />;
     }
 
     if (secType.includes("founder")) {
-      return <FounderSection key={key} />;
+      return <FounderSection key={key} title={sec.title} description={sec.description} />;
     }
 
     // Default: Custom Promotional Banner

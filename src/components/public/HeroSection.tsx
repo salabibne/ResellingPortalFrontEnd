@@ -5,20 +5,40 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { useCMSStore } from "@/store/useCMSStore";
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  imageUrl?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  content?: Record<string, any>;
+}
+
+export default function HeroSection({
+  title: overrideTitle,
+  subtitle: overrideSubtitle,
+  description: overrideDescription,
+  imageUrl: overrideImageUrl,
+  buttonText: overrideButtonText,
+  buttonLink: overrideButtonLink,
+  content,
+}: HeroSectionProps) {
   const hero = useCMSStore((state) => state.hero);
   const loading = useCMSStore((state) => state.loading && !state.initialized);
 
-  // Fallback defaults if no CMS data exists
-  const title = hero?.heroTitle || "Style Meets Substance";
+  // Use customizer data when provided, otherwise fall back to CMS data
+  const title = overrideTitle || hero?.heroTitle || "Style Meets Substance";
   const subtitle =
+    overrideDescription ||
+    overrideSubtitle ||
     hero?.heroSubtitle ||
     "Discover the latest trends in apparel. Our exclusive collection brings you the finest quality clothing designed for comfort and elegance.";
-  const btn1Text = hero?.buttonText1 || "Shop Collection";
-  const btn1Link = hero?.buttonLink1 || "/shop";
-  const btn2Text = hero?.buttonText2 || "Explore Categories";
-  const btn2Link = hero?.buttonLink2 || "/about";
-  const image = hero?.imageUrl || "/api/image?name=hero";
+  const btn1Text = overrideButtonText || hero?.buttonText1 || "Shop Collection";
+  const btn1Link = overrideButtonLink || hero?.buttonLink1 || "/shop";
+  const btn2Text = content?.buttonText2 || hero?.buttonText2 || "Explore Categories";
+  const btn2Link = content?.buttonLink2 || hero?.buttonLink2 || "/about";
+  const image = overrideImageUrl || hero?.imageUrl || "/api/image?name=hero";
 
   if (loading) {
     return (

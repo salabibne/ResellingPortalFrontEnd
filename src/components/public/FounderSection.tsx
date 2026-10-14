@@ -14,7 +14,12 @@ function getYouTubeEmbedUrl(url: string): string {
   return url;
 }
 
-export default function FounderSection() {
+interface FounderSectionProps {
+  title?: string;
+  description?: string;
+}
+
+export default function FounderSection({ title: overrideTitle, description: overrideDescription }: FounderSectionProps) {
   const profile = useCMSStore((state) => state.founderProfile);
   const blogs = useCMSStore((state) => state.founderBlogs);
   const videos = useCMSStore((state) => state.founderVideos);
@@ -56,10 +61,10 @@ export default function FounderSection() {
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-base-content mb-3 sm:mb-4">
-                {profile.title}
+                {overrideTitle || profile.title}
               </h2>
               <p className="text-base-content/80 text-sm sm:text-base md:text-lg italic leading-relaxed whitespace-pre-line">
-                &ldquo;{profile.description}&rdquo;
+                &ldquo;{overrideDescription || profile.description}&rdquo;
               </p>
             </div>
           </div>

@@ -26,7 +26,12 @@ const ICON_MAP: Record<string, any> = {
   Package,
 };
 
-export default function FeatureGrid() {
+interface FeatureGridProps {
+  title?: string;
+  description?: string;
+}
+
+export default function FeatureGrid({ title: overrideTitle, description: overrideDescription }: FeatureGridProps) {
   const features = useCMSStore((state) => state.features);
   const loading = useCMSStore((state) => state.loading && !state.initialized);
 
@@ -40,8 +45,8 @@ export default function FeatureGrid() {
 
   if (features.length === 0) return null;
 
-  const sectionTitle = features.find((f) => f.title)?.title || features[0]?.title || "Why Choose Us";
-  const sectionDesc = features.find((f) => f.description)?.description || features[0]?.description || "Discover the premium features and quality craftsmanship of Aarham Apparel.";
+  const sectionTitle = overrideTitle || features.find((f) => f.title)?.title || features[0]?.title || "Why Choose Us";
+  const sectionDesc = overrideDescription || features.find((f) => f.description)?.description || features[0]?.description || "Discover the premium features and quality craftsmanship of Aarham Apparel.";
 
   return (
     <section className="py-12 sm:py-20 px-4 sm:px-6 md:px-8 bg-base-200/60">

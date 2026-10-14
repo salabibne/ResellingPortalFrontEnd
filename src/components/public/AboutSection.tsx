@@ -4,6 +4,15 @@ import React from "react";
 import Link from "next/link";
 import { useCMSStore } from "@/store/useCMSStore";
 
+interface AboutSectionProps {
+  title?: string;
+  description?: string;
+  imageUrl?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  content?: Record<string, any>;
+}
+
 function getYouTubeEmbedUrl(url: string): string {
   if (!url) return "";
   if (url.includes("youtube.com/embed/")) return url;
@@ -14,9 +23,25 @@ function getYouTubeEmbedUrl(url: string): string {
   return url;
 }
 
-export default function AboutSection() {
+export default function AboutSection({
+  title: overrideTitle,
+  description: overrideDescription,
+  imageUrl: overrideImageUrl,
+  buttonText: overrideButtonText,
+  buttonLink: overrideButtonLink,
+  content,
+}: AboutSectionProps) {
   const about = useCMSStore((state) => state.about);
   const loading = useCMSStore((state) => state.loading && !state.initialized);
+
+  // Use customizer data when provided, otherwise fall back to CMS data
+  const title = overrideTitle || about?.title || "About Aarham Apparel";
+  const description = overrideDescription || about?.description || "";
+  const youtubeLink = content?.youtubeLink || about?.youtubeLink || "";
+  const buttonText1 = overrideButtonText || content?.buttonText1 || about?.buttonText1 || "Read Full Story";
+  const buttonLink1 = overrideButtonLink || content?.buttonLink1 || about?.buttonLink1 || "/about";
+  const buttonText2 = content?.buttonText2 || about?.buttonText2 || "";
+  const buttonLink2 = content?.buttonLink2 || about?.buttonLink2 || "#";
 
   if (loading) {
     return (
@@ -26,9 +51,7 @@ export default function AboutSection() {
     );
   }
 
-  if (!about) return null;
-
-  const embedUrl = getYouTubeEmbedUrl(about.youtubeLink);
+  const embedUrl = getYouTubeEmbedUrl(youtubeLink);
 
   return (
     <section className="py-12 sm:py-20 px-4 sm:px-6 md:px-8 bg-base-100 border-b border-base-200">
@@ -39,20 +62,20 @@ export default function AboutSection() {
             About Us
           </span>
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-base-content mb-4 sm:mb-6 leading-tight">
-            {about.title || "About Aarham Apparel"}
+            {title}
           </h2>
           <p className="text-base-content/80 text-sm sm:text-base md:text-lg mb-6 sm:mb-8 leading-relaxed whitespace-pre-line">
-            {about.description}
+            {description}
           </p>
           <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-            {about.buttonText1 && (
-              <Link href={about.buttonLink1 || "/about"} className="btn btn-primary rounded-full px-6 sm:px-8 w-full sm:w-auto text-center justify-center">
-                {about.buttonText1}
+            {buttonText1 && (
+              <Link href={buttonLink1} className="btn btn-primary rounded-full px-6 sm:px-8 w-full sm:w-auto text-center justify-center">
+                {buttonText1}
               </Link>
             )}
-            {about.buttonText2 && (
-              <Link href={about.buttonLink2 || "#"} className="btn btn-outline rounded-full px-6 sm:px-8 w-full sm:w-auto text-center justify-center">
-                {about.buttonText2}
+            {buttonText2 && (
+              <Link href={buttonLink2} className="btn btn-outline rounded-full px-6 sm:px-8 w-full sm:w-auto text-center justify-center">
+                {buttonText2}
               </Link>
             )}
           </div>
@@ -63,7 +86,7 @@ export default function AboutSection() {
           <div className="flex-1 w-full rounded-2xl overflow-hidden shadow-2xl bg-black aspect-video relative">
             <iframe
               src={embedUrl}
-              title={about.title}
+              title={title}
               className="w-full h-full border-0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
