@@ -10,7 +10,7 @@ import HomeProductsSection from "@/components/public/HomeProductsSection";
 import HomeCustomBanner from "@/components/public/HomeCustomBanner";
 import customPagesApi, { CustomPage, CustomPageSection } from "@/services/customPages.api";
 
-export const revalidate = 30; // ISR cache revalidation every 30 seconds
+export const dynamic = "force-dynamic"; // Always fetch fresh homepage data so customizer changes reflect immediately
 
 export default async function Home() {
   let homePage: CustomPage | null = null;
