@@ -23,7 +23,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 
 export default function MyOrdersPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, hasHydrated } = useAuthStore();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,10 +33,11 @@ export default function MyOrdersPage() {
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("ALL");
 
   useEffect(() => {
+    if (!hasHydrated) return;
     if (!isAuthenticated) {
       router.push("/login?redirect=/my-orders");
     }
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isAuthenticated, router]);
 
   const fetchOrders = useCallback(async () => {
     try {

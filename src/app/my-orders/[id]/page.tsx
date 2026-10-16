@@ -33,7 +33,7 @@ export default function CustomerOrderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const orderId = params?.id as string;
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, hasHydrated } = useAuthStore();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,12 +59,13 @@ export default function CustomerOrderDetailPage() {
   };
 
   useEffect(() => {
+    if (!hasHydrated) return;
     if (!isAuthenticated) {
       router.push(`/login?redirect=/my-orders/${orderId}`);
       return;
     }
     fetchOrderDetail();
-  }, [orderId, isAuthenticated, router]);
+  }, [orderId, hasHydrated, isAuthenticated, router]);
 
   const handleCopyTracking = (code: string) => {
     navigator.clipboard.writeText(code);

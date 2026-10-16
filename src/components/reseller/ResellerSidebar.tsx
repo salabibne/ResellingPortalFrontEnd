@@ -11,6 +11,7 @@ import {
   ArrowLeft,
   UserCheck,
   Wallet,
+  LifeBuoy,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
@@ -120,6 +121,12 @@ export default function ResellerSidebar({ isOpen = false, onClose }: ResellerSid
           <Link href="/reseller/payouts" className={getLinkClass("/reseller/payouts")}>
             <Wallet size={18} />
             <span>Payouts & Wallet</span>
+          </Link>
+        </li>
+        <li>
+          <Link href="/reseller/support" className={getLinkClass("/reseller/support")}>
+            <LifeBuoy size={18} />
+            <span>Support Tickets</span>
           </Link>
         </li>
       </ul>

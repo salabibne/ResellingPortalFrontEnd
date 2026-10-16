@@ -104,6 +104,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               <li><Link href="/admin/external-apis" className={getLinkClass("/admin/external-apis")} onClick={handleLinkClick}>External API Integrations</Link></li>
               <li><Link href="/admin/legal-documents" className={getLinkClass("/admin/legal-documents")} onClick={handleLinkClick}>Legal Documents</Link></li>
               <li><Link href="/admin/notices" className={getLinkClass("/admin/notices")} onClick={handleLinkClick}>Pop-up Notices</Link></li>
+              <li><Link href="/admin/tickets" className={getLinkClass("/admin/tickets")} onClick={handleLinkClick}>Support Tickets</Link></li>
             </ul>
           </details>
         </li>

@@ -13,6 +13,7 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  hasHydrated: boolean;
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
   updateToken: (accessToken: string, refreshToken: string) => void;
   logout: () => void;
@@ -25,6 +26,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      hasHydrated: false,
       setAuth: (user, accessToken, refreshToken) =>
         set({ user, accessToken, refreshToken, isAuthenticated: true }),
       updateToken: (accessToken, refreshToken) =>
@@ -39,6 +41,11 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage", // stores in localStorage by default
+      onRehydrateStorage: () => (state, error) => {
+        if (!error && state) {
+          state.hasHydrated = true;
+        }
+      },
     }
   )
 );
