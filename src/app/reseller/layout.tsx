@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ResellerSidebar from "@/components/reseller/ResellerSidebar";
 import Header from "@/components/shared/Header";
+import NoticePopupModal from "@/components/shared/NoticePopupModal";
 import { useAuthStore } from "@/store/useAuthStore";
 
 export default function ResellerLayout({
@@ -61,6 +62,7 @@ export default function ResellerLayout({
           {children}
         </main>
       </div>
+      <NoticePopupModal audience="RESELLER" />
     </div>
   );
 }

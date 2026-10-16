@@ -94,14 +94,14 @@ export default function ResellerSidebar({ isOpen = false, onClose }: ResellerSid
         <li>
           <Link href="/reseller/products" className={getLinkClass("/reseller/products")}>
             <Package size={18} />
-            <span>Wholesale Catalog</span>
+            <span>Product Catalog</span>
           </Link>
         </li>
         <li>
           <Link href="/reseller/cart" className={getLinkClass("/reseller/cart")}>
             <div className="relative flex items-center gap-3 w-full">
               <ShoppingCart size={18} />
-              <span>Reseller Cart</span>
+              <span>My Cart</span>
               {totalCartCount > 0 && (
                 <span className="ml-auto bg-primary text-primary-content text-xs font-bold px-2 py-0.5 rounded-full">
                   {totalCartCount}

@@ -130,13 +130,13 @@ export default function ResellerProductsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-base-100 p-6 rounded-2xl border border-base-200 shadow-sm">
         <div>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-2">
-            <Tag size={14} /> Wholesale Reseller Catalog
+            <Tag size={14} /> Product Catalog
           </span>
           <h1 className="text-2xl font-extrabold text-base-content">
             Reseller Products Section
           </h1>
           <p className="text-sm text-base-content/60 mt-1">
-            Compare retail market prices with wholesale reseller costs (`resellerPrice`) and add items to your reseller cart.
+            Compare retail market prices with wholesale reseller costs (`resellerPrice`) and add items to your cart.
           </p>
         </div>
 
@@ -145,7 +145,7 @@ export default function ResellerProductsPage() {
           className="btn btn-primary flex items-center gap-2 shadow-md"
         >
           <ShoppingCart size={18} />
-          <span>Reseller Cart ({totalCartCount})</span>
+          <span>My Cart ({totalCartCount})</span>
         </Link>
       </div>
 

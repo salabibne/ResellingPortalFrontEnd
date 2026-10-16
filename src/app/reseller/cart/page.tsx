@@ -73,7 +73,7 @@ export default function ResellerCartPage() {
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) {
-      setErrorMsg("Your reseller cart is empty. Please add products first.");
+      setErrorMsg("Your cart is empty. Please add products first.");
       return;
     }
 
@@ -146,13 +146,13 @@ export default function ResellerCartPage() {
           <ShoppingBag size={32} />
         </div>
         <h2 className="text-2xl font-bold text-base-content">
-          Your Reseller Cart is Empty
+          Your Cart is Empty
         </h2>
         <p className="text-sm text-base-content/60 max-w-md mx-auto">
-          Browse the wholesale catalog to add products and place orders on behalf of your customers.
+          Browse the product catalog to add products and place orders on behalf of your customers.
         </p>
         <Link href="/reseller/products" className="btn btn-primary font-bold">
-          Browse Wholesale Catalog
+          Browse Product Catalog
         </Link>
       </div>
     );

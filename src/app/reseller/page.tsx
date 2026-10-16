@@ -54,13 +54,13 @@ export default function ResellerDashboardPage() {
               href="/reseller/products"
               className="btn btn-sm bg-white text-primary border-none hover:bg-white/90 font-bold"
             >
-              <Package size={16} /> Browse Wholesale Catalog
+              <Package size={16} /> Browse Product Catalog
             </Link>
             <Link
               href="/reseller/cart"
               className="btn btn-sm btn-outline border-white text-white hover:bg-white/10 font-bold"
             >
-              <ShoppingCart size={16} /> Reseller Cart & Checkout
+              <ShoppingCart size={16} /> My Cart & Checkout
             </Link>
           </div>
         </div>
@@ -172,10 +172,10 @@ export default function ResellerDashboardPage() {
         <div className="card bg-base-100 border border-base-200 p-6 space-y-4 hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 text-primary font-bold text-lg">
             <Package size={24} />
-            <h2>Wholesale Catalog</h2>
+            <h2>Product Catalog</h2>
           </div>
           <p className="text-sm text-base-content/70">
-            Explore active products with wholesale reseller prices. Select sizes, colors, and quantities to add to your reseller cart.
+            Explore active products with wholesale reseller prices. Select sizes, colors, and quantities to add to your cart.
           </p>
           <div>
             <Link

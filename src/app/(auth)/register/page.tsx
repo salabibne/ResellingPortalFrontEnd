@@ -23,7 +23,7 @@ const registerSchema = z.object({
   permanentDistrict: z.string().min(1, { message: "Permanent District is required" }),
   permanentThana: z.string().min(1, { message: "Permanent Thana is required" }),
   secondaryPhone: z.string().optional(),
-  pageName: z.string().optional(),
+  pageName: z.string().trim().min(1, { message: "Page Name is required" }),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -46,6 +46,7 @@ function RegisterForm() {
     defaultValues: {
       role: initialRole as any,
       organizationId: "550e8400-e29b-41d4-a716-446655440000",
+      pageName: "",
     }
   });
 
@@ -125,7 +126,7 @@ function RegisterForm() {
               </div>
 
               <div className="form-control">
-                <label className="label"><span className="label-text">Page Name (Optional)</span></label>
+                <label className="label"><span className="label-text">Page Name</span></label>
                 <input type="text" placeholder="Your Page Name" className={`input input-bordered text-black w-full ${errors.pageName ? "input-error" : ""}`} {...register("pageName")} />
                 {errors.pageName && <span className="label-text-alt text-error mt-1">{errors.pageName.message}</span>}
               </div>
