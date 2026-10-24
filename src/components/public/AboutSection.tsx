@@ -3,14 +3,18 @@
 import React from "react";
 import Link from "next/link";
 import { useCMSStore } from "@/store/useCMSStore";
+import { safeLink } from "@/utils/links";
 
 interface AboutSectionProps {
   title?: string;
+  subtitle?: string;
   description?: string;
   imageUrl?: string;
   buttonText?: string;
   buttonLink?: string;
   content?: Record<string, any>;
+  /** false = never borrow CmsAbout values (homepage shows customizer data only) */
+  useCmsFallback?: boolean;
 }
 
 function getYouTubeEmbedUrl(url: string): string {
@@ -25,23 +29,29 @@ function getYouTubeEmbedUrl(url: string): string {
 
 export default function AboutSection({
   title: overrideTitle,
+  subtitle: overrideSubtitle,
   description: overrideDescription,
   imageUrl: overrideImageUrl,
   buttonText: overrideButtonText,
   buttonLink: overrideButtonLink,
   content,
+  useCmsFallback = true,
 }: AboutSectionProps) {
-  const about = useCMSStore((state) => state.about);
-  const loading = useCMSStore((state) => state.loading && !state.initialized);
+  const aboutFromCms = useCMSStore((state) => state.about);
+  const loadingFromCms = useCMSStore((state) => state.loading && !state.initialized);
+
+  const about = useCmsFallback ? aboutFromCms : null;
+  const loading = useCmsFallback && loadingFromCms;
 
   // Use customizer data when provided, otherwise fall back to CMS data
+  const badge = overrideSubtitle || "About Us";
   const title = overrideTitle || about?.title || "About Aarham Apparel";
   const description = overrideDescription || about?.description || "";
   const youtubeLink = content?.youtubeLink || about?.youtubeLink || "";
   const buttonText1 = overrideButtonText || content?.buttonText1 || about?.buttonText1 || "Read Full Story";
-  const buttonLink1 = overrideButtonLink || content?.buttonLink1 || about?.buttonLink1 || "/about";
-  const buttonText2 = content?.buttonText2 || about?.buttonText2 || "";
-  const buttonLink2 = content?.buttonLink2 || about?.buttonLink2 || "#";
+  const buttonLink1 = safeLink(overrideButtonLink || content?.buttonLink1 || about?.buttonLink1, "/about");
+  const buttonText2 = content?.buttonText2 ?? about?.buttonText2 ?? "";
+  const buttonLink2 = safeLink(content?.buttonLink2 ?? about?.buttonLink2, "/shop");
 
   if (loading) {
     return (
@@ -59,7 +69,7 @@ export default function AboutSection({
         {/* Content Column */}
         <div className="flex-1 text-left">
           <span className="badge badge-primary badge-outline text-xs uppercase font-semibold tracking-wider mb-3">
-            About Us
+            {badge}
           </span>
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-base-content mb-4 sm:mb-6 leading-tight">
             {title}
@@ -81,8 +91,8 @@ export default function AboutSection({
           </div>
         </div>
 
-        {/* Video Embed Column */}
-        {embedUrl && (
+        {/* Media: YouTube embed first, otherwise the customizer banner image */}
+        {embedUrl ? (
           <div className="flex-1 w-full rounded-2xl overflow-hidden shadow-2xl bg-black aspect-video relative">
             <iframe
               src={embedUrl}
@@ -92,7 +102,11 @@ export default function AboutSection({
               allowFullScreen
             />
           </div>
-        )}
+        ) : overrideImageUrl ? (
+          <div className="flex-1 w-full rounded-2xl overflow-hidden shadow-2xl aspect-video bg-base-200">
+            <img src={overrideImageUrl} alt={title} className="w-full h-full object-cover" />
+          </div>
+        ) : null}
       </div>
     </section>
   );

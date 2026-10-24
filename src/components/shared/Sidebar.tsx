@@ -95,11 +95,10 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               <li><Link href="/orders" className={getLinkClass("/orders")} onClick={handleLinkClick}>Orders & Sales</Link></li>
               <li><Link href="/reseller" className={getLinkClass("/reseller")} onClick={handleLinkClick}>Reseller Portal</Link></li>
               <li><Link href="/cms" className={getLinkClass("/cms")} onClick={handleLinkClick}>Base CMS Management</Link></li>
-              <li><Link href="/admin/homepage" className={getLinkClass("/admin/homepage")} onClick={handleLinkClick}>Homepage Customizer</Link></li>
               <li><Link href="/admin/users" className={getLinkClass("/admin/users")} onClick={handleLinkClick}>User Management</Link></li>
               <li><Link href="/admin/withdrawals" className={getLinkClass("/admin/withdrawals")} onClick={handleLinkClick}>Reseller Withdrawals</Link></li>
+              <li><Link href="/admin/courier/shipments" className={getLinkClass("/admin/courier/shipments")} onClick={handleLinkClick}>Courier Management</Link></li>
               <li><Link href="/admin/courier" className={getLinkClass("/admin/courier")} onClick={handleLinkClick}>Courier Policy Settings</Link></li>
-              <li><Link href="/admin/custom-pages" className={getLinkClass("/admin/custom-pages")} onClick={handleLinkClick}>Custom Pages Builder</Link></li>
               <li><Link href="/admin/product-pages" className={getLinkClass("/admin/product-pages")} onClick={handleLinkClick}>Product Landing CMS</Link></li>
               <li><Link href="/admin/external-apis" className={getLinkClass("/admin/external-apis")} onClick={handleLinkClick}>External API Integrations</Link></li>
               <li><Link href="/admin/legal-documents" className={getLinkClass("/admin/legal-documents")} onClick={handleLinkClick}>Legal Documents</Link></li>

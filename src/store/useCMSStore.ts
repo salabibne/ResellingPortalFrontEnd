@@ -9,6 +9,7 @@ import cmsApi, {
   TeamMemberItem,
   ContactInfoItem,
   SocialMediaItem,
+  BrandItem,
 } from "@/services/cms.api";
 
 interface CMSState {
@@ -21,6 +22,7 @@ interface CMSState {
   team: TeamMemberItem[];
   contactInfo: ContactInfoItem | null;
   socialMedia: SocialMediaItem[];
+  brand: BrandItem | null;
   loading: boolean;
   initialized: boolean;
   error: string | null;
@@ -37,6 +39,7 @@ export const useCMSStore = create<CMSState>((set, get) => ({
   team: [],
   contactInfo: null,
   socialMedia: [],
+  brand: null,
   loading: false,
   initialized: false,
   error: null,
@@ -59,6 +62,7 @@ export const useCMSStore = create<CMSState>((set, get) => ({
         team: cmsData.team,
         contactInfo: cmsData.contactInfo,
         socialMedia: cmsData.socialMedia,
+        brand: cmsData.brand,
         loading: false,
         initialized: true,
       });
@@ -67,7 +71,9 @@ export const useCMSStore = create<CMSState>((set, get) => ({
       set({
         error: err?.message || "Failed to load site CMS content",
         loading: false,
-        initialized: true,
+        // Leave initialized false so the next mount retries instead of pinning
+        // hardcoded fallbacks (e.g. the default WhatsApp number) for the session.
+        initialized: false,
       });
     }
   },

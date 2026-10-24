@@ -12,6 +12,7 @@ import {
   UserCheck,
   Wallet,
   LifeBuoy,
+  Truck,
 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
@@ -115,6 +116,12 @@ export default function ResellerSidebar({ isOpen = false, onClose }: ResellerSid
           <Link href="/reseller/orders" className={getLinkClass("/reseller/orders")}>
             <ShoppingBag size={18} />
             <span>My Orders</span>
+          </Link>
+        </li>
+        <li>
+          <Link href="/reseller/track" className={getLinkClass("/reseller/track")}>
+            <Truck size={18} />
+            <span>Track</span>
           </Link>
         </li>
         <li>

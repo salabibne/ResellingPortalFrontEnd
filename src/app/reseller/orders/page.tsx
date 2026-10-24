@@ -24,7 +24,13 @@ import {
   Check,
   AlertTriangle,
 } from "lucide-react";
-import { orderApi, Order, OrderProcessingStatus } from "@/services/order.api";
+import {
+  orderApi,
+  Order,
+  OrderProcessingStatus,
+  CourierTrackResult,
+} from "@/services/order.api";
+import CourierStatusBadge from "@/components/courier/CourierStatusBadge";
 import { exportOrdersToCSV } from "@/utils/csvExporter";
 
 export default function ResellerOrdersPage() {
@@ -41,9 +47,10 @@ export default function ResellerOrdersPage() {
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [exporting, setExporting] = useState<boolean>(false);
-  const [isSyncingCourier, setIsSyncingCourier] = useState<boolean>(false);
   const [copiedTrackingCode, setCopiedTrackingCode] = useState<string | null>(null);
-  const [courierSyncMsg, setCourierSyncMsg] = useState<string | null>(null);
+  const [courierTrack, setCourierTrack] = useState<CourierTrackResult | null>(null);
+  const [courierTrackLoading, setCourierTrackLoading] = useState<boolean>(false);
+  const [courierTrackError, setCourierTrackError] = useState<string | null>(null);
 
   const handleCopyTracking = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -51,19 +58,44 @@ export default function ResellerOrdersPage() {
     setTimeout(() => setCopiedTrackingCode(null), 2000);
   };
 
-  const handleSyncCourierStatus = async (orderId: string) => {
+  const getTrackingUrl = (order: Order) =>
+    order.courierTrackingLink ||
+    (order.courierTrackingCode
+      ? `https://steadfast.com.bd/t/${order.courierTrackingCode}`
+      : null);
+
+  const resetCourierTrack = () => {
+    setCourierTrack(null);
+    setCourierTrackError(null);
+    setCourierTrackLoading(false);
+  };
+
+  const openOrderDetails = (order: Order) => {
+    resetCourierTrack();
+    setSelectedOrder(order);
+  };
+
+  const closeOrderDetails = () => {
+    resetCourierTrack();
+    setSelectedOrder(null);
+  };
+
+  const handleShowCourierStatus = async () => {
+    const consignmentId = selectedOrder?.courierConsignmentId;
+    if (!consignmentId) return;
+    setCourierTrackError(null);
+    setCourierTrackLoading(true);
     try {
-      setIsSyncingCourier(true);
-      setCourierSyncMsg(null);
-      const res = await orderApi.syncCourierStatus(orderId);
-      setSelectedOrder(res.order);
-      setCourierSyncMsg(`Courier status updated: ${res.deliveryStatus.toUpperCase()}`);
-      fetchOrders();
+      setCourierTrack(await orderApi.trackCourierParcel(consignmentId));
     } catch (err: any) {
-      console.error("Failed to sync courier status:", err);
-      alert(err?.response?.data?.message || "Failed to sync status with Steadfast.");
+      const message = err?.response?.data?.message;
+      setCourierTrackError(
+        Array.isArray(message)
+          ? message.join(", ")
+          : message || err?.message || "Could not fetch courier status"
+      );
     } finally {
-      setIsSyncingCourier(false);
+      setCourierTrackLoading(false);
     }
   };
 
@@ -90,9 +122,9 @@ export default function ResellerOrdersPage() {
     }
   };
 
-  const fetchOrders = useCallback(async () => {
+  const fetchOrders = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await orderApi.getOrders(
         page,
         limit,
@@ -111,15 +143,30 @@ export default function ResellerOrdersPage() {
         total: res.meta?.total || 0,
         totalPages: res.meta?.totalPages || 1,
       });
+      setSelectedOrder((current) => {
+        if (!current) return current;
+        return (res.data || []).find((o) => o.id === current.id) || current;
+      });
     } catch (err) {
       console.error("Failed to load reseller orders:", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [page, limit, search, selectedStatus, startDate, endDate, customerPhone]);
 
   useEffect(() => {
     fetchOrders();
+  }, [fetchOrders]);
+
+  // DB-only refresh so admin bookings/returns appear without a full reload.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchOrders(true);
+      }
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, [fetchOrders]);
 
   const clearFilters = () => {
@@ -164,6 +211,62 @@ export default function ResellerOrdersPage() {
         return (
           <span className="badge badge-warning text-white text-[10px] font-bold py-1.5 px-2 gap-1">
             <AlertTriangle size={10} /> On Hold
+          </span>
+        );
+      case "partial_delivered":
+        return (
+          <span className="badge badge-warning text-slate-900 font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
+            <CheckCircle2 size={10} /> Partial Delivered
+          </span>
+        );
+      case "partial_delivered_approval_pending":
+        return (
+          <span className="badge badge-accent text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <Clock size={10} /> Part. Deliv. Pending Appr.
+          </span>
+        );
+      case "delivered_approval_pending":
+        return (
+          <span className="badge badge-accent text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <CheckCircle2 size={10} /> Deliv. Pending Appr.
+          </span>
+        );
+      case "cancelled_approval_pending":
+        return (
+          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <Clock size={10} /> Canc. Pending Appr.
+          </span>
+        );
+      case "cancelled_return_received":
+        return (
+          <span className="badge badge-error text-white font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-red-300">
+            <XCircle size={10} /> Returned & Restocked
+          </span>
+        );
+      case "partial_delivered_return_received":
+        return (
+          <span className="badge badge-warning text-slate-900 font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
+            <CheckCircle2 size={10} /> Part. Return Received
+          </span>
+        );
+      case "cancelled_return_processing":
+      case "cancelled_return_rider_assigned":
+        return (
+          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <Truck size={10} /> Return In Transit
+          </span>
+        );
+      case "partial_delivered_return_proccessing":
+      case "partial_delivered_return_rider_assigned":
+        return (
+          <span className="badge badge-warning text-slate-900 font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <Truck size={10} /> Part. Return In Transit
+          </span>
+        );
+      case "exceptional":
+        return (
+          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <AlertTriangle size={10} /> Exceptional
           </span>
         );
       default:
@@ -383,6 +486,11 @@ export default function ResellerOrdersPage() {
                               <span>{order.courierTrackingCode}</span>
                             </div>
                             <div>{renderCourierBadge(order.courierStatus)}</div>
+                            {order.courierReturnStatus && (
+                              <span className="badge badge-warning text-slate-900 text-[9px] font-bold uppercase py-1 px-1.5">
+                                Return: {order.courierReturnStatus}
+                              </span>
+                            )}
                           </div>
                         ) : (
                           <span className="text-[11px] text-base-content/40 italic">
@@ -429,7 +537,7 @@ export default function ResellerOrdersPage() {
                       <td>
                         <button
                           className="btn btn-ghost btn-xs gap-1 text-primary"
-                          onClick={() => setSelectedOrder(order)}
+                          onClick={() => openOrderDetails(order)}
                         >
                           <Eye size={14} /> Details
                         </button>
@@ -458,34 +566,40 @@ export default function ResellerOrdersPage() {
               </div>
               <button
                 className="btn btn-ghost btn-circle btn-sm"
-                onClick={() => setSelectedOrder(null)}
+                onClick={closeOrderDetails}
               >
                 <X size={18} />
               </button>
             </div>
 
-            {/* Courier Sync Banner */}
-            {courierSyncMsg && (
-              <div className="alert alert-success text-white text-xs font-bold rounded-xl py-2 flex items-center gap-2">
-                <CheckCircle2 size={16} /> {courierSyncMsg}
-              </div>
-            )}
-
             {/* Steadfast Courier Tracking Box */}
-            {selectedOrder.courierTrackingCode && (
-              <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
-                    <Truck size={14} /> Steadfast Courier Tracking
-                  </h4>
-                  {renderCourierBadge(selectedOrder.courierStatus)}
+            <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                  <Truck size={14} /> Steadfast Courier
+                </h4>
+                <CourierStatusBadge
+                  status={courierTrack?.deliveryStatus || selectedOrder.courierStatus}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-base-100 p-3 rounded-lg border border-base-200">
+                <div>
+                  <span className="text-base-content/60 font-semibold block uppercase text-[10px]">
+                    Consignment ID:
+                  </span>
+                  <span className="font-mono font-bold text-sm text-primary mt-0.5 block">
+                    {selectedOrder.courierConsignmentId
+                      ? `#${selectedOrder.courierConsignmentId}`
+                      : "Not assigned"}
+                  </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-base-100 p-3 rounded-lg border border-base-200">
-                  <div>
-                    <span className="text-base-content/60 font-semibold block uppercase text-[10px]">
-                      Tracking Code:
-                    </span>
+                <div>
+                  <span className="text-base-content/60 font-semibold block uppercase text-[10px]">
+                    Tracking Code:
+                  </span>
+                  {selectedOrder.courierTrackingCode ? (
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="font-mono font-black text-sm text-base-content">
                         {selectedOrder.courierTrackingCode}
@@ -503,33 +617,132 @@ export default function ResellerOrdersPage() {
                         )}
                       </button>
                     </div>
-                  </div>
-
-                  <div>
-                    <span className="text-base-content/60 font-semibold block uppercase text-[10px]">
-                      Consignment ID:
+                  ) : (
+                    <span className="text-base-content/40 italic text-[11px] block mt-0.5">
+                      Not booked yet
                     </span>
-                    <span className="font-mono font-bold text-sm text-primary mt-0.5 block">
-                      #{selectedOrder.courierConsignmentId || "N/A"}
-                    </span>
-                  </div>
+                  )}
                 </div>
+              </div>
 
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => handleSyncCourierStatus(selectedOrder.id)}
-                  disabled={isSyncingCourier}
-                  className="btn btn-xs btn-outline btn-primary rounded-lg font-bold gap-1.5 w-full"
+                  className="btn btn-primary btn-sm gap-2"
+                  onClick={handleShowCourierStatus}
+                  disabled={!selectedOrder.courierConsignmentId || courierTrackLoading}
+                  title={
+                    selectedOrder.courierConsignmentId
+                      ? "Fetch the live status from Steadfast"
+                      : "No consignment ID on this order yet"
+                  }
                 >
-                  {isSyncingCourier ? (
-                    <span className="loading loading-spinner loading-xs"></span>
+                  {courierTrackLoading ? (
+                    <span className="loading loading-spinner loading-xs" />
                   ) : (
-                    <RefreshCw size={12} />
+                    <Truck size={14} />
                   )}
-                  Refresh Live Delivery Status
+                  {courierTrackLoading ? "Checking..." : "Show Courier Status"}
                 </button>
+                {courierTrack && (
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm gap-1"
+                    onClick={handleShowCourierStatus}
+                    disabled={courierTrackLoading}
+                  >
+                    <RefreshCw size={13} /> Refresh
+                  </button>
+                )}
+                {!selectedOrder.courierConsignmentId && (
+                  <span className="text-[11px] text-base-content/50">
+                    Status is unavailable until this order has a consignment ID.
+                  </span>
+                )}
               </div>
-            )}
+
+              {courierTrackError && (
+                <div className="alert alert-error text-xs text-white font-semibold flex items-start gap-2">
+                  <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                  <span>{courierTrackError}</span>
+                </div>
+              )}
+
+              {courierTrack && (
+                <div className="bg-base-100 p-3 rounded-lg border border-base-200 space-y-3 text-xs">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CourierStatusBadge status={courierTrack.deliveryStatus} />
+                    <span className="text-[11px] text-base-content/60">
+                      Matched by {courierTrack.matchedBy.toUpperCase()} ·{" "}
+                      {courierTrack.matchedIdentifier || courierTrack.identifier}
+                    </span>
+                  </div>
+
+                  <h5 className="text-[10px] font-bold uppercase tracking-wider text-base-content/70 flex items-center gap-1">
+                    <MapPin size={12} /> Journey ({courierTrack.trackingEvents?.length || 0})
+                  </h5>
+
+                  {courierTrack.trackingEvents?.length ? (
+                    <ol className="space-y-2">
+                      {courierTrack.trackingEvents.map((event, index) => (
+                        <li
+                          key={`${event.created_at}-${index}`}
+                          className="bg-base-200/60 rounded-lg p-2.5"
+                        >
+                          <p className="font-semibold text-base-content">{event.text}</p>
+                          <span className="text-[10px] text-base-content/50">
+                            {new Date(event.created_at).toLocaleString()}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="text-[11px] text-base-content/50">
+                      No tracking milestones returned yet. The badge above is the
+                      latest provider response.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-base-content/60">
+                {selectedOrder.courierLastSyncedAt && (
+                  <span>
+                    Last synced:{" "}
+                    {new Date(selectedOrder.courierLastSyncedAt).toLocaleString()}
+                  </span>
+                )}
+                {selectedOrder.courierReturnStatus && (
+                  <span className="badge badge-warning text-slate-900 font-bold uppercase text-[10px]">
+                    Return: {selectedOrder.courierReturnStatus}
+                  </span>
+                )}
+                {selectedOrder.courierReturnRequestedAt && (
+                  <span>
+                    Return requested:{" "}
+                    {new Date(
+                      selectedOrder.courierReturnRequestedAt
+                    ).toLocaleString()}
+                  </span>
+                )}
+                {(courierTrack?.trackingLink || getTrackingUrl(selectedOrder)) && (
+                  <a
+                    href={(courierTrack?.trackingLink || getTrackingUrl(selectedOrder))!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link link-primary font-bold"
+                  >
+                    Open Steadfast Tracking
+                  </a>
+                )}
+              </div>
+
+              {selectedOrder.courierReturnReason && (
+                <p className="text-[11px] text-base-content/60">
+                  Return reason: {selectedOrder.courierReturnReason}
+                </p>
+              )}
+            </div>
 
             {/* Customer & Shipping Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-base-200/50 p-4 rounded-xl text-xs">
@@ -626,7 +839,7 @@ export default function ResellerOrdersPage() {
             )}
 
             <div className="modal-action">
-              <button className="btn btn-primary btn-sm" onClick={() => setSelectedOrder(null)}>
+              <button className="btn btn-primary btn-sm" onClick={closeOrderDetails}>
                 Close
               </button>
             </div>

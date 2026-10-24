@@ -1,40 +1,61 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CmsManager, { MODULE_CONFIGS } from "@/components/cms/CmsManager";
-import { CMSModuleType } from "@/services/cms.api";
+import cmsApi, { CMSModuleType } from "@/services/cms.api";
+import { useCMSStore } from "@/store/useCMSStore";
 import {
   Share2,
   PhoneCall,
   Layout,
-  Info,
-  Grid,
-  UserCheck,
-  BookOpen,
-  Video,
   Layers,
   ShoppingBag,
   Globe,
   FileText as FileTextIcon,
   ArrowRight,
   Users,
+  Image as ImageIcon,
 } from "lucide-react";
 
 const MODULE_TABS: { id: CMSModuleType; label: string; icon: any }[] = [
   { id: "contact", label: "WhatsApp & Contact Info", icon: PhoneCall },
+  { id: "brand", label: "Site Logo", icon: ImageIcon },
   { id: "social-media", label: "Social Media", icon: Share2 },
-  { id: "hero", label: "Hero Banner", icon: Layout },
-  { id: "about", label: "About Section", icon: Info },
-  { id: "section", label: "Feature Cards", icon: Grid },
-  { id: "team", label: "Our Team", icon: Users },
-  { id: "founder", label: "Founder Profile", icon: UserCheck },
-  { id: "founder-blog", label: "Founder Blogs", icon: BookOpen },
-  { id: "founder-video", label: "Founder Videos", icon: Video },
 ];
 
 export default function CMSDashboardPage() {
   const [activeTab, setActiveTab] = useState<CMSModuleType>("contact");
+  const [configuredWhatsApp, setConfiguredWhatsApp] = useState<string>("");
+  const editorRef = useRef<HTMLDivElement | null>(null);
+
+  // Live value from the API — the banner must reflect whatever was just saved.
+  const loadWhatsAppConfig = useCallback(async () => {
+    try {
+      const items = await cmsApi.getAll<any>("contact");
+      const primary = items?.[0];
+      setConfiguredWhatsApp(primary?.whatsapp || primary?.phone || "");
+    } catch {
+      setConfiguredWhatsApp("");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadWhatsAppConfig();
+  }, [loadWhatsAppConfig]);
+
+  // After any contact edit: refresh this banner and the floating widget data.
+  const handleContactSaved = useCallback(async () => {
+    await loadWhatsAppConfig();
+    await useCMSStore.getState().fetchPublicCMS(true);
+  }, [loadWhatsAppConfig]);
+
+  const handleEditWhatsApp = () => {
+    setActiveTab("contact");
+    requestAnimationFrame(() =>
+      editorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+    );
+  };
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto pb-12">
@@ -42,7 +63,9 @@ export default function CMSDashboardPage() {
       <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 rounded-2xl border border-primary/20">
         <h1 className="text-3xl font-extrabold text-black">Content Management System</h1>
         <p className="text-sm text-base-content/70 mt-1">
-          Configure site content, banners, videos, founder updates, and contact information.
+          Manage site-wide contact and social links here. Homepage hero &amp; about come from
+          the Homepage Customizer; feature cards, team and founder pages come from the Custom
+          Pages Builder.
         </p>
       </div>
 
@@ -62,13 +85,18 @@ export default function CMSDashboardPage() {
               <span className="badge badge-success badge-xs font-bold text-white px-2 py-1">Active</span>
             </div>
             <p className="text-xs text-slate-600 mt-0.5">
-              Live button displayed at bottom-right corner across all customer devices. Currently configured with <span className="font-mono font-bold text-slate-900">01577276367</span>.
+              Live button displayed at bottom-right corner across all customer devices.
+              Currently configured with{" "}
+              <span className="font-mono font-bold text-slate-900">
+                {configuredWhatsApp || "no number configured"}
+              </span>
+              .
             </p>
           </div>
         </div>
 
         <button
-          onClick={() => setActiveTab("contact")}
+          onClick={handleEditWhatsApp}
           className="btn btn-sm bg-[#25D366] hover:bg-[#20ba5a] text-white border-none font-bold rounded-xl gap-2 shadow-xs shrink-0 self-start sm:self-center"
         >
           <PhoneCall size={14} /> Edit WhatsApp Settings
@@ -96,22 +124,6 @@ export default function CMSDashboardPage() {
         </Link>
 
         <Link
-          href="/admin/users"
-          className="p-4 rounded-xl bg-white border border-gray-200 shadow-xs hover:border-primary hover:shadow-md transition flex flex-col justify-between group"
-        >
-          <div className="flex items-center justify-between">
-            <div className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-600">
-              <Users size={20} />
-            </div>
-            <ArrowRight size={16} className="text-gray-400 group-hover:text-primary transition-transform group-hover:translate-x-1" />
-          </div>
-          <div className="mt-3">
-            <h3 className="font-bold text-sm text-black">User Management</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Manage user roles and activation status</p>
-          </div>
-        </Link>
-
-        <Link
           href="/admin/custom-pages"
           className="p-4 rounded-xl bg-white border border-gray-200 shadow-xs hover:border-primary hover:shadow-md transition flex flex-col justify-between group"
         >
@@ -124,6 +136,22 @@ export default function CMSDashboardPage() {
           <div className="mt-3">
             <h3 className="font-bold text-sm text-black">Custom Pages Builder</h3>
             <p className="text-xs text-gray-500 mt-0.5">Build landing pages & dynamic sections</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/admin/users"
+          className="p-4 rounded-xl bg-white border border-gray-200 shadow-xs hover:border-primary hover:shadow-md transition flex flex-col justify-between group"
+        >
+          <div className="flex items-center justify-between">
+            <div className="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-600">
+              <Users size={20} />
+            </div>
+            <ArrowRight size={16} className="text-gray-400 group-hover:text-primary transition-transform group-hover:translate-x-1" />
+          </div>
+          <div className="mt-3">
+            <h3 className="font-bold text-sm text-black">User Management</h3>
+            <p className="text-xs text-gray-500 mt-0.5">Manage user roles and activation status</p>
           </div>
         </Link>
 
@@ -176,30 +204,31 @@ export default function CMSDashboardPage() {
         </Link>
       </div>
 
-      {/* Tabs Navigation */}
-      <div className="flex overflow-x-auto gap-2 p-1.5 bg-base-200/80 rounded-2xl border border-base-300 scrollbar-none">
-        {MODULE_TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
-                isActive
-                  ? "bg-primary text-white shadow-md"
-                  : "text-base-content/80 hover:text-black hover:bg-base-100"
-              }`}
-            >
-              <Icon size={16} />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      {/* Tabs Navigation + Module Content Manager */}
+      <div ref={editorRef} className="flex flex-col gap-6 scroll-mt-6">
+        <div className="flex overflow-x-auto gap-2 p-1.5 bg-base-200/80 rounded-2xl border border-base-300 scrollbar-none">
+          {MODULE_TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${
+                  isActive
+                    ? "bg-primary text-white shadow-md"
+                    : "text-base-content/80 hover:text-black hover:bg-base-100"
+                }`}
+              >
+                <Icon size={16} />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
-      {/* Module Content Manager */}
-      <CmsManager key={activeTab} module={activeTab} />
+        <CmsManager key={activeTab} module={activeTab} onSaved={handleContactSaved} />
+      </div>
     </div>
   );
 }

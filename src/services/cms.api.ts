@@ -80,9 +80,14 @@ export interface TeamMemberItem extends CMSBaseItem {
   sortOrder?: number;
 }
 
+export interface BrandItem extends CMSBaseItem {
+  logoUrl?: string;
+}
+
 export type CMSModuleType =
   | "social-media"
   | "contact"
+  | "brand"
   | "hero"
   | "about"
   | "section"
@@ -101,6 +106,7 @@ export interface PublicCMSData {
   team: TeamMemberItem[];
   contactInfo: ContactInfoItem | null;
   socialMedia: SocialMediaItem[];
+  brand: BrandItem | null;
 }
 
 export const cmsApi = {
@@ -173,6 +179,7 @@ export const cmsApi = {
       teamRes,
       contactRes,
       socialRes,
+      brandRes,
     ] = await Promise.allSettled([
       cmsApi.getAll<HeroSectionItem>("hero"),
       cmsApi.getAll<AboutSectionItem>("about"),
@@ -183,6 +190,7 @@ export const cmsApi = {
       cmsApi.getAll<TeamMemberItem>("team"),
       cmsApi.getAll<ContactInfoItem>("contact"),
       cmsApi.getAll<SocialMediaItem>("social-media"),
+      cmsApi.getAll<BrandItem>("brand"),
     ]);
 
     const activeFilter = <T extends CMSBaseItem>(res: PromiseSettledResult<T[]>): T[] => {
@@ -202,6 +210,7 @@ export const cmsApi = {
     const team = activeFilter(teamRes);
     const contacts = activeFilter(contactRes);
     const socials = activeFilter(socialRes);
+    const brands = activeFilter(brandRes);
 
     return {
       hero: heroes[0] || null,
@@ -213,6 +222,7 @@ export const cmsApi = {
       team,
       contactInfo: contacts[0] || null,
       socialMedia: socials,
+      brand: brands[0] || null,
     };
   },
 

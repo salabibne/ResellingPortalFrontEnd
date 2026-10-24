@@ -20,6 +20,7 @@ import { useCategoryStore } from "@/store/useCategoryStore";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useCMSStore } from "@/store/useCMSStore";
+import BrandLogo from "@/components/shared/BrandLogo";
 import CartDrawer from "./CartDrawer";
 
 function NavbarContent() {
@@ -105,17 +106,22 @@ function NavbarContent() {
               </button>
 
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="bg-white text-primary p-1.5 sm:p-2 rounded-xl group-hover:scale-105 transition-transform shrink-0">
-                  <ShoppingBag size={20} className="stroke-[2.5]" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-extrabold text-base sm:text-xl tracking-tight leading-none text-white">
-                    Aarham
-                  </span>
-                  <span className="text-[9px] sm:text-[10px] tracking-widest text-white/80 uppercase font-semibold">
-                    Apparel
-                  </span>
-                </div>
+                <BrandLogo
+                  className="h-8 sm:h-11 w-auto max-w-[45vw] object-contain shrink-0"
+                  alt="Aarham Apparel"
+                >
+                  <div className="bg-white text-primary p-1.5 sm:p-2 rounded-xl group-hover:scale-105 transition-transform shrink-0">
+                    <ShoppingBag size={20} className="stroke-[2.5]" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-extrabold text-base sm:text-xl tracking-tight leading-none text-white">
+                      Aarham
+                    </span>
+                    <span className="text-[9px] sm:text-[10px] tracking-widest text-white/80 uppercase font-semibold">
+                      Apparel
+                    </span>
+                  </div>
+                </BrandLogo>
               </Link>
             </div>
 

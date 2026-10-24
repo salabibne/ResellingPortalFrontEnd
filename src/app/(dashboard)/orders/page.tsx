@@ -66,6 +66,15 @@ export default function OrdersPage() {
   const [customerPhoneFilter, setCustomerPhoneFilter] = useState<string>("");
   const [exporting, setExporting] = useState<boolean>(false);
 
+  // Preselect search from ?search= (used by "Manage Order" links)
+  useEffect(() => {
+    const initialSearch = new URLSearchParams(window.location.search).get("search");
+    if (initialSearch) {
+      setSearchQuery(initialSearch);
+      setPage(1);
+    }
+  }, []);
+
   // Bulk Selection & Courier State
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [isBulkCourierModalOpen, setIsBulkCourierModalOpen] = useState<boolean>(false);
@@ -103,6 +112,92 @@ export default function OrdersPage() {
       alert("Failed to export CSV. Please try again.");
     } finally {
       setExporting(false);
+    }
+  };
+
+  // Bulk Sync All Active Courier Parcels
+  const [syncingAllCourier, setSyncingAllCourier] = useState<boolean>(false);
+  const [courierSyncBannerMsg, setCourierSyncBannerMsg] = useState<string | null>(null);
+
+  const handleSyncAllCourier = async () => {
+    try {
+      setSyncingAllCourier(true);
+      const res = await orderApi.syncAllCourierOrders();
+      setCourierSyncBannerMsg(res.message);
+      fetchOrders();
+      setTimeout(() => setCourierSyncBannerMsg(null), 6000);
+    } catch (err: any) {
+      console.error("Failed to sync all courier orders:", err);
+      alert(err?.response?.data?.message || "Failed to sync all courier orders");
+    } finally {
+      setSyncingAllCourier(false);
+    }
+  };
+
+  // Courier Status Filter
+  const [selectedCourierStatus, setSelectedCourierStatus] = useState<string>("ALL");
+
+  // Steadfast Merchant Balance State
+  const [steadfastBalance, setSteadfastBalance] = useState<number | null>(null);
+  const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
+
+  const fetchSteadfastBalance = async () => {
+    try {
+      setLoadingBalance(true);
+      const res = await orderApi.getCourierBalance();
+      if (res && res.status === 200) {
+        setSteadfastBalance(res.current_balance);
+      }
+    } catch (err) {
+      console.error("Failed to load Steadfast balance:", err);
+    } finally {
+      setLoadingBalance(false);
+    }
+  };
+
+  // Live Tracking Timeline Modal State
+  const [isTrackingModalOpen, setIsTrackingModalOpen] = useState<boolean>(false);
+  const [trackingTimelineData, setTrackingTimelineData] = useState<any>(null);
+  const [loadingTrackingHistory, setLoadingTrackingHistory] = useState<boolean>(false);
+
+  const handleOpenTrackingTimeline = async (orderId: string) => {
+    try {
+      setLoadingTrackingHistory(true);
+      setIsTrackingModalOpen(true);
+      setTrackingTimelineData(null);
+      const res = await orderApi.getOrderTrackingHistory(orderId);
+      setTrackingTimelineData(res);
+    } catch (err: any) {
+      console.error("Failed to fetch tracking history:", err);
+      alert("Could not load tracking history from Steadfast.");
+      setIsTrackingModalOpen(false);
+    } finally {
+      setLoadingTrackingHistory(false);
+    }
+  };
+
+  // Customer Fraud / Delivery Reputation Modal State
+  const [isFraudModalOpen, setIsFraudModalOpen] = useState<boolean>(false);
+  const [fraudCheckData, setFraudCheckData] = useState<any>(null);
+  const [loadingFraudCheck, setLoadingFraudCheck] = useState<boolean>(false);
+
+  const handleCheckFraudScore = async (phone: string) => {
+    if (!phone) {
+      alert("No phone number available for this customer.");
+      return;
+    }
+    try {
+      setLoadingFraudCheck(true);
+      setIsFraudModalOpen(true);
+      setFraudCheckData(null);
+      const res = await orderApi.checkCustomerFraud(phone);
+      setFraudCheckData(res);
+    } catch (err: any) {
+      console.error("Failed to check customer fraud score:", err);
+      alert(err?.response?.data?.message || "Failed to check customer delivery reputation");
+      setIsFraudModalOpen(false);
+    } finally {
+      setLoadingFraudCheck(false);
     }
   };
 
@@ -181,7 +276,67 @@ export default function OrdersPage() {
 
   useEffect(() => {
     fetchOrders();
+    fetchSteadfastBalance();
   }, [fetchOrders]);
+
+  // Automatically refresh orders so status updates from Steadfast webhooks reflect immediately
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchOrders();
+      }
+    }, 45000);
+
+    const handleFocus = () => {
+      if (document.visibilityState === "visible") {
+        fetchOrders();
+      }
+    };
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, [fetchOrders]);
+
+  // Filter orders by Courier Status
+  const displayedOrders = useMemo(() => {
+    if (selectedCourierStatus === "ALL") return orders;
+    return orders.filter((o) => {
+      const cs = (o.courierStatus || "").toLowerCase();
+      if (selectedCourierStatus === "NOT_SENT") {
+        return !o.courierTrackingCode && !o.courierConsignmentId;
+      }
+      if (selectedCourierStatus === "IN_TRANSIT") {
+        return [
+          "pending",
+          "in_review",
+          "in_transit",
+          "delivered_approval_pending",
+          "partial_delivered_approval_pending",
+        ].includes(cs);
+      }
+      if (selectedCourierStatus === "DELIVERED") {
+        return cs === "delivered";
+      }
+      if (selectedCourierStatus === "PARTIAL_DELIVERED") {
+        return cs === "partial_delivered" || cs === "partial_delivered_return_received";
+      }
+      if (selectedCourierStatus === "CANCELLED") {
+        return cs === "cancelled" || cs.includes("cancelled");
+      }
+      if (selectedCourierStatus === "HOLD") {
+        return cs === "hold";
+      }
+      if (selectedCourierStatus === "RETURNED") {
+        return cs.includes("return");
+      }
+      return cs === selectedCourierStatus.toLowerCase();
+    });
+  }, [orders, selectedCourierStatus]);
 
   // Sync state when drawer opens
   useEffect(() => {
@@ -458,6 +613,56 @@ export default function OrdersPage() {
             <CheckCircle2 size={10} /> Deliv. Pending Appr.
           </span>
         );
+      case "partial_delivered":
+        return (
+          <span className="badge badge-warning text-slate-900 font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
+            <CheckCircle2 size={10} /> Partial Delivered
+          </span>
+        );
+      case "partial_delivered_approval_pending":
+        return (
+          <span className="badge badge-accent text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <Clock size={10} /> Part. Deliv. Pending Appr.
+          </span>
+        );
+      case "cancelled_approval_pending":
+        return (
+          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <Clock size={10} /> Canc. Pending Appr.
+          </span>
+        );
+      case "exceptional":
+        return (
+          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <AlertTriangle size={10} /> Exceptional
+          </span>
+        );
+      case "cancelled_return_received":
+        return (
+          <span className="badge badge-error text-white font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-red-300">
+            <XCircle size={10} /> Returned & Restocked
+          </span>
+        );
+      case "partial_delivered_return_received":
+        return (
+          <span className="badge badge-warning text-slate-900 font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
+            <CheckCircle2 size={10} /> Part. Return Received
+          </span>
+        );
+      case "cancelled_return_processing":
+      case "cancelled_return_rider_assigned":
+        return (
+          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <Truck size={10} /> Return In Transit
+          </span>
+        );
+      case "partial_delivered_return_proccessing":
+      case "partial_delivered_return_rider_assigned":
+        return (
+          <span className="badge badge-warning text-slate-900 font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+            <Truck size={10} /> Part. Return In Transit
+          </span>
+        );
       default:
         return (
           <span className="badge badge-neutral text-white font-semibold text-[10px] uppercase py-1.5 px-2">
@@ -482,6 +687,15 @@ export default function OrdersPage() {
 
         <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
           <button
+            onClick={handleSyncAllCourier}
+            disabled={syncingAllCourier}
+            title="Poll and synchronize all active in-flight parcels from Steadfast"
+            className="btn btn-sm btn-info text-white rounded-xl font-bold gap-2 shadow-sm"
+          >
+            <Truck size={14} className={syncingAllCourier ? "animate-bounce" : ""} />
+            {syncingAllCourier ? "Syncing Steadfast..." : "Sync All Courier"}
+          </button>
+          <button
             onClick={handleExportCSV}
             disabled={exporting}
             className="btn btn-sm btn-success text-white rounded-xl font-bold gap-2"
@@ -503,8 +717,23 @@ export default function OrdersPage() {
 
       </div>
 
+      {courierSyncBannerMsg && (
+        <div className="alert alert-info shadow-sm rounded-2xl text-white text-xs font-bold flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Truck size={16} />
+            <span>{courierSyncBannerMsg}</span>
+          </div>
+          <button
+            onClick={() => setCourierSyncBannerMsg(null)}
+            className="btn btn-ghost btn-xs text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Orders */}
         <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
           <div>
@@ -562,6 +791,30 @@ export default function OrdersPage() {
           </div>
           <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
             <CreditCard size={22} />
+          </div>
+        </div>
+
+        {/* Steadfast Courier Wallet Balance */}
+        <div className="bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 p-5 rounded-3xl text-white shadow-sm flex items-center justify-between border border-indigo-800/80">
+          <div>
+            <div className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span>Steadfast Balance</span>
+              <button
+                type="button"
+                onClick={fetchSteadfastBalance}
+                className="btn btn-ghost btn-xs text-indigo-300 hover:text-white p-0 h-auto"
+                title="Refresh Courier Wallet Balance"
+              >
+                <RefreshCw size={11} className={loadingBalance ? "animate-spin" : ""} />
+              </button>
+            </div>
+            <div className="text-2xl font-black text-white mt-1">
+              {steadfastBalance !== null ? `৳ ${steadfastBalance.toLocaleString()}` : "৳ ---"}
+            </div>
+            <div className="text-[10px] text-emerald-400 font-semibold mt-0.5">Live Courier Wallet</div>
+          </div>
+          <div className="w-12 h-12 rounded-2xl bg-white/10 text-emerald-400 flex items-center justify-center font-bold">
+            <DollarSign size={22} />
           </div>
         </div>
       </div>
@@ -662,6 +915,28 @@ export default function OrdersPage() {
             </select>
           </div>
 
+          {/* Courier Status Filter */}
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+            <Truck size={14} className="text-info" /> Courier:
+            <select
+              value={selectedCourierStatus}
+              onChange={(e) => {
+                setSelectedCourierStatus(e.target.value);
+                setPage(1);
+              }}
+              className="select select-xs select-bordered bg-white text-slate-900 font-bold rounded-xl"
+            >
+              <option value="ALL">All Courier Statuses</option>
+              <option value="NOT_SENT">Not Placed with Courier</option>
+              <option value="IN_TRANSIT">In Transit / Active</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="PARTIAL_DELIVERED">Partially Delivered</option>
+              <option value="CANCELLED">Cancelled</option>
+              <option value="HOLD">On Hold</option>
+              <option value="RETURNED">Returned (Return Received)</option>
+            </select>
+          </div>
+
           {/* Payment Status Filter */}
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
             <CreditCard size={14} /> Payment:
@@ -693,11 +968,12 @@ export default function OrdersPage() {
             <SlidersHorizontal size={12} /> Edit Courier Policy
           </button>
 
-          {(searchQuery || selectedProcessingStatus !== "ALL" || selectedPaymentStatus !== "ALL" || selectedOrderType !== "ALL" || startDate || endDate || customerPhoneFilter) && (
+          {(searchQuery || selectedProcessingStatus !== "ALL" || selectedPaymentStatus !== "ALL" || selectedOrderType !== "ALL" || selectedCourierStatus !== "ALL" || startDate || endDate || customerPhoneFilter) && (
             <button
               onClick={() => {
                 setSearchQuery("");
                 setSelectedProcessingStatus("ALL");
+                setSelectedCourierStatus("ALL");
                 setSelectedPaymentStatus("ALL");
                 setSelectedOrderType("ALL");
                 setStartDate("");
@@ -777,7 +1053,7 @@ export default function OrdersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm">
-                {orders.map((ord) => {
+                {displayedOrders.map((ord) => {
                   const isReseller = ord.isResellerOrder || ord.customer?.role === "RESELLER";
                   const customerName = ord.customerName || ord.customer?.name || "Customer";
                   const customerPhone = ord.customerPhone || ord.customer?.phone || "N/A";
@@ -838,10 +1114,16 @@ export default function OrdersPage() {
                       <td>
                         {ord.courierTrackingCode ? (
                           <div className="space-y-1">
-                            <div className="flex items-center gap-1.5 font-mono text-xs font-black text-slate-900">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenTrackingTimeline(ord.id)}
+                              className="flex items-center gap-1.5 font-mono text-xs font-black text-indigo-700 hover:text-indigo-950 transition-colors group cursor-pointer"
+                              title="Click to view live parcel tracking journey from Steadfast"
+                            >
                               <Truck size={12} className="text-primary" />
-                              <span>{ord.courierTrackingCode}</span>
-                            </div>
+                              <span className="underline decoration-dotted">{ord.courierTrackingCode}</span>
+                              <ExternalLink size={10} className="opacity-40 group-hover:opacity-100" />
+                            </button>
                             <div>{renderCourierBadge(ord.courierStatus)}</div>
                           </div>
                         ) : (
@@ -984,8 +1266,20 @@ export default function OrdersPage() {
                     <div className="text-slate-500 mt-0.5 flex items-center gap-1">
                       <Phone size={12} /> {selectedOrder.customerPhone || selectedOrder.customer?.phone || "N/A"}
                     </div>
+                    {(selectedOrder.customerPhone || selectedOrder.customer?.phone) && (
+                      <button
+                        type="button"
+                        onClick={() => handleCheckFraudScore(selectedOrder.customerPhone || selectedOrder.customer?.phone || "")}
+                        disabled={loadingFraudCheck}
+                        className="btn btn-xs btn-outline btn-info rounded-xl gap-1 mt-1 text-[10px] font-bold shadow-2xs"
+                        title="Check customer delivery & cancellation history on Steadfast"
+                      >
+                        <ShieldAlert size={12} />
+                        {loadingFraudCheck ? "Checking History..." : "Check Delivery History"}
+                      </button>
+                    )}
                     {selectedOrder.customerSecondaryPhone && (
-                      <div className="text-slate-500 mt-0.5 flex items-center gap-1">
+                      <div className="text-slate-500 mt-1 flex items-center gap-1">
                         <Phone size={12} /> Sec: {selectedOrder.customerSecondaryPhone}
                       </div>
                     )}
@@ -1115,13 +1409,29 @@ export default function OrdersPage() {
                           </span>
                         </div>
                       )}
+
+                      {selectedOrder.courierReturnStatus && (
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
+                            Return Status
+                          </span>
+                          <span className="badge badge-warning text-slate-900 font-bold text-[10px] uppercase mt-0.5">
+                            {selectedOrder.courierReturnStatus}
+                          </span>
+                          {selectedOrder.courierReturnReason && (
+                            <span className="block text-[10px] text-slate-500 mt-1">
+                              {selectedOrder.courierReturnReason}
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="flex items-center gap-2 pt-1">
+                    <div className="flex flex-col sm:flex-row items-center gap-2 pt-1">
                       <button
                         onClick={handleSyncCourierStatus}
                         disabled={isSyncingCourier}
-                        className="btn btn-sm btn-outline btn-primary rounded-xl font-bold gap-2 flex-1 shadow-xs"
+                        className="btn btn-sm btn-outline btn-primary rounded-xl font-bold gap-2 flex-1 w-full shadow-xs"
                       >
                         {isSyncingCourier ? (
                           <span className="loading loading-spinner loading-xs"></span>
@@ -1129,6 +1439,18 @@ export default function OrdersPage() {
                           <RefreshCw size={14} />
                         )}
                         Sync Live Courier Status
+                      </button>
+                      <button
+                        onClick={() => handleOpenTrackingTimeline(selectedOrder.id)}
+                        disabled={loadingTrackingHistory}
+                        className="btn btn-sm btn-primary text-white rounded-xl font-bold gap-2 flex-1 w-full shadow-xs"
+                      >
+                        {loadingTrackingHistory ? (
+                          <span className="loading loading-spinner loading-xs"></span>
+                        ) : (
+                          <Truck size={14} />
+                        )}
+                        View Live Tracking Journey
                       </button>
                     </div>
                   </div>
@@ -1175,6 +1497,30 @@ export default function OrdersPage() {
                         placeholder="e.g. Deliver before 4 PM, call on arrival"
                         className="input input-sm input-bordered w-full bg-white text-slate-900 rounded-xl"
                       />
+                    </div>
+
+                    <div className="flex items-center justify-between py-1 px-1 bg-amber-50/80 rounded-xl border border-amber-200/60 p-2">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-amber-950">
+                        <input
+                          type="checkbox"
+                          className="checkbox checkbox-xs checkbox-warning rounded"
+                          checked={courierNote.includes("Partial delivery allowed")}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setCourierNote((prev) =>
+                                prev ? `${prev}, Partial delivery allowed` : "Partial delivery allowed"
+                              );
+                            } else {
+                              setCourierNote((prev) =>
+                                prev
+                                  .replace(/,?\s*Partial delivery allowed/gi, "")
+                                  .trim()
+                              );
+                            }
+                          }}
+                        />
+                        <span>Allow Partial Delivery (আংশিক ডেলিভারি গ্রহণযোগ্য)</span>
+                      </label>
                     </div>
 
                     <button
@@ -1547,6 +1893,207 @@ export default function OrdersPage() {
           </div>
         </div>
       )}
+
+      {/* Live Steadfast Parcel Tracking Timeline Modal */}
+      {isTrackingModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-lg bg-white p-6 space-y-5 rounded-3xl border border-slate-200 text-slate-800">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wider block">
+                  Steadfast Courier Logistics
+                </span>
+                <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2 mt-0.5">
+                  <Truck size={18} className="text-primary" />
+                  <span>Parcel Journey Timeline</span>
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="btn btn-ghost btn-circle btn-sm text-slate-400"
+                onClick={() => setIsTrackingModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {loadingTrackingHistory ? (
+              <div className="py-12 flex flex-col items-center justify-center gap-2">
+                <span className="loading loading-spinner loading-md text-primary"></span>
+                <span className="text-xs font-semibold text-slate-500">Fetching live journey milestones from Steadfast...</span>
+              </div>
+            ) : trackingTimelineData ? (
+              <div className="space-y-4">
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-slate-400 block font-bold text-[10px] uppercase">Invoice / Ref</span>
+                    <strong className="text-slate-900 font-mono text-sm">{trackingTimelineData.orderRef || trackingTimelineData.orderId}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block font-bold text-[10px] uppercase">Tracking Code</span>
+                    <strong className="text-indigo-700 font-mono text-sm">{trackingTimelineData.courierTrackingCode || "N/A"}</strong>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block font-bold text-[10px] uppercase">Current Status</span>
+                    {renderCourierBadge(trackingTimelineData.courierStatus)}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                    Milestone Events ({trackingTimelineData.trackingEvents?.length || 0})
+                  </h4>
+
+                  {(!trackingTimelineData.trackingEvents || trackingTimelineData.trackingEvents.length === 0) ? (
+                    <div className="bg-amber-50 text-amber-900 p-4 rounded-2xl border border-amber-200/60 text-xs font-medium">
+                      No milestone events recorded yet by Steadfast Courier. The parcel is booked and will show steps once received at the hub.
+                    </div>
+                  ) : (
+                    <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-indigo-100">
+                      {trackingTimelineData.trackingEvents.map((event: any, idx: number) => (
+                        <div key={idx} className="relative group">
+                          <div className="absolute -left-6 top-1 w-4 h-4 rounded-full bg-primary border-2 border-white shadow-xs flex items-center justify-center text-[8px] text-white font-bold">
+                            {idx + 1}
+                          </div>
+                          <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs">
+                            <p className="text-xs font-bold text-slate-900">{event.text}</p>
+                            <span className="text-[10px] text-slate-400 block mt-1">
+                              {new Date(event.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-6 text-slate-400 text-xs">
+                No tracking data available.
+              </div>
+            )}
+
+            <div className="modal-action border-t border-slate-100 pt-3">
+              <button
+                type="button"
+                className="btn btn-sm btn-ghost font-bold rounded-xl w-full"
+                onClick={() => setIsTrackingModalOpen(false)}
+              >
+                Close Tracking
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Customer Steadfast Delivery Reputation & Fraud Check Modal */}
+      {isFraudModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-md bg-white p-6 space-y-4 rounded-3xl border border-slate-200 text-slate-800">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-info uppercase tracking-wider block">
+                  Steadfast Courier Intelligence
+                </span>
+                <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2 mt-0.5">
+                  <ShieldAlert size={18} className="text-info" />
+                  <span>Customer Delivery Record</span>
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="btn btn-ghost btn-circle btn-sm text-slate-400"
+                onClick={() => setIsFraudModalOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {loadingFraudCheck ? (
+              <div className="py-10 flex flex-col items-center justify-center gap-2">
+                <span className="loading loading-spinner loading-md text-info"></span>
+                <span className="text-xs font-semibold text-slate-500">Checking customer reputation across Steadfast...</span>
+              </div>
+            ) : fraudCheckData ? (
+              <div className="space-y-4 text-xs">
+                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex items-center justify-between">
+                  <span className="text-slate-500 font-bold">Checked Mobile:</span>
+                  <strong className="text-slate-900 font-mono text-sm">{fraudCheckData.phone}</strong>
+                </div>
+
+                {/* Delivery & Cancellation Ratios */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-emerald-50/80 p-3.5 rounded-2xl border border-emerald-100 space-y-1">
+                    <span className="text-[10px] font-extrabold text-emerald-800 uppercase block">Delivery Success</span>
+                    <div className="text-2xl font-black text-emerald-700">
+                      {fraudCheckData.delivery_ratio !== null ? `${fraudCheckData.delivery_ratio}%` : "No Record"}
+                    </div>
+                    {fraudCheckData.delivered_count !== null && (
+                      <span className="text-[10px] text-emerald-600 block">
+                        {fraudCheckData.delivered_count} parcels completed
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="bg-rose-50/80 p-3.5 rounded-2xl border border-rose-100 space-y-1">
+                    <span className="text-[10px] font-extrabold text-rose-800 uppercase block">Cancellation Rate</span>
+                    <div className="text-2xl font-black text-rose-700">
+                      {fraudCheckData.cancellation_ratio !== null ? `${fraudCheckData.cancellation_ratio}%` : "No Record"}
+                    </div>
+                    {fraudCheckData.cancelled_count !== null && (
+                      <span className="text-[10px] text-rose-600 block">
+                        {fraudCheckData.cancelled_count} parcels cancelled
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Volume Tier */}
+                <div className="bg-indigo-50/70 p-3.5 rounded-2xl border border-indigo-100 flex items-center justify-between">
+                  <span className="font-bold text-indigo-950">Customer Parcel Volume:</span>
+                  <span className="badge badge-primary font-bold text-xs uppercase">
+                    {fraudCheckData.volume_range || fraudCheckData.volume_band || "Low Activity"}
+                  </span>
+                </div>
+
+                {/* Reported Disputes by Other Merchants */}
+                <div className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50/60 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-700">Merchant Dispute Reports:</span>
+                    <span className={`badge font-bold text-xs ${Number(fraudCheckData.total_reports || 0) > 0 ? "badge-error text-white" : "badge-ghost text-slate-500"}`}>
+                      {fraudCheckData.total_reports || 0} Reports
+                    </span>
+                  </div>
+                  {fraudCheckData.fraud_categories && Object.keys(fraudCheckData.fraud_categories).length > 0 && (
+                    <div className="pt-2 border-t border-slate-200 flex flex-wrap gap-1 mt-1">
+                      {Object.entries(fraudCheckData.fraud_categories).map(([cat, count]) => (
+                        <span key={cat} className="badge badge-warning text-slate-900 font-bold text-[10px]">
+                          {cat}: {String(count)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-6 text-slate-400 text-xs">
+                Could not retrieve fraud stats.
+              </div>
+            )}
+
+            <div className="modal-action border-t border-slate-100 pt-3">
+              <button
+                type="button"
+                className="btn btn-sm btn-ghost font-bold rounded-xl w-full"
+                onClick={() => setIsFraudModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

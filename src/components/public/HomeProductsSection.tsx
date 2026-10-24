@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { productApi, Product } from "@/services/product.api";
 import ProductCard from "@/components/ProductCard";
+import { safeLink } from "@/utils/links";
 
 interface HomeProductsSectionProps {
   title?: string;
@@ -69,7 +70,7 @@ export default function HomeProductsSection({
         </div>
 
         <Link
-          href={buttonLink || "/shop"}
+          href={safeLink(buttonLink, "/shop")}
           className="btn btn-sm sm:btn-md btn-outline btn-primary rounded-xl gap-2 font-bold self-start md:self-auto shrink-0 shadow-xs"
         >
           <span>{buttonText}</span>

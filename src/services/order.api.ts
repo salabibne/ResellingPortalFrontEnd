@@ -100,6 +100,13 @@ export interface Order {
   courierLastSyncedAt?: string | null;
   courierDeliveryType?: number;
   courierNotes?: string | null;
+  courierTrackingLink?: string | null;
+  courierCodAmount?: number | null;
+  courierBookingState?: string | null;
+  courierReturnRequestId?: number | null;
+  courierReturnStatus?: string | null;
+  courierReturnReason?: string | null;
+  courierReturnRequestedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   orderItems: OrderItem[];
@@ -138,6 +145,84 @@ export interface OrderListResponse {
     limit: number;
     totalPages: number;
   };
+}
+
+export interface CourierPickup {
+  id: string;
+  provider: string;
+  addressId?: number | null;
+  policeStationId?: number | null;
+  address: string;
+  contactNumber: string;
+  note?: string | null;
+  estimQty?: number | null;
+  status?: string | null;
+  providerResponse?: any;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CourierReturnRequest {
+  id: number | string;
+  consignment_id?: number | string | null;
+  invoice?: string | null;
+  reason?: string | null;
+  status: string;
+  created_at?: string | null;
+  updated_at?: string | null;
+  [key: string]: any;
+}
+
+export interface CourierPayment {
+  id: number | string;
+  amount: number | string;
+  created_at?: string | null;
+  updated_at?: string | null;
+  consignments?: any[];
+  [key: string]: any;
+}
+
+export interface PoliceStation {
+  id: number | string;
+  name: string;
+  district?: string;
+  [key: string]: any;
+}
+
+export interface CourierTrackingEvent {
+  text: string;
+  created_at: string;
+  tracking_type?: number;
+}
+
+export interface CourierTrackResult {
+  identifier: string;
+  matchedBy: "cid" | "tracking" | "invoice" | string;
+  matchedIdentifier?: string;
+  orderId?: string;
+  orderRef?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
+  consignmentId?: string | null;
+  trackingCode?: string | null;
+  trackingLink?: string | null;
+  deliveryStatus: string;
+  persistedCourierStatus?: string | null;
+  lastSyncedAt?: string | null;
+  returnStatus?: string | null;
+  returnReason?: string | null;
+  returnRequestedAt?: string | null;
+  trackingEvents: CourierTrackingEvent[];
+}
+
+export interface CourierAuthStatus {
+  preferredSource: "env" | "database" | null;
+  envConfigured: boolean;
+  databaseConfigured: boolean;
+  pingOk?: boolean;
+  pingError?: string;
+  balanceOk: boolean;
+  balanceError?: string;
 }
 
 export const orderApi = {
@@ -193,6 +278,104 @@ export const orderApi = {
     if (endDate) params.set("endDate", endDate);
     if (customerPhone) params.set("customerPhone", customerPhone);
     const response = await api.get(`/orders?${params.toString()}`);
+    return response.data;
+  },
+  getCourierShipments: async (
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      courierStatus?: string;
+      consignmentId?: string;
+      shipmentState?: string;
+      startDate?: string;
+      endDate?: string;
+      customerPhone?: string;
+    } = {}
+  ): Promise<OrderListResponse> => {
+    const query = new URLSearchParams();
+    query.set("page", (params.page ?? 1).toString());
+    query.set("limit", (params.limit ?? 20).toString());
+    if (params.search) query.set("search", params.search);
+    if (params.courierStatus && params.courierStatus !== "ALL") {
+      query.set("courierStatus", params.courierStatus);
+    }
+    if (params.consignmentId) query.set("consignmentId", params.consignmentId);
+    if (params.shipmentState) query.set("shipmentState", params.shipmentState);
+    if (params.startDate) query.set("startDate", params.startDate);
+    if (params.endDate) query.set("endDate", params.endDate);
+    if (params.customerPhone) query.set("customerPhone", params.customerPhone);
+    const response = await api.get(`/orders/courier/shipments?${query.toString()}`);
+    return response.data;
+  },
+  createCourierPickup: async (data: {
+    address: string;
+    contactNumber: string;
+    policeStationId?: number;
+    addressId?: number;
+    estimQty?: number;
+    note?: string;
+  }): Promise<{
+    message: string;
+    pickup: CourierPickup;
+    providerResponse: any;
+  }> => {
+    const response = await api.post("/orders/courier/pickups", data);
+    return response.data;
+  },
+  getCourierPickups: async (
+    page = 1,
+    limit = 20
+  ): Promise<{
+    data: CourierPickup[];
+    meta: { total: number; page: number; limit: number; totalPages: number };
+  }> => {
+    const response = await api.get(
+      `/orders/courier/pickups?page=${page}&limit=${limit}`
+    );
+    return response.data;
+  },
+  getPoliceStations: async (): Promise<{
+    data: PoliceStation[];
+    meta?: any;
+    raw?: any;
+  }> => {
+    const response = await api.get("/orders/courier/police-stations");
+    return response.data;
+  },
+  createCourierReturn: async (data: {
+    orderId: string;
+    reason?: string;
+  }): Promise<{ message: string; returnRequest: any; order: Order }> => {
+    const response = await api.post("/orders/courier/returns", data);
+    return response.data;
+  },
+  getCourierReturns: async (
+    page = 1
+  ): Promise<{
+    data: CourierReturnRequest[];
+    meta?: any;
+    raw?: any;
+  }> => {
+    const response = await api.get(`/orders/courier/returns?page=${page}`);
+    return response.data;
+  },
+  getCourierReturn: async (id: string | number): Promise<any> => {
+    const response = await api.get(`/orders/courier/returns/${id}`);
+    return response.data;
+  },
+  getCourierPayments: async (
+    page = 1
+  ): Promise<{
+    data: CourierPayment[];
+    meta?: any;
+    raw?: any;
+  }> => {
+    const response = await api.get(`/orders/courier/payments?page=${page}`);
+    return response.data;
+  },
+  getCourierPayment: async (id: string | number): Promise<any> => {
+    const response = await api.get(`/orders/courier/payments/${id}`);
     return response.data;
   },
   getOrderById: async (orderId: string): Promise<Order> => {
@@ -258,9 +441,71 @@ export const orderApi = {
     const response = await api.post(`/orders/${orderId}/sync-courier-status`, {});
     return response.data;
   },
-  getCourierBalance: async (): Promise<{ status: number; current_balance: number }> => {
+  syncAllCourierOrders: async (): Promise<{
+    message: string;
+    totalChecked: number;
+    syncedCount: number;
+    failedCount: number;
+  }> => {
+    const response = await api.post("/orders/sync-all-courier", {});
+    return response.data;
+  },
+  getOrderTrackingHistory: async (
+    orderId: string
+  ): Promise<{
+    orderId: string;
+    orderRef?: string;
+    courierStatus?: string;
+    courierTrackingCode?: string;
+    courierConsignmentId?: string;
+    courierSubmittedAt?: string;
+    courierLastSyncedAt?: string;
+    trackingEvents: Array<{
+      consignment_id: number;
+      tracking_type: number;
+      text: string;
+      created_at: string;
+    }>;
+  }> => {
+    const response = await api.get(`/orders/${orderId}/courier-tracking`);
+    return response.data;
+  },
+  checkCustomerFraud: async (
+    phone: string
+  ): Promise<{
+    status: number;
+    phone: string;
+    delivery_ratio?: number | null;
+    cancellation_ratio?: number | null;
+    volume_band?: string | null;
+    volume_range?: string | null;
+    delivered_count?: number | null;
+    cancelled_count?: number | null;
+    total_reports?: number;
+    fraud_categories?: Record<string, number>;
+  }> => {
+    const response = await api.get(`/orders/fraud-check/${encodeURIComponent(phone)}`);
+    return response.data;
+  },
+  trackCourierParcel: async (identifier: string): Promise<CourierTrackResult> => {
+    const response = await api.get(
+      `/orders/courier/track?identifier=${encodeURIComponent(identifier)}`
+    );
+    return response.data;
+  },
+  getCourierAuthStatus: async (): Promise<CourierAuthStatus> => {
+    const response = await api.get("/orders/courier/auth-status");
+    return response.data;
+  },
+  getCourierBalance: async (): Promise<{
+    status: number;
+    current_balance: number;
+    error?: string;
+  }> => {
     const response = await api.get("/orders/courier/balance");
     return response.data;
   },
 };
+
+
 

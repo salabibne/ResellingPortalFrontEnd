@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { ShoppingBag, Phone, Mail, MapPin, Send, MessageSquare, Facebook, Share2 } from "lucide-react";
 import { useCMSStore } from "@/store/useCMSStore";
+import BrandLogo from "@/components/shared/BrandLogo";
 
 export default function Footer() {
   const contact = useCMSStore((state) => state.contactInfo);
@@ -14,8 +15,10 @@ export default function Footer() {
       <div className="footer p-6 sm:p-10 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         <aside className="max-w-xs">
           <Link href="/" className="flex items-center gap-2 text-2xl font-bold mb-3 text-black">
-            <ShoppingBag className="text-primary" size={28} />
-            Aarham Apparel
+            <BrandLogo className="h-10 sm:h-12 w-auto max-w-[60%] object-contain" alt="Aarham Apparel">
+              <ShoppingBag className="text-primary" size={28} />
+              Aarham Apparel
+            </BrandLogo>
           </Link>
           <p className="text-sm text-base-content/70 leading-relaxed mb-4">
             Aarham Apparel Ltd.

@@ -2,8 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { useCMSStore } from "@/store/useCMSStore";
+import { safeLink } from "@/utils/links";
 
 interface HeroSectionProps {
   title?: string;
@@ -13,6 +14,8 @@ interface HeroSectionProps {
   buttonText?: string;
   buttonLink?: string;
   content?: Record<string, any>;
+  /** false = never borrow CmsHero values (homepage shows customizer data only) */
+  useCmsFallback?: boolean;
 }
 
 export default function HeroSection({
@@ -23,21 +26,28 @@ export default function HeroSection({
   buttonText: overrideButtonText,
   buttonLink: overrideButtonLink,
   content,
+  useCmsFallback = true,
 }: HeroSectionProps) {
-  const hero = useCMSStore((state) => state.hero);
-  const loading = useCMSStore((state) => state.loading && !state.initialized);
+  const heroFromCms = useCMSStore((state) => state.hero);
+  const loadingFromCms = useCMSStore((state) => state.loading && !state.initialized);
+
+  const hero = useCmsFallback ? heroFromCms : null;
+  const loading = useCmsFallback && loadingFromCms;
 
   // Use customizer data when provided, otherwise fall back to CMS data
   const title = overrideTitle || hero?.heroTitle || "Style Meets Substance";
+  // Subtitle from the customizer renders as the badge above the headline;
+  // without a badge it still serves as the intro paragraph (legacy behaviour).
+  const badge = overrideSubtitle || "";
   const subtitle =
     overrideDescription ||
-    overrideSubtitle ||
+    (badge ? "" : overrideSubtitle) ||
     hero?.heroSubtitle ||
     "Discover the latest trends in apparel. Our exclusive collection brings you the finest quality clothing designed for comfort and elegance.";
   const btn1Text = overrideButtonText || hero?.buttonText1 || "Shop Collection";
-  const btn1Link = overrideButtonLink || hero?.buttonLink1 || "/shop";
-  const btn2Text = content?.buttonText2 || hero?.buttonText2 || "Explore Categories";
-  const btn2Link = content?.buttonLink2 || hero?.buttonLink2 || "/about";
+  const btn1Link = safeLink(overrideButtonLink || hero?.buttonLink1, "/shop");
+  const btn2Text = content?.buttonText2 ?? hero?.buttonText2 ?? "Explore Categories";
+  const btn2Link = safeLink(content?.buttonLink2 ?? hero?.buttonLink2, "/about");
   const image = overrideImageUrl || hero?.imageUrl || "/api/image?name=hero";
 
   if (loading) {
@@ -62,12 +72,20 @@ export default function HeroSection({
           />
         </div>
         <div className="flex-1 text-left">
+          {badge && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-4">
+              <Sparkles size={12} />
+              <span>{badge}</span>
+            </span>
+          )}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-base-content mb-4 sm:mb-6 leading-tight">
             {title}
           </h1>
-          <p className="py-2 sm:py-4 text-sm sm:text-base md:text-lg text-base-content/80 mb-6 sm:mb-8 leading-relaxed">
-            {subtitle}
-          </p>
+          {subtitle && (
+            <p className="py-2 sm:py-4 text-sm sm:text-base md:text-lg text-base-content/80 mb-6 sm:mb-8 leading-relaxed">
+              {subtitle}
+            </p>
+          )}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             {btn1Text && (
               <Link href={btn1Link} className="btn btn-primary btn-md sm:btn-lg gap-2 rounded-full px-6 sm:px-8 w-full sm:w-auto justify-center">

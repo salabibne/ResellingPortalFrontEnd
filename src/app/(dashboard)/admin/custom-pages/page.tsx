@@ -47,7 +47,8 @@ export default function AdminCustomPagesPage() {
         search,
         status: statusFilter,
       });
-      setPages(data);
+      // The home page lives in the Homepage Customizer, never in this builder.
+      setPages((data || []).filter((page) => page.slug !== "home"));
     } catch (err) {
       console.error("Failed to fetch custom pages", err);
     } finally {
@@ -212,6 +213,15 @@ export default function AdminCustomPagesPage() {
             <option value="ARCHIVED">Archived</option>
           </select>
         </div>
+      </div>
+
+      {/* Home page is owned by the Homepage Customizer, not this builder */}
+      <div className="flex flex-wrap items-center gap-2 bg-gray-50 border border-dashed border-gray-300 rounded-xl px-4 py-2.5 text-xs text-gray-600">
+        <Layers className="w-4 h-4 text-primary shrink-0" />
+        <span>The site Home Page is not edited here — it is managed in the Homepage Customizer.</span>
+        <a href="/admin/homepage" className="link link-primary font-semibold">
+          Open Homepage Customizer
+        </a>
       </div>
 
       {/* Data Table View */}
@@ -654,6 +664,49 @@ export default function AdminCustomPagesPage() {
                               className="textarea textarea-bordered textarea-xs w-full mt-1 h-12 bg-white text-black"
                             />
                           </div>
+                          {(() => {
+                            const contentType = String(
+                              ((sec.content as any) || {}).type || ""
+                            ).toLowerCase();
+                            if (contentType !== "feature_card" && contentType !== "founder_video")
+                              return null;
+
+                            const isVideo = contentType === "founder_video";
+                            const contentKey = isVideo ? "videoLink" : "cardIcon";
+                            return (
+                              <div className="md:col-span-2">
+                                <label className="label-text text-[11px] font-medium text-black">
+                                  {isVideo ? "Video URL" : "Card Icon"}
+                                </label>
+                                <input
+                                  type="text"
+                                  value={((sec.content as any) || {})[contentKey] || ""}
+                                  placeholder={
+                                    isVideo
+                                      ? "https://www.youtube.com/watch?v=..."
+                                      : "e.g. ShieldCheck, Truck, Sparkles"
+                                  }
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setSections((prev) =>
+                                      prev.map((s, i) =>
+                                        i === idx
+                                          ? {
+                                              ...s,
+                                              content: {
+                                                ...((s.content as any) || {}),
+                                                [contentKey]: val,
+                                              },
+                                            }
+                                          : s
+                                      )
+                                    );
+                                  }}
+                                  className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                                />
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
                     ))}

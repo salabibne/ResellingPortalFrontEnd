@@ -22,7 +22,6 @@ import {
   Palette,
   Copy,
   Check,
-  RefreshCw,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/shared/Footer";
@@ -39,7 +38,6 @@ export default function CustomerOrderDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedTrackingCode, setCopiedTrackingCode] = useState<string | null>(null);
-  const [isSyncingCourier, setIsSyncingCourier] = useState<boolean>(false);
 
   const fetchOrderDetail = () => {
     if (orderId) {
@@ -73,18 +71,44 @@ export default function CustomerOrderDetailPage() {
     setTimeout(() => setCopiedTrackingCode(null), 2000);
   };
 
-  const handleSyncCourier = async () => {
+  const [trackingEvents, setTrackingEvents] = useState<any[]>([]);
+  const [loadingTrackingEvents, setLoadingTrackingEvents] = useState<boolean>(false);
+
+  const fetchTrackingHistory = async () => {
     if (!orderId) return;
     try {
-      setIsSyncingCourier(true);
-      const res = await orderApi.syncCourierStatus(orderId);
-      setOrder(res.order);
-    } catch (err: any) {
-      console.error("Failed to sync courier tracking:", err);
+      setLoadingTrackingEvents(true);
+      const res = await orderApi.getOrderTrackingHistory(orderId);
+      if (res && res.trackingEvents) {
+        setTrackingEvents(res.trackingEvents);
+      }
+    } catch {
+      // ignore
     } finally {
-      setIsSyncingCourier(false);
+      setLoadingTrackingEvents(false);
     }
   };
+
+  useEffect(() => {
+    if (order?.courierTrackingCode) {
+      fetchTrackingHistory();
+    }
+  }, [order?.courierTrackingCode]);
+
+  // Auto-refresh courier tracking status if active
+  useEffect(() => {
+    if (!order?.courierTrackingCode) return;
+    if (order.processingStatus === "DELIVERED" || order.processingStatus === "CANCELLED") return;
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchOrderDetail();
+        fetchTrackingHistory();
+      }
+    }, 45000);
+
+    return () => clearInterval(interval);
+  }, [order?.courierTrackingCode, order?.processingStatus]);
 
   const steps: OrderProcessingStatus[] = [
     "PENDING",
@@ -142,6 +166,18 @@ export default function CustomerOrderDetailPage() {
         return (
           <span className="badge badge-error text-white font-bold text-xs py-2 px-3 gap-1">
             <XCircle size={12} /> Courier Cancelled
+          </span>
+        );
+      case "partial_delivered":
+        return (
+          <span className="badge badge-warning text-slate-900 font-extrabold text-xs py-2 px-3 gap-1 border border-amber-400">
+            <CheckCircle2 size={12} /> Partially Delivered
+          </span>
+        );
+      case "partial_delivered_approval_pending":
+        return (
+          <span className="badge badge-accent text-white font-bold text-xs py-2 px-3 gap-1">
+            <Clock size={12} /> Part. Deliv. Pending Appr.
           </span>
         );
       default:
@@ -379,19 +415,29 @@ export default function CustomerOrderDetailPage() {
                       )}
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleSyncCourier}
-                      disabled={isSyncingCourier}
-                      className="btn btn-sm btn-outline text-white border-white/30 hover:bg-white/10 rounded-xl font-bold w-full gap-2 text-xs"
-                    >
-                      {isSyncingCourier ? (
-                        <span className="loading loading-spinner loading-xs"></span>
-                      ) : (
-                        <RefreshCw size={14} />
-                      )}
-                      Refresh Live Tracking Status
-                    </button>
+                    {/* Live Milestone Journey */}
+                    {loadingTrackingEvents ? (
+                      <div className="py-2 text-center text-xs text-indigo-300">
+                        <span className="loading loading-spinner loading-xs mr-2"></span>
+                        Checking parcel location...
+                      </div>
+                    ) : trackingEvents.length > 0 ? (
+                      <div className="space-y-2 pt-2 border-t border-white/10 text-left">
+                        <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider block">
+                          Delivery Progress ({trackingEvents.length})
+                        </span>
+                        <div className="space-y-2.5 pl-3.5 border-l border-indigo-400/40 my-2">
+                          {trackingEvents.map((ev, idx) => (
+                            <div key={idx} className="relative text-xs">
+                              <span className="absolute -left-[18px] top-1 w-2 h-2 rounded-full bg-emerald-400 shadow-xs"></span>
+                              <div className="font-bold text-white leading-tight">{ev.text}</div>
+                              <div className="text-[10px] text-indigo-300 mt-0.5">{new Date(ev.created_at).toLocaleString()}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
                   </div>
                 )}
 

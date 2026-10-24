@@ -44,6 +44,14 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
       { name: "facebook", label: "Facebook Page URL", type: "url", required: false, placeholder: "https://facebook.com/aarhamapparel" },
     ],
   },
+  brand: {
+    module: "brand",
+    title: "Site Logo",
+    description: "Set the brand logo shown in the public site header and footer. Paste an image URL (absolute or site-relative).",
+    fields: [
+      { name: "logoUrl", label: "Logo Image URL", type: "url", required: true, placeholder: "https://cdn.aarhamapparel.com/logo.png or /images/logo.png" },
+    ],
+  },
   hero: {
     module: "hero",
     title: "Hero Banner",
@@ -132,9 +140,12 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
 
 type Props = {
   module: CMSModuleType;
+  /** Called after any successful create/update/toggle/delete so parent views
+   *  (e.g. the configured WhatsApp number shown on /cms) stay in sync. */
+  onSaved?: () => void | Promise<void>;
 };
 
-export default function CmsManager({ module }: Props) {
+export default function CmsManager({ module, onSaved }: Props) {
   const config = MODULE_CONFIGS[module];
   const [records, setRecords] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -221,6 +232,7 @@ export default function CmsManager({ module }: Props) {
       }
       handleCloseForm();
       await fetchRecords();
+      await onSaved?.();
     } catch (err: any) {
       console.error("Save failed:", err);
       setFeedback({
@@ -239,6 +251,7 @@ export default function CmsManager({ module }: Props) {
       await cmsApi.toggleStatus(module, record.id, newStatus);
       setFeedback({ type: "success", message: `Status updated to ${newStatus}` });
       await fetchRecords();
+      await onSaved?.();
     } catch (err: any) {
       console.error("Status update failed:", err);
       setFeedback({
@@ -256,6 +269,7 @@ export default function CmsManager({ module }: Props) {
       setFeedback({ type: "success", message: "Item deleted successfully!" });
       setDeleteTargetId(null);
       await fetchRecords();
+      await onSaved?.();
     } catch (err: any) {
       console.error("Delete failed:", err);
       setFeedback({

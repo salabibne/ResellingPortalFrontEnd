@@ -56,6 +56,7 @@ export default function AdminHomepageManagerPage() {
     buttonText: "Shop Now",
     buttonLink: "/shop",
     type: "custom_banner",
+    animation: "default",
   });
 
   const showToast = (text: string, type: "success" | "error" = "success") => {
@@ -222,7 +223,7 @@ export default function AdminHomepageManagerPage() {
         buttonText: newSection.buttonText || undefined,
         buttonLink: newSection.buttonLink || undefined,
         sortOrder: sections.length + 1,
-        content: { type: newSection.type, isActive: true },
+        content: { type: newSection.type, isActive: true, animation: newSection.animation },
       };
 
       await customPagesApi.addSection(homePage.id, payload);
@@ -235,6 +236,7 @@ export default function AdminHomepageManagerPage() {
         buttonText: "Shop Now",
         buttonLink: "/shop",
         type: "custom_banner",
+        animation: "default",
       });
       await loadHomePage();
       showToast("New homepage section added successfully!");
@@ -389,6 +391,12 @@ export default function AdminHomepageManagerPage() {
               const content = (sec.content as any) || {};
               const secType = (content.type || sec.subtitle || "custom").toLowerCase();
               const isActive = content.isActive !== false;
+              // Feature cards / team / founder are Custom Pages Builder content and
+              // are never rendered on the home page any more.
+              const movedToBuilder =
+                secType.includes("feature") ||
+                secType.includes("team") ||
+                secType.includes("founder");
 
               return (
                 <div
@@ -443,6 +451,14 @@ export default function AdminHomepageManagerPage() {
                             Hidden
                           </span>
                         )}
+                        {movedToBuilder && (
+                          <span
+                            className="badge badge-xs badge-outline badge-info font-bold"
+                            title="Managed in the Custom Pages Builder — this section is not shown on the home page"
+                          >
+                            Builder only
+                          </span>
+                        )}
                       </div>
 
                       {sec.description && (
@@ -461,35 +477,46 @@ export default function AdminHomepageManagerPage() {
 
                   {/* Right: Actions (Toggle Active, Edit, Delete) */}
                   <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleActive(sec)}
-                      className={`btn btn-xs rounded-xl font-bold gap-1.5 ${
-                        isActive
-                          ? "btn-success text-white"
-                          : "btn-outline border-base-300 text-base-content/60"
-                      }`}
-                      title={isActive ? "Visible on Homepage" : "Hidden from Homepage"}
-                    >
-                      {isActive ? <Eye size={12} /> : <EyeOff size={12} />}
-                      <span>{isActive ? "Visible" : "Hidden"}</span>
-                    </button>
+                    {movedToBuilder ? (
+                      <a
+                        href="/admin/custom-pages"
+                        className="btn btn-xs btn-outline btn-primary rounded-xl font-bold gap-1"
+                        title="This block is no longer home page content — edit it in the Custom Pages Builder"
+                      >
+                        <ExternalLink size={12} /> Manage in Builder
+                      </a>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(sec)}
+                          className={`btn btn-xs rounded-xl font-bold gap-1.5 ${
+                            isActive
+                              ? "btn-success text-white"
+                              : "btn-outline border-base-300 text-base-content/60"
+                          }`}
+                          title={isActive ? "Visible on Homepage" : "Hidden from Homepage"}
+                        >
+                          {isActive ? <Eye size={12} /> : <EyeOff size={12} />}
+                          <span>{isActive ? "Visible" : "Hidden"}</span>
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setEditingSection(sec)}
-                      className="btn btn-xs btn-outline btn-primary rounded-xl font-bold gap-1"
-                    >
-                      <Edit2 size={12} /> Edit Content
-                    </button>
-
+                        <button
+                          type="button"
+                          onClick={() => setEditingSection(sec)}
+                          className="btn btn-xs btn-outline btn-primary rounded-xl font-bold gap-1"
+                        >
+                          <Edit2 size={12} /> Edit Content
+                        </button>
+                      </>
+                    )}
                     {/* Delete Custom Sections */}
-                    {secType === "custom_banner" && (
+                    {(secType === "custom_banner" || movedToBuilder) && (
                       <button
                         type="button"
                         onClick={() => handleDeleteSection(sec.id!, sec.title)}
                         className="btn btn-xs btn-ghost text-error btn-circle"
-                        title="Delete custom section"
+                        title={movedToBuilder ? "Remove from homepage layout" : "Delete custom section"}
                       >
                         <Trash2 size={13} />
                       </button>
@@ -572,6 +599,34 @@ export default function AdminHomepageManagerPage() {
                 />
               </div>
 
+              <div className="form-control bg-base-200/50 p-3 rounded-xl">
+                <label className="label font-bold text-base-content">
+                  Section Entrance Animation
+                </label>
+                <select
+                  className="select select-bordered select-sm w-full font-semibold"
+                  value={String(((editingSection.content as any) || {}).animation || "default")}
+                  onChange={(e) => {
+                    const prevContent = (editingSection.content as any) || {};
+                    setEditingSection({
+                      ...editingSection,
+                      content: { ...prevContent, animation: e.target.value },
+                    });
+                  }}
+                >
+                  <option value="default">Default (by section type)</option>
+                  <option value="fade-up">Fade In Up</option>
+                  <option value="slide-left">Slide In from Left</option>
+                  <option value="slide-right">Slide In from Right</option>
+                  <option value="zoom-in">Zoom In</option>
+                  <option value="zoom-out">Zoom Out</option>
+                  <option value="none">No Animation</option>
+                </select>
+                <p className="text-[11px] text-base-content/50 mt-1">
+                  Plays once when the section scrolls into view on the home page.
+                </p>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="form-control">
                   <label className="label font-bold text-base-content">
@@ -610,6 +665,48 @@ export default function AdminHomepageManagerPage() {
                 </div>
               </div>
 
+              {/* Secondary CTA — only hero / about render a second button */}
+              {(() => {
+                const contentType = String(
+                  ((editingSection.content as any) || {}).type || ""
+                ).toLowerCase();
+                if (!contentType.includes("hero") && !contentType.includes("about")) return null;
+
+                const content = (editingSection.content as any) || {};
+                const setContentField = (key: string, value: string) =>
+                  setEditingSection({ ...editingSection, content: { ...content, [key]: value } });
+
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="form-control">
+                      <label className="label font-bold text-base-content">
+                        Secondary Button Label
+                      </label>
+                      <input
+                        type="text"
+                        value={content.buttonText2 ?? ""}
+                        onChange={(e) => setContentField("buttonText2", e.target.value)}
+                        placeholder='e.g. "Explore Categories"'
+                        className="input input-bordered input-sm w-full"
+                      />
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label font-bold text-base-content">
+                        Secondary Button Link
+                      </label>
+                      <input
+                        type="text"
+                        value={content.buttonLink2 ?? ""}
+                        onChange={(e) => setContentField("buttonLink2", e.target.value)}
+                        placeholder="e.g. /about"
+                        className="input input-bordered input-sm w-full"
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+
               <div className="form-control">
                 <label className="label font-bold text-base-content">
                   Banner Image URL (Optional)
@@ -629,7 +726,9 @@ export default function AdminHomepageManagerPage() {
               </div>
 
               {/* Special options for Products section */}
-              {editingSection.subtitle?.toLowerCase().includes("product") && (
+              {String(((editingSection.content as any) || {}).type || "")
+                .toLowerCase()
+                .includes("product") && (
                 <div className="form-control bg-base-200/50 p-3 rounded-xl">
                   <label className="label font-bold text-base-content">
                     Number of Products to Display
@@ -804,6 +903,27 @@ export default function AdminHomepageManagerPage() {
                   placeholder="https://images.unsplash.com/... or /banner.jpg"
                   className="input input-bordered input-sm w-full"
                 />
+              </div>
+
+              <div className="form-control bg-base-200/50 p-3 rounded-xl">
+                <label className="label font-bold text-base-content">
+                  Section Entrance Animation
+                </label>
+                <select
+                  className="select select-bordered select-sm w-full font-semibold"
+                  value={newSection.animation}
+                  onChange={(e) =>
+                    setNewSection({ ...newSection, animation: e.target.value })
+                  }
+                >
+                  <option value="default">Default (by section type)</option>
+                  <option value="fade-up">Fade In Up</option>
+                  <option value="slide-left">Slide In from Left</option>
+                  <option value="slide-right">Slide In from Right</option>
+                  <option value="zoom-in">Zoom In</option>
+                  <option value="zoom-out">Zoom Out</option>
+                  <option value="none">No Animation</option>
+                </select>
               </div>
 
               <div className="modal-action border-t border-base-200 pt-3">

@@ -71,6 +71,15 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
     "Order Date",
     "Processing Status",
     "Payment Status",
+    "Courier Provider",
+    "Courier Status",
+    "Tracking Code",
+    "Consignment ID",
+    "Courier Delivery Type",
+    "Courier Placed At",
+    "Courier Last Synced",
+    "Tracking Link",
+    "COD Amount",
     "Products (Qty)",
     "Total Quantity",
     "Subtotal",
@@ -104,6 +113,35 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
     const orderDate = formatDateTimeAMPM(ord.createdAt);
     const processingStatus = ord.processingStatus || "";
     const paymentStatus = ord.paymentStatus || "";
+
+    // Courier Details
+    const courierProvider = ord.courierProvider || (ord.courierTrackingCode ? "STEADFAST" : "");
+    const courierStatus = ord.courierStatus ? ord.courierStatus.toUpperCase() : (ord.courierTrackingCode || ord.courierConsignmentId ? "NOT_SYNCED" : "NOT_SENT");
+    const trackingCode = ord.courierTrackingCode || "";
+    const consignmentId = ord.courierConsignmentId || "";
+    const deliveryType = ord.courierDeliveryType === 1 ? "Point/Hub Pickup" : "Home Delivery";
+    const courierSubmittedAt = formatDateTimeAMPM(ord.courierSubmittedAt);
+    const courierLastSyncedAt = formatDateTimeAMPM(ord.courierLastSyncedAt);
+    const trackingLink =
+      ord.courierTrackingLink ||
+      (trackingCode ? `https://steadfast.com.bd/t/${trackingCode}` : "");
+    const codAmount =
+      ord.courierCodAmount !== null && ord.courierCodAmount !== undefined
+        ? Number(ord.courierCodAmount)
+        : ord.paymentStatus === "PAID"
+        ? 0
+        : Math.max(
+            0,
+            Math.round(
+              isReseller && ord.resellerSellPrice
+                ? Number(ord.resellerSellPrice) +
+                    Number(ord.courierCharge || 0) -
+                    (ord.isAdvanceCourierPaid
+                      ? Number(ord.advanceCourierAmount || 0)
+                      : 0)
+                : Number(ord.total || 0)
+            )
+          );
 
     // Products & Quantity Info
     const productsSummary = (ord.orderItems || [])
@@ -144,6 +182,15 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
       escapeCSVField(orderDate),
       escapeCSVField(processingStatus),
       escapeCSVField(paymentStatus),
+      escapeCSVField(courierProvider),
+      escapeCSVField(courierStatus),
+      escapeCSVField(trackingCode),
+      escapeCSVField(consignmentId),
+      escapeCSVField(deliveryType),
+      escapeCSVField(courierSubmittedAt),
+      escapeCSVField(courierLastSyncedAt),
+      escapeCSVField(trackingLink),
+      escapeCSVField(codAmount),
       escapeCSVField(productsSummary),
       escapeCSVField(totalQuantity),
       escapeCSVField(subtotal),
