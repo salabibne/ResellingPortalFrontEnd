@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import type { SectionRenderProps } from "../types";
 import SectionFrame, { alignmentClass, resolveColor } from "../SectionFrame";
 import SafeImage from "../SafeImage";
-import { CtaButtons, SectionHeading } from "../primitives";
+import { CtaButtons, Eyebrow, SectionHeading } from "../primitives";
 
 function HeroImage({
   section,
@@ -230,6 +230,66 @@ export function PromoCategoryHero({ section, level = 1 }: SectionRenderProps) {
           className="order-1 lg:order-2 aspect-[4/5] sm:aspect-[4/3] lg:aspect-[4/5] max-h-[560px]"
         />
       </div>
+    </SectionFrame>
+  );
+}
+
+/**
+ * Variants: text-only-centered | text-only-editorial
+ * No image is rendered at all, so an admin can publish a hero with copy only.
+ */
+export function TextOnlyHero({ section, level = 1 }: SectionRenderProps) {
+  const editorial = section.variant === "text-only-editorial";
+  const alignment = editorial
+    ? "left"
+    : (section.settings.alignment as string) || "center";
+  const Tag: "h1" | "h2" = level === 1 ? "h1" : "h2";
+  const titleSize = editorial
+    ? "text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05]"
+    : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight";
+
+  return (
+    <SectionFrame section={section} className="border-b border-base-200">
+      {editorial ? (
+        <div className="grid items-end gap-6 lg:grid-cols-12 lg:gap-10">
+          <div className="flex flex-col items-start lg:col-span-7">
+            <Eyebrow text={section.subtitle} />
+            {section.title && <Tag className={titleSize}>{section.title}</Tag>}
+            <div className="mt-5 h-1.5 w-20 rounded-full bg-primary" aria-hidden="true" />
+          </div>
+          <div className="flex flex-col items-start lg:col-span-5">
+            {section.description && (
+              <p className="text-sm sm:text-base leading-relaxed text-base-content/70 whitespace-pre-line break-words">
+                {section.description}
+              </p>
+            )}
+            <CtaButtons section={section} className="mt-6" />
+          </div>
+        </div>
+      ) : (
+        <div
+          className={`mx-auto flex max-w-3xl flex-col ${
+            alignment === "left"
+              ? "items-start text-left"
+              : alignment === "right"
+              ? "items-end text-right"
+              : "items-center text-center"
+          }`}
+        >
+          <Eyebrow text={section.subtitle} />
+          {section.title && <Tag className={titleSize}>{section.title}</Tag>}
+          <div className="mt-5 h-1 w-16 rounded-full bg-primary" aria-hidden="true" />
+          {section.description && (
+            <p className="mt-4 max-w-2xl text-sm sm:text-base leading-relaxed text-base-content/70 whitespace-pre-line break-words">
+              {section.description}
+            </p>
+          )}
+          <CtaButtons
+            section={section}
+            className={`mt-6 ${alignment === "center" ? "justify-center" : ""}`}
+          />
+        </div>
+      )}
     </SectionFrame>
   );
 }

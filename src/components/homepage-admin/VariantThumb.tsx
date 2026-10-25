@@ -20,6 +20,32 @@ function Line({ width = "w-3/4" }: { width?: string }) {
 export default function VariantThumb({ type, variant, className = "" }: VariantThumbProps) {
   const body = (() => {
     if (type === "hero") {
+      if (variant.startsWith("text-only")) {
+        if (variant === "text-only-editorial") {
+          return (
+            <div className="flex h-full items-center gap-1.5">
+              <div className="flex flex-1 flex-col gap-1">
+                <Line width="w-full" />
+                <Line width="w-3/4" />
+                <div className="mt-1 h-1.5 w-1/2 rounded-full bg-primary/60" />
+              </div>
+              <div className="flex flex-1 flex-col gap-1">
+                <Line width="w-full" />
+                <Line width="w-3/4" />
+                <Line width="w-1/2" />
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div className="flex h-full flex-col items-center justify-center gap-1">
+            <Line width="w-2/3" />
+            <Line width="w-1/2" />
+            <div className="mt-1 h-1.5 w-1/4 rounded-full bg-primary/70" />
+            <Line width="w-1/3" />
+          </div>
+        );
+      }
       if (variant === "split-image-right" || variant === "split-image-left") {
         const imageFirst = variant === "split-image-left";
         return (
@@ -154,6 +180,16 @@ export default function VariantThumb({ type, variant, className = "" }: VariantT
     }
 
     if (type === "story") {
+      if (variant === "text-only") {
+        return (
+          <div className="flex h-full flex-col items-center justify-center gap-1">
+            <Line width="w-2/3" />
+            <div className="h-1 w-1/4 rounded-full bg-primary/60" />
+            <Line width="w-3/4" />
+            <Line width="w-1/2" />
+          </div>
+        );
+      }
       if (variant === "full-width-bg") {
         return (
           <div className="flex h-full flex-col items-center justify-center gap-1">
@@ -186,6 +222,19 @@ export default function VariantThumb({ type, variant, className = "" }: VariantT
     }
 
     if (type === "promotion") {
+      if (variant === "text-only") {
+        return (
+          <div className="grid h-full grid-cols-2 gap-1">
+            {[0, 1].map((i) => (
+              <div key={i} className="flex flex-col justify-center gap-1 rounded border border-base-content/20 p-1">
+                <Line width="w-full" />
+                <Line width="w-3/4" />
+                <div className="h-1 w-1/2 rounded-full bg-primary/60" />
+              </div>
+            ))}
+          </div>
+        );
+      }
       if (variant === "three-columns") {
         return (
           <div className="grid h-full grid-cols-3 gap-1">
@@ -252,6 +301,19 @@ export default function VariantThumb({ type, variant, className = "" }: VariantT
           ))}
         </div>
       );
+    }
+
+    if (type === "banner") {
+      if (variant === "text-only") {
+        return (
+          <div className="flex h-full flex-col items-center justify-center gap-1 rounded border border-primary/30 bg-base-200/60">
+            <Line width="w-2/3" />
+            <div className="h-1 w-1/5 rounded-full bg-primary/60" />
+            <Line width="w-1/2" />
+          </div>
+        );
+      }
+      return <div className="h-full rounded bg-base-content/20" />;
     }
 
     return <div className="h-full rounded bg-base-content/20" />;

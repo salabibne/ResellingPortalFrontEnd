@@ -46,6 +46,15 @@ const ANIMATION_OPTIONS = [
   { value: "none", label: "No animation" },
 ];
 
+/** Variants that render pure typography and must not ask for an image. */
+const TEXT_ONLY_VARIANTS = new Set([
+  "hero:text-only-centered",
+  "hero:text-only-editorial",
+  "story:text-only",
+  "promotion:text-only",
+  "banner:text-only",
+]);
+
 const PRODUCT_SOURCES = [
   { value: "new", label: "New arrivals" },
   { value: "discount", label: "Discounted products" },
@@ -176,12 +185,24 @@ export default function SectionEditor({
   const items = (settings.items as unknown as Record<string, unknown>[]) || [];
   const cards = (settings.cards as unknown as Record<string, unknown>[]) || [];
 
-  const showMedia = ["hero", "story", "banner", "promotion"].includes(type);
+  const isTextOnly = TEXT_ONLY_VARIANTS.has(`${type}:${section.variant}`);
+  const showMedia =
+    ["hero", "story", "banner", "promotion"].includes(type) && !isTextOnly;
   const showButtons = ["hero", "story", "banner", "products"].includes(type);
   const showSecondary = ["hero", "story", "banner"].includes(type);
 
   return (
     <div className="space-y-3">
+      {isTextOnly && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-3">
+          <p className="text-[11px] font-bold text-primary">Text-only design</p>
+          <p className="mt-0.5 text-[10px] leading-relaxed text-base-content/60">
+            This layout renders copy only — no image is required or displayed.
+            Add a title, description and buttons below.
+          </p>
+        </div>
+      )}
+
       <FieldGroup title="Content">
         <TextField
           label="Title"
@@ -239,7 +260,7 @@ export default function SectionEditor({
         </FieldGroup>
       )}
 
-      {type === "hero" && (
+      {type === "hero" && !isTextOnly && (
         <FieldGroup title="Image & overlay">
           <SelectField
             label="Image focal point"
@@ -270,8 +291,9 @@ export default function SectionEditor({
         </FieldGroup>
       )}
 
-      {(type === "story" && section.variant === "full-width-bg") ||
-      (type === "banner" && section.variant === "image-overlay") ? (
+      {!isTextOnly &&
+      ((type === "story" && section.variant === "full-width-bg") ||
+        (type === "banner" && section.variant === "image-overlay")) ? (
         <FieldGroup title="Overlay">
           <NumberField
             label="Overlay darkness"
@@ -483,11 +505,13 @@ export default function SectionEditor({
                     value={item.description as string}
                     onChange={(description) => update({ description })}
                   />
-                  <MediaField
-                    label="Image"
-                    value={item.imageUrl as string}
-                    onChange={(imageUrl) => update({ imageUrl })}
-                  />
+                  {!isTextOnly && (
+                    <MediaField
+                      label="Image"
+                      value={item.imageUrl as string}
+                      onChange={(imageUrl) => update({ imageUrl })}
+                    />
+                  )}
                   <TextField
                     label="Button label"
                     value={item.buttonText as string}

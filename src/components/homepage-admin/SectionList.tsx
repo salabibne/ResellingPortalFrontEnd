@@ -84,6 +84,7 @@ export default function SectionList({
               }}
               onDragOver={(event) => {
                 event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
                 setOverId(section.id);
               }}
               onDragLeave={() =>

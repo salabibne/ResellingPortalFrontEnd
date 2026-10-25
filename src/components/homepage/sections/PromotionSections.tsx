@@ -144,3 +144,72 @@ export function PromotionBanner({ section, mode = "view" }: SectionRenderProps) 
     </SectionFrame>
   );
 }
+
+/** Variant: text-only — offer cards with no images. */
+export function TextOnlyPromotion({ section, mode = "view" }: SectionRenderProps) {
+  const cards = (section.settings.cards as unknown as PromoCard[]) || [];
+  const columns = Math.min(Math.max(Number(section.settings.columns ?? 2), 1), 3);
+
+  if (cards.length === 0) {
+    const hasMainContent = Boolean(section.title || section.description);
+
+    if (!hasMainContent) {
+      if (mode !== "edit") return null;
+      return (
+        <SectionFrame section={section}>
+          <EmptySection message="Add offer cards or a title in the editor." />
+        </SectionFrame>
+      );
+    }
+
+    return (
+      <SectionFrame section={section}>
+        <div className="rounded-3xl border border-primary/15 bg-base-200/60 p-6 sm:p-10">
+          <SectionHeading section={section} />
+          <CtaButtons section={section} className="mt-5" />
+        </div>
+      </SectionFrame>
+    );
+  }
+
+  return (
+    <SectionFrame section={section}>
+      <SectionHeading section={section} className="mb-6 sm:mb-8" />
+      <div className={`grid gap-3 sm:gap-5 ${gridClass(columns)}`}>
+        {cards.map((card, index) => (
+          <div
+            key={index}
+            className="flex h-full flex-col justify-between gap-3 rounded-2xl border border-base-200 bg-base-100 p-5 shadow-sm"
+          >
+            <div>
+              {card.eyebrow && (
+                <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+                  <Sparkles size={9} /> {card.eyebrow}
+                </span>
+              )}
+              <h3 className="text-base sm:text-lg font-extrabold break-words">
+                {card.title}
+              </h3>
+              {card.description && (
+                <p className="mt-1.5 text-[11px] sm:text-sm leading-relaxed text-base-content/65 break-words">
+                  {card.description}
+                </p>
+              )}
+            </div>
+            {card.buttonText &&
+              (card.buttonLink ? (
+                <Link
+                  href={card.buttonLink}
+                  className="inline-flex w-fit items-center gap-1 text-[11px] font-bold text-primary hover:underline"
+                >
+                  {card.buttonText} <ArrowRight size={11} />
+                </Link>
+              ) : (
+                <span className="text-[11px] font-bold text-primary">{card.buttonText}</span>
+              ))}
+          </div>
+        ))}
+      </div>
+    </SectionFrame>
+  );
+}

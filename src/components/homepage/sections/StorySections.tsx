@@ -1,7 +1,7 @@
 import type { SectionRenderProps } from "../types";
 import SectionFrame, { resolveColor } from "../SectionFrame";
 import SafeImage from "../SafeImage";
-import { CtaButtons, SectionHeading } from "../primitives";
+import { CtaButtons, Eyebrow, SectionHeading } from "../primitives";
 
 function StoryImage({
   section,
@@ -96,6 +96,29 @@ export function CenteredStory({ section }: SectionRenderProps) {
       {section.imageUrl && (
         <StoryImage section={section} className="mt-8 aspect-[16/9] max-h-[520px]" />
       )}
+    </SectionFrame>
+  );
+}
+
+/** Variant: text-only */
+export function TextOnlyStory({ section }: SectionRenderProps) {
+  return (
+    <SectionFrame section={section}>
+      <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+        <Eyebrow text={section.subtitle} />
+        {section.title && (
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight break-words">
+            {section.title}
+          </h2>
+        )}
+        <div className="mt-4 h-1 w-16 rounded-full bg-primary" aria-hidden="true" />
+        {section.description && (
+          <p className="mt-5 text-sm sm:text-base leading-relaxed text-base-content/70 whitespace-pre-line break-words">
+            {section.description}
+          </p>
+        )}
+        <CtaButtons section={section} className="mt-6 justify-center" />
+      </div>
     </SectionFrame>
   );
 }

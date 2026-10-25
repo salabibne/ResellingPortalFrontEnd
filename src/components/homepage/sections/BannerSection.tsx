@@ -3,7 +3,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import type { SectionRenderProps } from "../types";
 import SectionFrame, { resolveColor } from "../SectionFrame";
 import SafeImage from "../SafeImage";
-import { CtaButtons } from "../primitives";
+import { CtaButtons, Eyebrow } from "../primitives";
 
 /** Variants: default | image-overlay */
 export function BannerSection({ section }: SectionRenderProps) {
@@ -77,6 +77,51 @@ export function BannerSection({ section }: SectionRenderProps) {
               </Link>
             )}
           </div>
+        </div>
+      </div>
+    </SectionFrame>
+  );
+}
+
+/** Variant: text-only — typography banner with no image at all. */
+export function TextOnlyBanner({ section, mode = "view" }: SectionRenderProps) {
+  const alignment = (section.settings.alignment as string) || "center";
+  const hasContent = Boolean(section.title || section.description);
+
+  if (!hasContent && mode !== "edit") return null;
+
+  return (
+    <SectionFrame section={section}>
+      <div className="relative overflow-hidden rounded-3xl border border-primary/15 bg-base-200/60 p-6 sm:p-10 md:p-14">
+        <div
+          className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-2xl"
+          aria-hidden="true"
+        />
+        <div
+          className={`relative z-10 flex flex-col ${
+            alignment === "left"
+              ? "items-start text-left"
+              : alignment === "right"
+              ? "items-end text-right"
+              : "items-center text-center"
+          }`}
+        >
+          <Eyebrow text={section.subtitle} />
+          {section.title && (
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-tight break-words">
+              {section.title}
+            </h2>
+          )}
+          <div className="mt-4 h-1 w-14 rounded-full bg-primary" aria-hidden="true" />
+          {section.description && (
+            <p className="mt-3 max-w-2xl text-xs sm:text-sm md:text-base leading-relaxed text-base-content/70 whitespace-pre-line break-words">
+              {section.description}
+            </p>
+          )}
+          <CtaButtons
+            section={section}
+            className={`mt-5 ${alignment === "center" ? "justify-center" : ""}`}
+          />
         </div>
       </div>
     </SectionFrame>

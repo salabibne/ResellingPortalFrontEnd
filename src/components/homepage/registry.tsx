@@ -6,6 +6,7 @@ import {
   MinimalCenteredHero,
   PromoCategoryHero,
   SplitHero,
+  TextOnlyHero,
 } from "./sections/HeroSections";
 import {
   CategoryGrid,
@@ -19,9 +20,18 @@ import {
   ProductCarousel,
   ProductGrid,
 } from "./sections/ProductSections";
-import { BackgroundStory, CenteredStory, SplitStory } from "./sections/StorySections";
-import { BannerSection } from "./sections/BannerSection";
-import { PromotionBanner, PromotionCards } from "./sections/PromotionSections";
+import {
+  BackgroundStory,
+  CenteredStory,
+  SplitStory,
+  TextOnlyStory,
+} from "./sections/StorySections";
+import { BannerSection, TextOnlyBanner } from "./sections/BannerSection";
+import {
+  PromotionBanner,
+  PromotionCards,
+  TextOnlyPromotion,
+} from "./sections/PromotionSections";
 import { BenefitsRow, TrustBadges, TrustIconCards } from "./sections/TrustSections";
 import { FeaturedTestimonial, TestimonialCards } from "./sections/TestimonialSections";
 import { LogoCarousel } from "./sections/LogoSection";
@@ -91,6 +101,18 @@ export const SECTION_REGISTRY: Partial<Record<HomepageSectionType, SectionDefini
         description: "Category-focused promotional hero.",
         Component: PromoCategoryHero,
       },
+      {
+        id: "text-only-centered",
+        label: "Text only · centered",
+        description: "Typography-led hero with no image.",
+        Component: TextOnlyHero,
+      },
+      {
+        id: "text-only-editorial",
+        label: "Text only · editorial",
+        description: "Large left-aligned headline with no image.",
+        Component: TextOnlyHero,
+      },
     ],
   },
 
@@ -136,6 +158,7 @@ export const SECTION_REGISTRY: Partial<Record<HomepageSectionType, SectionDefini
       { id: "image-right", label: "Image right", description: "Text left, image right.", Component: SplitStory },
       { id: "full-width-bg", label: "Full-width background", description: "Text over a background image.", Component: BackgroundStory },
       { id: "centered", label: "Centered story", description: "Centered copy with an image below.", Component: CenteredStory },
+      { id: "text-only", label: "Text only", description: "Centered prose block with no image.", Component: TextOnlyStory },
     ],
   },
 
@@ -149,6 +172,7 @@ export const SECTION_REGISTRY: Partial<Record<HomepageSectionType, SectionDefini
     variants: [
       { id: "default", label: "Banner", description: "Centered copy on a dark gradient.", Component: BannerSection },
       { id: "image-overlay", label: "Image overlay", description: "Copy over your own image.", Component: BannerSection },
+      { id: "text-only", label: "Text only", description: "Typography banner with no image.", Component: TextOnlyBanner },
     ],
   },
 
@@ -164,6 +188,7 @@ export const SECTION_REGISTRY: Partial<Record<HomepageSectionType, SectionDefini
       { id: "two-cards", label: "Two cards", description: "Two side-by-side offer cards.", Component: PromotionCards },
       { id: "three-columns", label: "Three columns", description: "Three offer cards.", Component: PromotionCards },
       { id: "image-overlay", label: "Image overlay", description: "Text over a background image.", Component: PromotionBanner },
+      { id: "text-only", label: "Text only cards", description: "Offer cards with no images.", Component: TextOnlyPromotion },
     ],
   },
 

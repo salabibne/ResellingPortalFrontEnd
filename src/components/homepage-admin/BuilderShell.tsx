@@ -50,10 +50,20 @@ function normalizeRow(raw: any): HomepageSection {
   };
 }
 
+/** Sorts server data by its saved order and renumbers 1..n. */
 function sortSections(list: HomepageSection[]): HomepageSection[] {
   return [...list]
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((section, index) => ({ ...section, sortOrder: index + 1 }));
+}
+
+/**
+ * Renumbers the array exactly as it is. Never sorts — moving a section swaps
+ * array positions while the old sortOrder values are still attached, so sorting
+ * here would immediately undo the move.
+ */
+function renumberSections(list: HomepageSection[]): HomepageSection[] {
+  return list.map((section, index) => ({ ...section, sortOrder: index + 1 }));
 }
 
 function errorMessage(err: any, fallback: string): string {
@@ -188,7 +198,7 @@ export default function BuilderShell() {
 
     const next = [...sections];
     [next[index], next[target]] = [next[target], next[index]];
-    const renumbered = sortSections(next);
+    const renumbered = renumberSections(next);
     setSections(renumbered);
     void persistOrder(renumbered);
   };
@@ -201,7 +211,7 @@ export default function BuilderShell() {
     const next = [...sections];
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
-    const renumbered = sortSections(next);
+    const renumbered = renumberSections(next);
     setSections(renumbered);
     void persistOrder(renumbered);
   };
