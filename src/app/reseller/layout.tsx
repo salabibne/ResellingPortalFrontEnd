@@ -5,16 +5,18 @@ import { useRouter } from "next/navigation";
 import ResellerSidebar from "@/components/reseller/ResellerSidebar";
 import Header from "@/components/shared/Header";
 import { useAuthStore } from "@/store/useAuthStore";
+import api from "@/services/axios";
 
 export default function ResellerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -28,10 +30,42 @@ export default function ResellerLayout({
     const allowedRoles = ["RESELLER", "ADMIN", "SUPER_ADMIN", "MANAGER", "SALES_EXECUTIVE"];
     if (!allowedRoles.includes(role)) {
       router.push("/");
+      return;
     }
-  }, [isAuthenticated, user, router]);
 
-  if (!mounted || !isAuthenticated) {
+    // The persisted role/status can be stale (e.g. a reseller suspended after
+    // login). Re-validate against the server before rendering the portal.
+    if (role === "RESELLER") {
+      let alive = true;
+      setCheckingStatus(true);
+
+      api
+        .get("/auth/me")
+        .then((response) => {
+          if (!alive) return;
+          if (response.data?.status !== "ACTIVE") {
+            logout();
+            router.push("/login");
+          }
+        })
+        .catch((err: any) => {
+          if (!alive) return;
+          if (err?.response?.status === 403 || err?.response?.status === 401) {
+            logout();
+            router.push("/login");
+          }
+        })
+        .finally(() => {
+          if (alive) setCheckingStatus(false);
+        });
+
+      return () => {
+        alive = false;
+      };
+    }
+  }, [isAuthenticated, user, router, logout]);
+
+  if (!mounted || !isAuthenticated || checkingStatus) {
     return (
       <div className="h-screen flex items-center justify-center bg-base-200">
         <span className="loading loading-spinner loading-lg text-primary"></span>
