@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -16,7 +14,7 @@ const registerSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   phone: z.string().min(1, { message: "Phone is required" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
-  role: z.enum(["USER", "SALES_EXECUTIVE", "RESELLER", "INVENTOR", "MANAGER", "ADMIN", "SUPER_ADMIN"]).default("USER"),
+  role: z.enum(["USER", "RESELLER"]).default("USER"),
   organizationId: z.string().uuid({ message: "Organization ID (UUID) is required" }),
   presentDistrict: z.string().min(1, { message: "Present District is required" }),
   presentThana: z.string().min(1, { message: "Present Thana is required" }),
@@ -31,11 +29,14 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 function RegisterForm() {
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(
+    "Thank you for registering. Our representative will contact you within 24 to 72 hours.",
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
   
-  const initialRole = searchParams.get("role") || "USER";
+  const initialRole = searchParams.get("role") === "RESELLER" ? "RESELLER" : "USER";
 
   const {
     register,
@@ -53,8 +54,27 @@ function RegisterForm() {
   const onSubmit = async (data: RegisterFormValues) => {
     try {
       setError("");
+
       const res = await authApi.register(data);
+
+      // Reseller accounts are gated behind admin approval, so the API
+      // deliberately does not return tokens for them.
+      if (res.requiresApproval || !res.accessToken) {
+        setSuccessMessage(
+          "Your reseller account is awaiting approval. You will be able to log in once an administrator approves it.",
+        );
+        setIsSuccess(true);
+
+        setTimeout(() => {
+          router.push("/login");
+        }, 2600);
+        return;
+      }
+
       setAuth(res.user, res.accessToken, res.refreshToken);
+      setSuccessMessage(
+        "Thank you for registering. Our representative will contact you within 24 to 72 hours.",
+      );
       setIsSuccess(true);
 
       const redirectParam = searchParams.get("redirect");
@@ -65,30 +85,29 @@ function RegisterForm() {
           router.push(redirectParam);
           return;
         }
-        if (userRole === "USER" || userRole === "RESELLER") {
-          router.push("/");
-        } else {
-          router.push("/dashboard");
-        }
+        router.push(userRole === "USER" ? "/" : "/dashboard");
       }, 1500);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Registration failed");
+      const message = err.response?.data?.message;
+      setError(Array.isArray(message) ? message.join(", ") : message || "Registration failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-base-200">
-      <Navbar />
+    <div className="flex-1 flex flex-col bg-base-200">
       <div className="flex-1 flex items-center justify-center p-4 py-12">
         <div className="card w-full max-w-2xl bg-base-100 shadow-xl">
           <div className="card-body">
           <h2 className="card-title text-3xl font-bold justify-center mb-6 text-[#001C94]">Create an Account</h2>
           
           {isSuccess ? (
-            <div className="text-center py-8">
+            <div className="text-center py-8 space-y-4">
               <p className="text-xl font-semibold" style={{ color: "#001C94" }}>
-                Thank you for registratin. Our representative will contact you within 24 to 72 hours.
+                {successMessage}
               </p>
+              <Link href="/login" className="btn btn-primary btn-sm rounded-full">
+                Go to login
+              </Link>
             </div>
           ) : (
             <>
@@ -190,7 +209,6 @@ function RegisterForm() {
         </div>
       </div>
       </div>
-      <Footer />
     </div>
   );
 }

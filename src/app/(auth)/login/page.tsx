@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -63,8 +61,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-base-200">
-      <Navbar />
+    <div className="flex-1 flex flex-col bg-base-200">
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="card w-full max-w-md bg-base-100 shadow-xl">
           <div className="card-body">
@@ -154,7 +151,6 @@ function LoginForm() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

@@ -56,7 +56,7 @@ export default function WhatsAppButton() {
 
   return (
     <div
-      className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 z-50 flex items-center print:hidden select-none"
+      className="relative flex items-center print:hidden select-none"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -69,7 +69,7 @@ export default function WhatsAppButton() {
         }`}
       >
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         </span>
         <span>Chat with us</span>
@@ -81,10 +81,10 @@ export default function WhatsAppButton() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat with Aarham Apparel on WhatsApp"
-        className="group relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-lg shadow-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-110 active:scale-95 focus:outline-hidden focus:ring-4 focus:ring-emerald-400/30"
+        className="group relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-lg shadow-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400/40 motion-reduce:transition-none motion-reduce:hover:scale-100"
       >
         {/* Soft Pulse Background Ping */}
-        <span className="absolute -inset-0.5 rounded-full bg-[#25D366] opacity-30 animate-pulse group-hover:opacity-0 transition-opacity"></span>
+        <span className="absolute -inset-0.5 rounded-full bg-[#25D366] opacity-30 animate-pulse motion-reduce:animate-none group-hover:opacity-0 transition-opacity"></span>
 
         {/* WhatsApp Official Vector Icon */}
         <svg

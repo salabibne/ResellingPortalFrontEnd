@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Comfortaa } from "next/font/google";
 import "./globals.css";
 import CMSInitializer from "@/components/CMSInitializer";
-import WhatsAppButton from "@/components/shared/WhatsAppButton";
 import NoticePopupModal from "@/components/shared/NoticePopupModal";
 
 const comfortaa = Comfortaa({ subsets: ["latin"] });
@@ -23,12 +22,7 @@ export default function RootLayout({
         <CMSInitializer />
         {children}
         <NoticePopupModal audience="PUBLIC" />
-        <WhatsAppFloatingButtonWrapper />
       </body>
     </html>
   );
-}
-
-function WhatsAppFloatingButtonWrapper() {
-  return <WhatsAppButton />;
 }

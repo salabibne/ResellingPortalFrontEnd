@@ -225,6 +225,18 @@ export interface CourierAuthStatus {
   balanceError?: string;
 }
 
+export interface PublicTrackingResult {
+  orderRef: string | null;
+  processingStatus: OrderProcessingStatus;
+  paymentStatus: PaymentStatus;
+  courierStatus: string | null;
+  courierTrackingLink: string | null;
+  courierSubmittedAt: string | null;
+  courierLastSyncedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const orderApi = {
   createOrder: async (data: CreateOrderDto): Promise<Order> => {
     const response = await api.post("/orders", data);
@@ -236,6 +248,10 @@ export const orderApi = {
   },
   getCourierPolicy: async (): Promise<CourierPolicy> => {
     const response = await api.get("/orders/courier-policy");
+    return response.data;
+  },
+  trackOrder: async (code: string): Promise<PublicTrackingResult> => {
+    const response = await api.get(`/orders/track/${encodeURIComponent(code)}`);
     return response.data;
   },
   updateCourierPolicy: async (data: Partial<CourierPolicy>): Promise<CourierPolicy> => {
