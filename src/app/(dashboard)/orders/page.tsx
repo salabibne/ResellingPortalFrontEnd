@@ -3,6 +3,7 @@
 import PanelPageHeader from "@/components/panel/PanelPageHeader";
 import PanelSkeleton from "@/components/panel/PanelSkeleton";
 import StatusBadge from "@/components/panel/StatusBadge";
+import CourierStatusBadge from "@/components/courier/CourierStatusBadge";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
@@ -508,133 +509,39 @@ export default function OrdersPage() {
   };
 
   const renderPaymentBadge = (status: PaymentStatus) => {
+    const base =
+      "badge text-[11px] font-bold whitespace-nowrap h-auto py-1 px-2";
     switch (status) {
       case "PAID":
         return (
-          <span className="badge badge-success text-white font-bold text-xs py-1.5 px-2.5">
+          <span className={`${base} badge-success text-white`}>
             PAID
           </span>
         );
       case "PARTIAL":
         return (
-          <span className="badge badge-warning text-base-content font-bold text-xs py-1.5 px-2.5">
+          <span className={`${base} badge-warning text-base-content`}>
             PARTIAL
           </span>
         );
       case "CANCELLED":
         return (
-          <span className="badge badge-error text-white font-bold text-xs py-1.5 px-2.5">
+          <span className={`${base} badge-error text-white`}>
             CANCELLED
           </span>
         );
       default:
         return (
-          <span className="badge badge-ghost font-bold text-xs py-1.5 px-2.5">
+          <span className={`${base} badge-ghost`}>
             DUE
           </span>
         );
     }
   };
 
-  const renderCourierBadge = (status?: string | null) => {
-    if (!status) return null;
-    const s = status.toLowerCase();
-    switch (s) {
-      case "delivered":
-        return (
-          <span className="badge badge-success text-white font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Check size={10} /> Delivered
-          </span>
-        );
-      case "in_review":
-        return (
-          <span className="badge badge-warning text-base-content font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Clock size={10} /> In Review
-          </span>
-        );
-      case "pending":
-      case "in_transit":
-        return (
-          <span className="badge badge-info text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Truck size={10} /> In Transit
-          </span>
-        );
-      case "cancelled":
-        return (
-          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <X size={10} /> Courier Cancelled
-          </span>
-        );
-      case "hold":
-        return (
-          <span className="badge badge-warning text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <AlertTriangle size={10} /> On Hold
-          </span>
-        );
-      case "delivered_approval_pending":
-        return (
-          <span className="badge badge-accent text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <CheckCircle2 size={10} /> Deliv. Pending Appr.
-          </span>
-        );
-      case "partial_delivered":
-        return (
-          <span className="badge badge-warning text-base-content font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
-            <CheckCircle2 size={10} /> Partial Delivered
-          </span>
-        );
-      case "partial_delivered_approval_pending":
-        return (
-          <span className="badge badge-accent text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Clock size={10} /> Part. Deliv. Pending Appr.
-          </span>
-        );
-      case "cancelled_approval_pending":
-        return (
-          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Clock size={10} /> Canc. Pending Appr.
-          </span>
-        );
-      case "exceptional":
-        return (
-          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <AlertTriangle size={10} /> Exceptional
-          </span>
-        );
-      case "cancelled_return_received":
-        return (
-          <span className="badge badge-error text-white font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-red-300">
-            <XCircle size={10} /> Returned & Restocked
-          </span>
-        );
-      case "partial_delivered_return_received":
-        return (
-          <span className="badge badge-warning text-base-content font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
-            <CheckCircle2 size={10} /> Part. Return Received
-          </span>
-        );
-      case "cancelled_return_processing":
-      case "cancelled_return_rider_assigned":
-        return (
-          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Truck size={10} /> Return In Transit
-          </span>
-        );
-      case "partial_delivered_return_proccessing":
-      case "partial_delivered_return_rider_assigned":
-        return (
-          <span className="badge badge-warning text-base-content font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Truck size={10} /> Part. Return In Transit
-          </span>
-        );
-      default:
-        return (
-          <span className="badge badge-neutral text-white font-semibold text-[10px] uppercase py-1.5 px-2">
-            {status}
-          </span>
-        );
-    }
-  };
+  const renderCourierBadge = (status?: string | null) => (
+    <CourierStatusBadge status={status} />
+  );
 
   return (
     <div className="space-y-6">
@@ -987,10 +894,10 @@ export default function OrdersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="table w-full">
+            <table className="table w-full min-w-[1100px]">
               <thead className="bg-slate-50 text-slate-700 text-xs uppercase tracking-wider">
                 <tr>
-                  <th className="py-4 pl-6 w-10">
+                  <th className="py-4 pl-6 w-10 whitespace-nowrap">
                     <input
                       type="checkbox"
                       className="checkbox checkbox-sm checkbox-primary rounded-md"
@@ -998,15 +905,17 @@ export default function OrdersPage() {
                       onChange={toggleSelectAll}
                     />
                   </th>
-                  <th>Order Ref</th>
-                  <th>Order Type</th>
-                  <th>Customer Info</th>
-                  <th>Steadfast Courier</th>
-                  <th>Order Date</th>
-                  <th>Processing Status</th>
-                  <th>Payment Status</th>
-                  <th>Total Bill</th>
-                  <th className="text-right pr-6">Action</th>
+                  <th className="whitespace-nowrap">Order Ref</th>
+                  <th className="whitespace-nowrap">Order Type</th>
+                  <th className="whitespace-nowrap">Customer Info</th>
+                  <th className="whitespace-nowrap">Steadfast Courier</th>
+                  <th className="whitespace-nowrap">Order Date</th>
+                  <th className="whitespace-nowrap">Processing Status</th>
+                  <th className="whitespace-nowrap">Payment Status</th>
+                  <th className="whitespace-nowrap">Total Bill</th>
+                  <th className="text-right pr-6 whitespace-nowrap sticky right-0 bg-base-100 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm">
@@ -1029,11 +938,11 @@ export default function OrdersPage() {
                   return (
                     <tr
                       key={ord.id}
-                      className={`hover:bg-slate-50/80 transition-colors ${
+                      className={`hover:bg-slate-50/80 transition-colors align-middle ${
                         isSelected ? "bg-indigo-50/40" : ""
                       }`}
                     >
-                      <td className="pl-6 py-4">
+                      <td className="pl-6 py-3 align-middle">
                         <input
                           type="checkbox"
                           className="checkbox checkbox-sm checkbox-primary rounded-md"
@@ -1041,36 +950,36 @@ export default function OrdersPage() {
                           onChange={() => toggleSelectOrder(ord.id)}
                         />
                       </td>
-                      <td className="font-mono font-bold text-indigo-600 text-xs">
+                      <td className="font-mono font-bold text-indigo-600 text-xs whitespace-nowrap align-middle py-3">
                         {displayRef}
                       </td>
-                      <td>
+                      <td className="align-middle py-3 whitespace-nowrap">
                         {isReseller ? (
-                          <span className="badge badge-primary text-white font-extrabold text-[10px] uppercase py-2 px-2.5">
-                            Reseller Order
+                          <span className="badge badge-primary text-white font-extrabold text-[11px] uppercase whitespace-nowrap h-auto py-1 px-2">
+                            Reseller
                           </span>
                         ) : (
-                          <span className="badge badge-ghost text-slate-600 font-semibold text-[10px] uppercase py-2 px-2.5">
-                            Direct Customer
+                          <span className="badge badge-ghost text-slate-600 font-semibold text-[11px] uppercase whitespace-nowrap h-auto py-1 px-2">
+                            Direct
                           </span>
                         )}
                       </td>
-                      <td>
-                        <div className="font-bold text-base-content text-sm">
+                      <td className="min-w-[180px] align-middle py-3">
+                        <div className="font-bold text-base-content text-sm whitespace-nowrap">
                           {customerName}
                         </div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-slate-500 whitespace-nowrap">
                           {customerPhone}
                         </div>
                         {isReseller && ord.reseller && (
-                          <div className="text-[10px] text-primary font-semibold mt-0.5">
+                          <div className="text-[10px] text-primary font-semibold mt-0.5 whitespace-nowrap">
                             Via Reseller: {ord.reseller.name} ({ord.reseller.phone})
                           </div>
                         )}
                       </td>
-                      <td>
+                      <td className="align-middle py-3 whitespace-nowrap">
                         {ord.courierTrackingCode ? (
-                          <div className="space-y-1">
+                          <div className="space-y-1 whitespace-nowrap">
                             <button
                               type="button"
                               onClick={() => handleOpenTrackingTimeline(ord.id)}
@@ -1084,24 +993,24 @@ export default function OrdersPage() {
                             <div>{renderCourierBadge(ord.courierStatus)}</div>
                           </div>
                         ) : (
-                          <span className="text-[11px] text-slate-400 font-medium italic">
+                          <span className="text-[11px] text-slate-400 font-medium italic whitespace-nowrap">
                             Not dispatched
                           </span>
                         )}
                       </td>
-                      <td className="text-xs text-slate-500 font-medium">
+                      <td className="text-xs text-slate-500 font-medium align-middle py-3 whitespace-nowrap">
                         <div className="font-semibold text-slate-700">{new Date(ord.createdAt).toLocaleDateString()}</div>
                         <div className="text-[10px] text-slate-400 font-sans">
                           {new Date(ord.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                         </div>
                       </td>
 
-                      <td>{renderProcessingBadge(ord.processingStatus)}</td>
-                      <td>{renderPaymentBadge(ord.paymentStatus)}</td>
-                      <td className="font-black text-indigo-950 text-sm">
+                      <td className="align-middle py-3 whitespace-nowrap">{renderProcessingBadge(ord.processingStatus)}</td>
+                      <td className="align-middle py-3 whitespace-nowrap">{renderPaymentBadge(ord.paymentStatus)}</td>
+                      <td className="font-black text-indigo-950 text-sm align-middle py-3 whitespace-nowrap">
                         ৳{totalBillVal.toLocaleString()}
                       </td>
-                      <td className="text-right pr-6">
+                      <td className="text-right pr-6 align-middle py-3 whitespace-nowrap sticky right-0 bg-base-100 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
                         <button
                           onClick={() => setSelectedOrder(ord)}
                           className="btn btn-xs btn-primary gap-1 rounded-lg font-bold"

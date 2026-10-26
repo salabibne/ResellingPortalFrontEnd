@@ -43,7 +43,9 @@ export default function StatusBadge({ status, label, className = "" }: StatusBad
   const key = (status || "").toUpperCase().replace(/\s+/g, "_");
   const colour = STATUS_STYLES[key] ?? "badge-ghost";
   return (
-    <span className={`badge badge-sm font-semibold ${colour} ${className}`}>
+    <span
+      className={`badge ${colour} text-[11px] font-semibold whitespace-nowrap h-auto py-1 px-2 ${className}`}
+    >
       {label ?? humanise(key || "unknown")}
     </span>
   );

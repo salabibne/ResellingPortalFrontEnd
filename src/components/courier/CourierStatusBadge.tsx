@@ -28,11 +28,19 @@ const STATUS_TONES: Record<string, BadgeTone> = {
     label: "Cancelled · Return In Progress",
     className: "badge-error text-white",
   },
+  cancelled_return_processing: {
+    label: "Cancelled · Return In Progress",
+    className: "badge-error text-white",
+  },
   cancelled_return_rider_assigned: {
     label: "Cancelled · Return Rider Assigned",
     className: "badge-error text-white",
   },
   partial_delivered_return_proccessing: {
+    label: "Partial · Return In Progress",
+    className: "badge-warning text-base-content",
+  },
+  partial_delivered_return_processing: {
     label: "Partial · Return In Progress",
     className: "badge-warning text-base-content",
   },
@@ -77,7 +85,7 @@ const STATUS_TONES: Record<string, BadgeTone> = {
     className: "badge-error text-white",
   },
   unknown: {
-    label: "Unknown",
+    label: "Awaiting Update",
     className: "badge-neutral text-white",
   },
 };
@@ -94,21 +102,21 @@ export default function CourierStatusBadge({
   if (!status) {
     return (
       <span
-        className={`badge badge-ghost text-slate-500 text-[10px] font-bold uppercase ${className}`}
+        className={`badge badge-ghost text-slate-500 text-[11px] font-bold uppercase whitespace-nowrap h-auto py-1 px-2 ${className}`}
       >
-        Not Synced
+        Awaiting Update
       </span>
     );
   }
 
-  const normalized = status.toLowerCase();
+  const normalized = status.toLowerCase().trim().replace(/\s+/g, "_");
   const tone = STATUS_TONES[normalized];
-  const label = tone?.label || status.replace(/_/g, " ");
+  const label = tone?.label || "Awaiting Update";
 
   return (
     <span
       title={status}
-      className={`badge font-bold text-[10px] uppercase py-1.5 px-2 gap-1 ${
+      className={`badge text-[11px] font-bold uppercase whitespace-nowrap h-auto py-1 px-2 gap-1 ${
         tone?.className || "badge-neutral text-white"
       } ${className}`}
     >
