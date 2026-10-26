@@ -684,10 +684,10 @@ export default function OrdersPage() {
       </div>
 
       {/* Filter & Search Toolbar */}
-      <div className="bg-base-100 p-4 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-base-100 p-4 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
           {/* Search Input */}
-          <div className="relative w-full md:w-72">
+          <div className="relative w-full md:w-auto md:flex-1 md:min-w-[160px]">
             <input
               type="text"
               placeholder="Search by Order Ref, Name, Address..."
@@ -702,7 +702,7 @@ export default function OrdersPage() {
           </div>
 
           {/* Date Range Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 whitespace-nowrap">
             <Calendar size={14} className="text-primary" /> From:
             <input
               type="date"
@@ -726,7 +726,7 @@ export default function OrdersPage() {
           </div>
 
           {/* Customer Mobile Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 whitespace-nowrap">
             <Phone size={14} className="text-primary" /> Mobile:
             <input
               type="text"
@@ -740,16 +740,52 @@ export default function OrdersPage() {
             />
           </div>
 
+          {/* Toolbar Actions */}
+          <div className="flex items-center gap-2 ml-auto">
+            {(searchQuery || selectedProcessingStatus !== "ALL" || selectedPaymentStatus !== "ALL" || selectedOrderType !== "ALL" || selectedCourierStatus !== "ALL" || startDate || endDate || customerPhoneFilter) && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedProcessingStatus("ALL");
+                  setSelectedCourierStatus("ALL");
+                  setSelectedPaymentStatus("ALL");
+                  setSelectedOrderType("ALL");
+                  setStartDate("");
+                  setEndDate("");
+                  setCustomerPhoneFilter("");
+                  setPage(1);
+                }}
+                className="btn btn-xs btn-ghost text-rose-600 font-bold whitespace-nowrap"
+              >
+                Reset Filters
+              </button>
+            )}
+
+            {/* Edit Courier Policy Button */}
+            <button
+              type="button"
+              className="btn btn-xs btn-outline btn-primary rounded-xl font-bold gap-1 whitespace-nowrap"
+              onClick={() => {
+                fetchCourierPolicy();
+                setIsCourierModalOpen(true);
+              }}
+            >
+              <SlidersHorizontal size={12} /> Edit Courier Policy
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3">
           {/* Order Type Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-            <Package size={14} /> Type:
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 min-w-0 whitespace-nowrap">
+            <Package size={14} className="shrink-0" /> Type:
             <select
               value={selectedOrderType}
               onChange={(e) => {
                 setSelectedOrderType(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0"
             >
               <option value="ALL">All Order Types</option>
               <option value="RESELLER">Reseller Orders</option>
@@ -758,15 +794,15 @@ export default function OrdersPage() {
           </div>
 
           {/* Processing Status Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-            <Filter size={14} /> Processing:
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 min-w-0 whitespace-nowrap">
+            <Filter size={14} className="shrink-0" /> Processing:
             <select
               value={selectedProcessingStatus}
               onChange={(e) => {
                 setSelectedProcessingStatus(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0"
             >
               <option value="ALL">All Statuses</option>
               <option value="PENDING">PENDING</option>
@@ -780,15 +816,15 @@ export default function OrdersPage() {
           </div>
 
           {/* Courier Status Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-            <Truck size={14} className="text-info" /> Courier:
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 min-w-0 whitespace-nowrap">
+            <Truck size={14} className="text-info shrink-0" /> Courier:
             <select
               value={selectedCourierStatus}
               onChange={(e) => {
                 setSelectedCourierStatus(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0"
             >
               <option value="ALL">All Courier Statuses</option>
               <option value="NOT_SENT">Not Placed with Courier</option>
@@ -802,15 +838,15 @@ export default function OrdersPage() {
           </div>
 
           {/* Payment Status Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-            <CreditCard size={14} /> Payment:
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 min-w-0 whitespace-nowrap">
+            <CreditCard size={14} className="shrink-0" /> Payment:
             <select
               value={selectedPaymentStatus}
               onChange={(e) => {
                 setSelectedPaymentStatus(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0"
             >
               <option value="ALL">All Payments</option>
               <option value="DUE">DUE</option>
@@ -819,37 +855,6 @@ export default function OrdersPage() {
               <option value="CANCELLED">CANCELLED</option>
             </select>
           </div>
-
-          {/* Edit Courier Policy Button */}
-          <button
-            type="button"
-            className="btn btn-xs btn-outline btn-primary rounded-xl font-bold gap-1"
-            onClick={() => {
-              fetchCourierPolicy();
-              setIsCourierModalOpen(true);
-            }}
-          >
-            <SlidersHorizontal size={12} /> Edit Courier Policy
-          </button>
-
-          {(searchQuery || selectedProcessingStatus !== "ALL" || selectedPaymentStatus !== "ALL" || selectedOrderType !== "ALL" || selectedCourierStatus !== "ALL" || startDate || endDate || customerPhoneFilter) && (
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedProcessingStatus("ALL");
-                setSelectedCourierStatus("ALL");
-                setSelectedPaymentStatus("ALL");
-                setSelectedOrderType("ALL");
-                setStartDate("");
-                setEndDate("");
-                setCustomerPhoneFilter("");
-                setPage(1);
-              }}
-              className="btn btn-xs btn-ghost text-rose-600 font-bold"
-            >
-              Reset Filters
-            </button>
-          )}
         </div>
       </div>
 
@@ -894,10 +899,10 @@ export default function OrdersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="table w-full min-w-[1100px]">
+            <table className="table w-full min-w-[920px] [&_th]:px-3 [&_td]:px-3">
               <thead className="bg-slate-50 text-slate-700 text-xs uppercase tracking-wider">
                 <tr>
-                  <th className="py-4 pl-6 w-10 whitespace-nowrap">
+                  <th className="py-4 !pl-5 w-10 whitespace-nowrap">
                     <input
                       type="checkbox"
                       className="checkbox checkbox-sm checkbox-primary rounded-md"
@@ -905,15 +910,13 @@ export default function OrdersPage() {
                       onChange={toggleSelectAll}
                     />
                   </th>
-                  <th className="whitespace-nowrap">Order Ref</th>
-                  <th className="whitespace-nowrap">Order Type</th>
+                  <th className="whitespace-nowrap">Order Ref / Type</th>
                   <th className="whitespace-nowrap">Customer Info</th>
                   <th className="whitespace-nowrap">Steadfast Courier</th>
                   <th className="whitespace-nowrap">Order Date</th>
-                  <th className="whitespace-nowrap">Processing Status</th>
-                  <th className="whitespace-nowrap">Payment Status</th>
+                  <th className="whitespace-nowrap">Status</th>
                   <th className="whitespace-nowrap">Total Bill</th>
-                  <th className="text-right pr-6 whitespace-nowrap sticky right-0 bg-base-100 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
+                  <th className="text-right !pr-5 whitespace-nowrap sticky right-0 bg-slate-50 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
                     Action
                   </th>
                 </tr>
@@ -942,7 +945,7 @@ export default function OrdersPage() {
                         isSelected ? "bg-indigo-50/40" : ""
                       }`}
                     >
-                      <td className="pl-6 py-3 align-middle">
+                      <td className="!pl-5 py-3 align-middle">
                         <input
                           type="checkbox"
                           className="checkbox checkbox-sm checkbox-primary rounded-md"
@@ -950,10 +953,8 @@ export default function OrdersPage() {
                           onChange={() => toggleSelectOrder(ord.id)}
                         />
                       </td>
-                      <td className="font-mono font-bold text-indigo-600 text-xs whitespace-nowrap align-middle py-3">
-                        {displayRef}
-                      </td>
                       <td className="align-middle py-3 whitespace-nowrap">
+                        <div className="font-mono font-bold text-indigo-600 text-xs mb-1">{displayRef}</div>
                         {isReseller ? (
                           <span className="badge badge-primary text-white font-extrabold text-[11px] uppercase whitespace-nowrap h-auto py-1 px-2">
                             Reseller
@@ -964,7 +965,7 @@ export default function OrdersPage() {
                           </span>
                         )}
                       </td>
-                      <td className="min-w-[180px] align-middle py-3">
+                      <td className="min-w-[160px] max-w-[220px] align-middle py-3">
                         <div className="font-bold text-base-content text-sm whitespace-nowrap">
                           {customerName}
                         </div>
@@ -972,7 +973,7 @@ export default function OrdersPage() {
                           {customerPhone}
                         </div>
                         {isReseller && ord.reseller && (
-                          <div className="text-[10px] text-primary font-semibold mt-0.5 whitespace-nowrap">
+                          <div className="text-[10px] text-primary font-semibold mt-0.5 leading-tight">
                             Via Reseller: {ord.reseller.name} ({ord.reseller.phone})
                           </div>
                         )}
@@ -1005,17 +1006,22 @@ export default function OrdersPage() {
                         </div>
                       </td>
 
-                      <td className="align-middle py-3 whitespace-nowrap">{renderProcessingBadge(ord.processingStatus)}</td>
-                      <td className="align-middle py-3 whitespace-nowrap">{renderPaymentBadge(ord.paymentStatus)}</td>
+                      <td className="align-middle py-3 whitespace-nowrap">
+                        <div className="flex flex-col items-start gap-1">
+                          {renderProcessingBadge(ord.processingStatus)}
+                          {renderPaymentBadge(ord.paymentStatus)}
+                        </div>
+                      </td>
                       <td className="font-black text-indigo-950 text-sm align-middle py-3 whitespace-nowrap">
                         ৳{totalBillVal.toLocaleString()}
                       </td>
-                      <td className="text-right pr-6 align-middle py-3 whitespace-nowrap sticky right-0 bg-base-100 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
+                      <td className="text-right !pr-5 align-middle py-3 whitespace-nowrap sticky right-0 bg-base-100 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
                         <button
                           onClick={() => setSelectedOrder(ord)}
-                          className="btn btn-xs btn-primary gap-1 rounded-lg font-bold"
+                          className="btn btn-xs btn-primary gap-1 rounded-lg font-bold flex-nowrap whitespace-nowrap"
+                          title="Manage Order"
                         >
-                          <Eye size={14} /> Manage Order
+                          <Eye size={14} className="shrink-0" /> Manage
                         </button>
                       </td>
                     </tr>

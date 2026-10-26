@@ -48,7 +48,8 @@ One Next.js app serves three audiences:
 - **Nothing should jump.** Use skeletons shaped like the final content, fixed image ratios, and buttons that keep their width while loading.
 - **Calm motion.** Short fades and scales (150–250 ms), and respect `prefers-reduced-motion`.
 - **Accessible by default.** Use real buttons and links, `aria-label` on icon-only buttons, visible `focus-visible` rings, keyboard close for overlays.
-- **Mobile is first-class.** Check every screen at **375 px and 1440 px**. Don't allow horizontal page scroll. Tabs scroll sideways and never wrap.
+- **Mobile is first-class.** Check every screen at **375 px, 1366 px and 1440 px**, at **100 % browser zoom** with the sidebar open. Don't allow horizontal page scroll. Tabs scroll sideways and never wrap.
+- **Laptops are the tightest desktop.** At 1366 px the sidebar leaves only about **1050 px** of content width. A page that only looks right at 75–90 % zoom is broken. See §3.8.
 
 ### 3.2 Theme and tokens
 
@@ -93,7 +94,7 @@ Import them from the barrel: `import { PanelPage, PanelPageHeader, … } from "@
 | `PanelTabs` | Tab bars and status filters | One row, scrolls sideways, same height for every tab, active = `bg-primary text-white`. |
 | `PanelModal` | **Every** dialog | Escape and backdrop close it, scroll lock, focus return, bottom sheet on phones. **Cancel on the left, primary action on the right.** |
 | `PanelCard` | Content blocks, stat cards | Card token plus an optional header row. |
-| `PanelTable` | Data tables | `table-sm`, no `table-zebra`, actions in the last column, right-aligned in a `flex justify-end gap-1` group. |
+| `PanelTable` | Data tables | `table-sm`, no `table-zebra`, actions in the last column, right-aligned in a `flex justify-end gap-1` group. Must fit about 1050 px without sideways scroll (§3.8). |
 | `PanelEmpty` | Empty lists and empty cart | Icon + title + text + optional action. |
 | `PanelSkeleton` | Loading states | `variant="table" \| "cards" \| "form"`. Use instead of full-page spinners. |
 | `StatusBadge` | **Every** status pill | One status → one colour across admin and reseller. Unknown statuses fall back to a neutral ghost badge with a readable label. |
@@ -131,6 +132,27 @@ Import them from the barrel: `import { PanelPage, PanelPageHeader, … } from "@
 ### 3.7 Storefront
 
 The storefront (`components/public`, `components/homepage`) has its own visual language driven by CMS content and the Homepage Builder. Panel rules (sidebar, `PanelPage`) don't apply there, but these do: no layout shift, fixed image ratios (`SafeImage` / `next/image`), accessibility, mobile-first, and sanitised HTML.
+
+### 3.8 Wide tables and filter bars (fit at 100 % zoom)
+
+Admin list pages (orders, inventory, products, withdrawals) must fit about **1050 px** of content width at 100 % zoom. That's a 1366 px laptop with the sidebar open. Reference implementation: `(dashboard)/orders/page.tsx`.
+
+**Filter / toolbar card**
+- Don't use one `flex flex-wrap justify-between` row for everything. It breaks into uneven lines and leaves single buttons stranded.
+- **Row 1:** search (`md:flex-1 md:min-w-[160px]`, so the row still fits when Reset Filters appears), date range and text filters, then the toolbar buttons grouped on the right (`flex gap-2 ml-auto`). Reset Filters sits in that group.
+- **Row 2:** dropdown filters in a grid (`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-3`). Each label gets `whitespace-nowrap min-w-0`, icons get `shrink-0`, and the select gets `flex-1 min-w-0` so it fills its cell.
+
+**Data table**
+- Wrap it in `overflow-x-auto`, and keep the table's `min-w-[…]` at **920 px or less**. Don't use values like `min-w-[1100px]`.
+- Cell padding is `px-3` (`[&_th]:px-3 [&_td]:px-3` or `table-sm`). Don't keep daisyUI's default `px-4` on tables with 8+ columns.
+- Aim for **8 columns or fewer**. Stack related narrow values in one cell instead of giving each its own column: ref + type badge, processing + payment status, date + time.
+- Keep headers short: "Status", "Total Bill", "Order Date". Avoid long uppercase headers like "Processing Status", because `uppercase tracking-wider` makes them wider than their data.
+- Secondary text that can be long, such as "Via Reseller: name (phone)", wraps (`leading-tight` in a `max-w-[220px]` cell). Only short values (refs, money, dates, badges) use `whitespace-nowrap`.
+
+**Sticky action column**
+- Use `sticky right-0 z-10` with a background that matches its row: `bg-slate-50` in the header, `bg-base-100` in the body.
+- Row buttons are `btn-xs` with `whitespace-nowrap flex-nowrap` and a `shrink-0` icon, so the label never drops under the icon. Use a short label ("Manage", "View") and put the full text in `title`.
+- If the sticky column covers other columns at 1366 px, the table is too wide. Fix the width; don't leave it to scroll.
 
 ---
 
@@ -308,7 +330,7 @@ npm run build      # prisma generate + nest build (type-checks)
 ```
 
 Then check by hand:
-- [ ] Desktop 1440 px **and** mobile 375 px.
+- [ ] Desktop 1440 px, laptop **1366 px at 100 % zoom** (sidebar open, no sideways table scroll, sticky column covers nothing) **and** mobile 375 px.
 - [ ] Each affected role (staff, reseller, customer, logged out).
 - [ ] Only one sidebar item is highlighted, and the drawer closes on navigation.
 - [ ] Loading, empty and error states look right, and nothing jumps.
@@ -347,5 +369,5 @@ Fix these when you're working nearby, or schedule them. Remove an item once it's
 ## 11. Working with AI assistants on this repo
 
 - `UI_CONSISTENCY_PROMPT.md` (root) is the original spec for the panel design system. §3 of this document is the current summary.
-- Point assistants at this file first. Remind them that UI tasks must not touch logic, that statuses must be checked against the backend, and that "done" means lint + type-check + build.
+- Point assistants at this file first. For layout fixes, point them at §3.8 and the 1366 px / 100 % zoom check. Remind them that UI tasks must not touch logic, that statuses must be checked against the backend, and that "done" means lint + type-check + build.
 - This file sits in the workspace root, **outside** both git repos. Copy it (or the relevant half) into each repo's `README.md` or `CLAUDE.md` if it should be versioned with the code.
