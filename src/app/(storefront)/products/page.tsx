@@ -453,7 +453,7 @@ function ProductsPageContent() {
               /* Skeleton Loader Grid */
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                  <div key={n} className="flex flex-col gap-3 sm:gap-4 bg-base-100 p-3 sm:p-4 rounded-2xl border border-base-200 shadow-xs">
+                  <div key={n} className="flex flex-col gap-3 sm:gap-4 bg-base-100 p-3 sm:p-4 rounded-2xl border border-base-200 shadow-sm">
                     <div className="skeleton w-full aspect-[4/5] rounded-xl" />
                     <div className="skeleton h-3 sm:h-4 w-20 sm:w-28 rounded" />
                     <div className="skeleton h-4 sm:h-5 w-full rounded" />
@@ -492,7 +492,7 @@ function ProductsPageContent() {
 
       {/* Mobile Filters Slide-over Modal */}
       {mobileFilterOpen && (
-        <div className="fixed inset-0 z-[60] flex justify-end bg-black/60 backdrop-blur-xs lg:hidden">
+        <div className="fixed inset-0 z-[60] flex justify-end bg-black/60 backdrop-blur-sm lg:hidden">
           <div className="w-full max-w-xs bg-base-100 h-full shadow-2xl flex flex-col p-5 overflow-y-auto space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-base-200">
               <h3 className="font-bold text-base sm:text-lg flex items-center gap-2">

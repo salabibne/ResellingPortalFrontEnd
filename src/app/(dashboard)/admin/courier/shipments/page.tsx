@@ -34,6 +34,13 @@ import PickupsPanel from "@/components/courier/PickupsPanel";
 import ReturnsPanel from "@/components/courier/ReturnsPanel";
 import InvoicesPanel from "@/components/courier/InvoicesPanel";
 import TrackPanel from "@/components/courier/TrackPanel";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelTabs from "@/components/panel/PanelTabs";
+import PanelTable from "@/components/panel/PanelTable";
+import PanelEmpty from "@/components/panel/PanelEmpty";
+import PanelSkeleton from "@/components/panel/PanelSkeleton";
+import PanelModal from "@/components/panel/PanelModal";
 
 type CourierTab =
   | "shipments"
@@ -58,7 +65,7 @@ const BOOKING_STATE_STYLES: Record<string, string> = {
   BOOKED: "badge-success text-white",
   BOOKING: "badge-info text-white",
   FAILED: "badge-error text-white",
-  UNCERTAIN: "badge-warning text-slate-900 border border-amber-400",
+  UNCERTAIN: "badge-warning text-base-content border border-amber-400",
 };
 
 const BOOKING_STATE_LABELS: Record<string, string> = {
@@ -327,130 +334,110 @@ export default function CourierShipmentsPage() {
     !!customerPhone;
 
   return (
-    <div className="space-y-6">
+    <PanelPage>
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Truck className="text-primary" /> Courier Management
-          </h1>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Booked Steadfast shipments, saved consignment details, and manual status refresh using each order&apos;s consignment ID.
-          </p>
-
-          <div className="mt-4 inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-indigo-950 to-slate-900 px-4 py-2.5 text-white shadow-sm">
-            <Wallet size={18} className="text-emerald-400" />
-            <div>
-              <div className="text-[10px] uppercase tracking-wider text-indigo-300 font-bold">
-                Steadfast Balance
-              </div>
-              <div className="text-lg font-black leading-tight">
-                {loadingBalance
-                  ? "Loading..."
-                  : balanceError
-                    ? "Unavailable"
-                    : balance !== null
-                      ? `৳ ${balance.toLocaleString()}`
-                      : "—"}
-              </div>
-            </div>
+      <PanelPageHeader
+        title="Courier Management"
+        subtitle="Booked Steadfast shipments, saved consignment details, and manual status refresh using each order's consignment ID."
+        icon={Truck}
+        actions={
+          <>
+            <Link
+              href="/admin/courier"
+              className="btn btn-outline btn-sm rounded-xl gap-2"
+            >
+              <SlidersHorizontal size={16} /> Courier Policy
+            </Link>
             <button
               type="button"
-              onClick={fetchBalance}
-              disabled={loadingBalance}
-              className="btn btn-ghost btn-xs text-indigo-200 hover:text-white ml-1"
-              title="Refresh Steadfast wallet balance"
+              onClick={handleSyncAll}
+              disabled={refreshingAll}
+              className="btn btn-info btn-sm rounded-xl gap-2 text-white"
+              title="Refresh every active shipment from Steadfast"
             >
-              <RefreshCw
-                size={12}
-                className={loadingBalance ? "animate-spin" : ""}
-              />
+              <Truck size={16} className={refreshingAll ? "animate-bounce" : ""} />
+              {refreshingAll ? "Syncing..." : "Sync All Active"}
             </button>
-
-            <span
-              className={`badge badge-xs font-bold uppercase ${
-                authStatus === null
-                  ? "badge-neutral text-white"
-                  : authStatus.balanceOk
-                    ? "badge-success text-white"
-                    : "badge-error text-white"
-              }`}
-              title={
-                authStatus === null
-                  ? "Checking Steadfast API health"
-                  : authStatus.balanceOk
-                    ? `Connected via ${authStatus.preferredSource || (authStatus.envConfigured ? "env" : "database")}`
-                    : authStatus.balanceError ||
-                      "Steadfast API rejected the credentials"
-              }
+            <button
+              type="button"
+              onClick={fetchShipments}
+              disabled={loading}
+              className="btn btn-outline btn-sm rounded-xl gap-2"
             >
-              {authStatus === null
-                ? "API Checking"
-                : authStatus.balanceOk
-                  ? `API Connected${
-                      authStatus.preferredSource
-                        ? ` (${authStatus.preferredSource})`
-                        : ""
-                    }`
-                  : "API Rejected"}
-            </span>
+              <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Refresh List
+            </button>
+          </>
+        }
+      />
+
+      <div className="inline-flex flex-wrap items-center gap-3 rounded-xl bg-base-200 px-4 py-2.5 text-base-content">
+        <Wallet size={18} className="text-emerald-600" />
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-base-content/50 font-bold">
+            Steadfast Balance
           </div>
-
-          {balanceError && (
-            <p className="text-[10px] text-rose-600 font-semibold mt-1 max-w-md">
-              {balanceError}
-            </p>
-          )}
+          <div className="text-lg font-black leading-tight">
+            {loadingBalance
+              ? "Loading..."
+              : balanceError
+                ? "Unavailable"
+                : balance !== null
+                  ? `৳ ${balance.toLocaleString()}`
+                  : "—"}
+          </div>
         </div>
+        <button
+          type="button"
+          onClick={fetchBalance}
+          disabled={loadingBalance}
+          className="btn btn-ghost btn-xs btn-square rounded-lg"
+          title="Refresh Steadfast wallet balance"
+          aria-label="Refresh Steadfast wallet balance"
+        >
+          <RefreshCw size={12} className={loadingBalance ? "animate-spin" : ""} />
+        </button>
 
-        <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
-          <Link
-            href="/admin/courier"
-            className="btn btn-sm btn-outline rounded-xl font-bold gap-2"
-          >
-            <SlidersHorizontal size={14} /> Courier Policy
-          </Link>
-          <button
-            onClick={handleSyncAll}
-            disabled={refreshingAll}
-            className="btn btn-sm btn-info text-white rounded-xl font-bold gap-2"
-            title="Refresh every active shipment from Steadfast"
-          >
-            <Truck size={14} className={refreshingAll ? "animate-bounce" : ""} />
-            {refreshingAll ? "Syncing..." : "Sync All Active"}
-          </button>
-          <button
-            onClick={fetchShipments}
-            disabled={loading}
-            className="btn btn-sm btn-outline rounded-xl font-bold gap-2"
-          >
-            <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh List
-          </button>
-        </div>
+        <span
+          className={`badge badge-xs font-bold uppercase ${
+            authStatus === null
+              ? "badge-neutral text-white"
+              : authStatus.balanceOk
+                ? "badge-success text-white"
+                : "badge-error text-white"
+          }`}
+          title={
+            authStatus === null
+              ? "Checking Steadfast API health"
+              : authStatus.balanceOk
+                ? `Connected via ${authStatus.preferredSource || (authStatus.envConfigured ? "env" : "database")}`
+                : authStatus.balanceError || "Steadfast API rejected the credentials"
+          }
+        >
+          {authStatus === null
+            ? "API Checking"
+            : authStatus.balanceOk
+              ? `API Connected${
+                  authStatus.preferredSource ? ` (${authStatus.preferredSource})` : ""
+                }`
+              : "API Rejected"}
+        </span>
+
+        {balanceError && (
+          <span className="text-[10px] text-rose-600 font-semibold">{balanceError}</span>
+        )}
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200/80 shadow-sm">
-        {COURIER_TABS.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`btn btn-sm rounded-xl gap-2 font-bold ${
-                isActive
-                  ? "btn-primary text-white"
-                  : "btn-ghost text-slate-600"
-              }`}
-            >
-              <Icon size={14} />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      <PanelTabs
+        ariaLabel="Courier sections"
+        value={activeTab}
+        onChange={(id) => setActiveTab(id as CourierTab)}
+        tabs={COURIER_TABS.map((tab) => ({
+          id: tab.id,
+          label: tab.label,
+          icon: tab.icon,
+        }))}
+      />
 
       {successMsg && (
         <div className="alert alert-success text-white text-xs font-bold shadow-sm flex items-center gap-2">
@@ -483,7 +470,7 @@ export default function CourierShipmentsPage() {
       {activeTab === "shipments" && (
         <>
       {/* Filters */}
-      <div className="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col gap-4">
+      <div className="bg-base-100 p-4 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative w-full md:w-64">
             <input
@@ -494,7 +481,7 @@ export default function CourierShipmentsPage() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="input input-sm input-bordered w-full rounded-2xl pl-9 text-slate-900 text-xs"
+              className="input input-sm input-bordered w-full rounded-2xl pl-9 text-base-content text-xs"
             />
             <Search
               size={16}
@@ -512,7 +499,7 @@ export default function CourierShipmentsPage() {
                 setConsignmentId(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-white text-slate-900 font-bold rounded-xl w-40"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl w-40"
             />
           </div>
 
@@ -524,7 +511,7 @@ export default function CourierShipmentsPage() {
                 setCourierStatus(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
             >
               <option value="ALL">All Courier Statuses</option>
               <option value="NOT_SENT">Not Placed with Courier</option>
@@ -545,7 +532,7 @@ export default function CourierShipmentsPage() {
                 setShipmentState(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
             >
               <option value="">All Booking States</option>
               <option value="NOT_BOOKED">Not Booked</option>
@@ -565,7 +552,7 @@ export default function CourierShipmentsPage() {
                 setStartDate(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl"
             />
             <span>To:</span>
             <input
@@ -575,7 +562,7 @@ export default function CourierShipmentsPage() {
                 setEndDate(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl"
             />
           </div>
 
@@ -589,7 +576,7 @@ export default function CourierShipmentsPage() {
                 setCustomerPhone(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-white text-slate-900 font-bold rounded-xl w-36"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl w-36"
             />
           </div>
 
@@ -605,23 +592,19 @@ export default function CourierShipmentsPage() {
       </div>
 
       {/* Shipments Table */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="h-64 flex items-center justify-center">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
-          </div>
-        ) : shipments.length === 0 ? (
-          <div className="p-12 text-center text-slate-400">
-            <Truck size={48} className="mx-auto mb-3 opacity-60" />
-            <p className="text-lg font-bold text-slate-700">No Shipments Found</p>
-            <p className="text-xs text-slate-500 mt-1">
-              No orders match the current courier filters.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="table w-full">
-              <thead className="bg-slate-50 text-slate-700 text-xs uppercase tracking-wider">
+      {loading ? (
+        <PanelSkeleton variant="table" rows={8} />
+      ) : shipments.length === 0 ? (
+        <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm">
+          <PanelEmpty
+            icon={Truck}
+            title="No Shipments Found"
+            text="No orders match the current courier filters."
+          />
+        </div>
+      ) : (
+          <PanelTable>
+              <thead>
                 <tr>
                   <th className="py-4 pl-6">Order</th>
                   <th>Reseller</th>
@@ -665,7 +648,7 @@ export default function CourierShipmentsPage() {
                       </td>
 
                       <td>
-                        <div className="font-bold text-slate-900 text-xs">
+                        <div className="font-bold text-base-content text-xs">
                           {order.customerName || order.customer?.name || "Customer"}
                         </div>
                         <div className="text-[11px] text-slate-500 mt-0.5">
@@ -738,7 +721,7 @@ export default function CourierShipmentsPage() {
                         <CourierStatusBadge status={order.courierStatus} />
                         {order.courierReturnStatus && (
                           <div className="mt-1">
-                            <span className="badge badge-warning text-slate-900 text-[9px] font-bold uppercase py-1 px-1.5">
+                            <span className="badge badge-warning text-base-content text-[9px] font-bold uppercase py-1 px-1.5">
                               Return: {order.courierReturnStatus}
                             </span>
                           </div>
@@ -833,14 +816,13 @@ export default function CourierShipmentsPage() {
                   );
                 })}
               </tbody>
-            </table>
-          </div>
+          </PanelTable>
         )}
 
         {/* Pagination */}
         {meta.totalPages > 1 && (
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <span className="text-xs font-medium text-slate-500">
+          <div className="p-4 border-t border-base-200 flex items-center justify-between bg-base-200/40 rounded-2xl">
+            <span className="text-xs font-medium text-base-content/60">
               Page {page} of {meta.totalPages} ({meta.total} shipments)
             </span>
             <div className="flex items-center gap-2">
@@ -861,7 +843,6 @@ export default function CourierShipmentsPage() {
             </div>
           </div>
         )}
-      </div>
         </>
       )}
 
@@ -874,55 +855,16 @@ export default function CourierShipmentsPage() {
 
       {/* Request Return Modal */}
       {returnOrder && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-md bg-white p-6 space-y-4 rounded-3xl border border-slate-200">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
-                <RotateCcw size={18} className="text-primary" /> Request Return
-              </h3>
+        <PanelModal
+          open={!!returnOrder}
+          onClose={() => setReturnOrder(null)}
+          title="Request Return"
+          size="sm"
+          footer={
+            <>
               <button
                 type="button"
-                className="btn btn-ghost btn-circle btn-sm text-slate-400"
-                onClick={() => setReturnOrder(null)}
-                disabled={creatingReturn}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="text-xs space-y-3">
-              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <div className="font-bold text-slate-900">
-                  {returnOrder.orderRef ||
-                    `#${returnOrder.id.substring(0, 8).toUpperCase()}`}
-                </div>
-                <div className="text-slate-500 mt-1">
-                  Consignment: #{returnOrder.courierConsignmentId || "N/A"}
-                </div>
-                <div className="text-slate-500">
-                  Tracking: {returnOrder.courierTrackingCode || "N/A"}
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  Return Reason
-                </label>
-                <textarea
-                  value={returnReason}
-                  onChange={(e) => setReturnReason(e.target.value)}
-                  rows={3}
-                  placeholder="Why is this parcel being returned?"
-                  className="textarea textarea-bordered w-full rounded-xl text-slate-900"
-                  maxLength={500}
-                />
-              </div>
-            </div>
-
-            <div className="modal-action border-t border-slate-100 pt-4">
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm font-bold rounded-xl"
+                className="btn btn-ghost btn-sm rounded-xl"
                 onClick={() => setReturnOrder(null)}
                 disabled={creatingReturn}
               >
@@ -930,21 +872,50 @@ export default function CourierShipmentsPage() {
               </button>
               <button
                 type="button"
-                className="btn btn-primary btn-sm font-bold rounded-xl gap-2 text-white"
+                className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
                 onClick={handleCreateReturn}
                 disabled={creatingReturn}
               >
                 {creatingReturn ? (
                   <span className="loading loading-spinner loading-xs"></span>
                 ) : (
-                  <RotateCcw size={14} />
+                  <RotateCcw size={16} />
                 )}
                 {creatingReturn ? "Submitting..." : "Submit Return Request"}
               </button>
+            </>
+          }
+        >
+          <div className="text-xs space-y-3">
+            <div className="bg-base-200/60 p-3 rounded-xl border border-base-200">
+              <div className="font-bold text-base-content">
+                {returnOrder.orderRef ||
+                  `#${returnOrder.id.substring(0, 8).toUpperCase()}`}
+              </div>
+              <div className="text-base-content/60 mt-1">
+                Consignment: #{returnOrder.courierConsignmentId || "N/A"}
+              </div>
+              <div className="text-base-content/60">
+                Tracking: {returnOrder.courierTrackingCode || "N/A"}
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-bold text-base-content/70 mb-1">
+                Return Reason
+              </label>
+              <textarea
+                value={returnReason}
+                onChange={(e) => setReturnReason(e.target.value)}
+                rows={3}
+                placeholder="Why is this parcel being returned?"
+                className="textarea textarea-bordered w-full rounded-xl"
+                maxLength={500}
+              />
             </div>
           </div>
-        </div>
+        </PanelModal>
       )}
-    </div>
+    </PanelPage>
   );
 }

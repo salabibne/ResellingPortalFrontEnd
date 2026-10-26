@@ -131,9 +131,9 @@ export default function TrackPanel({
 
   return (
     <div className="space-y-5">
-      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+      <div className="bg-base-100 p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
         <div>
-          <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+          <h2 className="text-base font-extrabold text-base-content flex items-center gap-2">
             <Search size={18} className="text-primary" /> {title}
           </h2>
           <p className="text-[11px] text-slate-500 mt-0.5">{description}</p>
@@ -150,7 +150,7 @@ export default function TrackPanel({
                 setSelectedIdentifier(e.target.value);
                 setManualIdentifier("");
               }}
-              className="select select-sm select-bordered w-full rounded-xl text-slate-900"
+              className="select select-sm select-bordered w-full rounded-xl text-base-content"
               disabled={optionsLoading}
             >
               <option value="">
@@ -182,7 +182,7 @@ export default function TrackPanel({
                     setSelectedIdentifier("");
                   }}
                   placeholder="e.g. 1424107, 15BAEB8A, or ORD-10231"
-                  className="input input-sm input-bordered flex-1 rounded-xl text-slate-900"
+                  className="input input-sm input-bordered flex-1 rounded-xl text-base-content"
                 />
                 <button
                   type="submit"
@@ -235,12 +235,12 @@ export default function TrackPanel({
       )}
 
       {result && (
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="bg-base-100 rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div className="p-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
                 <Truck size={16} className="text-primary" />
-                <h3 className="font-extrabold text-slate-900 text-sm">
+                <h3 className="font-extrabold text-base-content text-sm">
                   Parcel Status
                 </h3>
                 <CourierStatusBadge status={result.deliveryStatus} />
@@ -266,7 +266,7 @@ export default function TrackPanel({
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                 Consignment ID
               </span>
-              <span className="font-mono font-bold text-slate-900">
+              <span className="font-mono font-bold text-base-content">
                 {result.consignmentId ? `#${result.consignmentId}` : "-"}
               </span>
             </div>
@@ -310,7 +310,7 @@ export default function TrackPanel({
                 </a>
               )}
               {result.returnStatus && (
-                <span className="badge badge-warning text-slate-900 font-bold uppercase text-[10px]">
+                <span className="badge badge-warning text-base-content font-bold uppercase text-[10px]">
                   Return: {result.returnStatus}
                 </span>
               )}
@@ -341,7 +341,7 @@ export default function TrackPanel({
                       {index + 1}
                     </div>
                     <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                      <p className="text-xs font-bold text-slate-900">
+                      <p className="text-xs font-bold text-base-content">
                         {event.text}
                       </p>
                       <span className="text-[10px] text-slate-400 block mt-1">

@@ -27,6 +27,13 @@ import supportApi, {
   SupportTicketReason,
   SupportTicketStatus,
 } from "@/services/support.api";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelTable from "@/components/panel/PanelTable";
+import PanelEmpty from "@/components/panel/PanelEmpty";
+import PanelSkeleton from "@/components/panel/PanelSkeleton";
+import PanelModal from "@/components/panel/PanelModal";
+import StatusBadge from "@/components/panel/StatusBadge";
 
 const REASONS: { id: SupportTicketReason; label: string; icon: any; color: string }[] = [
   { id: "PAYMENT", label: "Payment / Payout", icon: CreditCard, color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
@@ -131,79 +138,43 @@ export default function AdminTicketsPage() {
     );
   };
 
-  const getStatusBadge = (status: SupportTicketStatus) => {
-    switch (status) {
-      case "OPEN":
-        return (
-          <span className="badge badge-warning text-xs font-bold gap-1 py-2 px-2.5">
-            <Clock size={12} /> Open
-          </span>
-        );
-      case "IN_PROGRESS":
-        return (
-          <span className="badge badge-info text-xs font-bold gap-1 py-2 px-2.5">
-            <RefreshCw size={12} className="animate-spin" /> In Progress
-          </span>
-        );
-      case "RESOLVED":
-        return (
-          <span className="badge badge-success text-white text-xs font-bold gap-1 py-2 px-2.5">
-            <CheckCircle2 size={12} /> Resolved
-          </span>
-        );
-      case "CLOSED":
-        return (
-          <span className="badge badge-ghost text-xs font-bold gap-1 py-2 px-2.5 text-slate-500">
-            Closed
-          </span>
-        );
-    }
-  };
-
   return (
-    <div className="space-y-6 pb-20 max-w-7xl mx-auto">
-      {/* Top Banner Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 rounded-2xl border border-primary/20 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider mb-1">
-            <LifeBuoy size={14} /> Reseller Support Desk
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-            Support Tickets Management
-          </h1>
-          <p className="text-sm text-slate-600 mt-1 max-w-2xl">
-            Monitor and resolve incoming reseller inquiries. Search by Ticket ID, customer name, or keyword, and update resolution notes.
-          </p>
-        </div>
-
-        <button
-          onClick={fetchTickets}
-          className="btn btn-outline btn-sm gap-2 font-bold shrink-0"
-          title="Refresh list"
-        >
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
-        </button>
-      </div>
+    <PanelPage>
+      <PanelPageHeader
+        title="Support Tickets Management"
+        subtitle="Monitor and resolve incoming reseller inquiries. Search by Ticket ID, customer name, or keyword, and update resolution notes."
+        icon={LifeBuoy}
+        actions={
+          <button
+            type="button"
+            onClick={fetchTickets}
+            className="btn btn-outline btn-sm rounded-xl gap-2"
+            title="Refresh list"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Refresh
+          </button>
+        }
+      />
 
       {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="card bg-base-100 border border-base-200 p-4 rounded-xl shadow-xs">
+        <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
           <p className="text-xs text-slate-500 font-semibold uppercase">Total Inquiries</p>
-          <p className="text-2xl font-black text-slate-900 mt-1">{tickets.length}</p>
+          <p className="text-2xl font-black text-base-content mt-1">{tickets.length}</p>
         </div>
-        <div className="card bg-base-100 border border-base-200 p-4 rounded-xl shadow-xs">
+        <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
           <p className="text-xs text-amber-600 font-semibold uppercase">Open</p>
           <p className="text-2xl font-black text-amber-600 mt-1">
             {tickets.filter((t) => t.status === "OPEN").length}
           </p>
         </div>
-        <div className="card bg-base-100 border border-base-200 p-4 rounded-xl shadow-xs">
+        <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
           <p className="text-xs text-blue-600 font-semibold uppercase">In Progress</p>
           <p className="text-2xl font-black text-blue-600 mt-1">
             {tickets.filter((t) => t.status === "IN_PROGRESS").length}
           </p>
         </div>
-        <div className="card bg-base-100 border border-base-200 p-4 rounded-xl shadow-xs">
+        <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
           <p className="text-xs text-emerald-600 font-semibold uppercase">Resolved</p>
           <p className="text-2xl font-black text-emerald-600 mt-1">
             {tickets.filter((t) => t.status === "RESOLVED").length}
@@ -221,8 +192,8 @@ export default function AdminTicketsPage() {
               onClick={() => setSelectedStatus(st)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
                 selectedStatus === st
-                  ? "bg-primary text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-base-200"
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-slate-600 hover:text-base-content hover:bg-base-200"
               }`}
             >
               {st === "ALL" ? "All Statuses" : st.replace("_", " ")}
@@ -253,7 +224,7 @@ export default function AdminTicketsPage() {
           <input
             type="text"
             placeholder="Search by Ticket ID (e.g. TKT-...) or Name..."
-            className="input input-bordered input-sm pl-9 pr-14 w-full text-xs text-black"
+            className="input input-bordered input-sm pl-9 pr-14 w-full text-xs text-base-content"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -268,38 +239,36 @@ export default function AdminTicketsPage() {
 
       {/* Tickets Table / List */}
       {loading ? (
-        <div className="py-16 text-center">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="text-xs text-slate-400 mt-2">Loading support tickets...</p>
-        </div>
+        <PanelSkeleton variant="table" rows={6} />
       ) : tickets.length === 0 ? (
-        <div className="card bg-base-100 border border-base-200 rounded-2xl p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
-            <LifeBuoy size={24} />
-          </div>
-          <h3 className="text-lg font-bold text-slate-800">No support tickets found</h3>
-          <p className="text-xs text-slate-500 max-w-md mx-auto">
-            {search ? `No tickets matching search "${search}".` : "No tickets currently submitted under this category."}
-          </p>
-          {search && (
-            <div>
-              <button
-                onClick={() => {
-                  setSearch("");
-                  fetchTickets();
-                }}
-                className="btn btn-ghost btn-sm text-primary font-bold"
-              >
-                Clear Search
-              </button>
-            </div>
-          )}
+        <div className="bg-base-100 border border-base-200 rounded-2xl shadow-sm">
+          <PanelEmpty
+            icon={LifeBuoy}
+            title="No support tickets found"
+            text={
+              search
+                ? `No tickets matching search "${search}".`
+                : "No tickets currently submitted under this category."
+            }
+            action={
+              search ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch("");
+                    fetchTickets();
+                  }}
+                  className="btn btn-ghost btn-sm rounded-xl text-primary"
+                >
+                  Clear Search
+                </button>
+              ) : undefined
+            }
+          />
         </div>
       ) : (
-        <div className="bg-base-100 border border-base-200 rounded-2xl overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
-            <table className="table table-zebra w-full text-xs">
-              <thead className="bg-slate-50 text-slate-600 font-extrabold uppercase text-[10px] tracking-wider border-b border-base-200">
+        <PanelTable>
+              <thead>
                 <tr>
                   <th>Ticket ID</th>
                   <th>Reseller</th>
@@ -378,7 +347,7 @@ export default function AdminTicketsPage() {
                       </td>
 
                       {/* Status */}
-                      <td>{getStatusBadge(t.status)}</td>
+                      <td><StatusBadge status={t.status} /></td>
 
                       {/* Date */}
                       <td className="whitespace-nowrap text-slate-500">
@@ -401,33 +370,42 @@ export default function AdminTicketsPage() {
                   );
                 })}
               </tbody>
-            </table>
-          </div>
-        </div>
+          </PanelTable>
       )}
 
       {/* MANAGE TICKET MODAL */}
       {selectedTicket && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[92vh] overflow-y-auto border border-slate-200">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <div>
-                <span className="font-mono text-xs font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded">
-                  {selectedTicket.ticketId}
-                </span>
-                <h3 className="text-xl font-bold text-slate-900 mt-1">
-                  Manage Support Ticket
-                </h3>
-              </div>
+        <PanelModal
+          open={!!selectedTicket}
+          onClose={() => setSelectedTicket(null)}
+          title={`Manage Support Ticket — ${selectedTicket.ticketId}`}
+          size="lg"
+          footer={
+            <>
               <button
+                type="button"
+                className="btn btn-ghost btn-sm rounded-xl"
                 onClick={() => setSelectedTicket(null)}
-                className="btn btn-ghost btn-circle btn-sm text-slate-400 hover:text-slate-700"
+                disabled={updating}
               >
-                <X size={18} />
+                Close
               </button>
-            </div>
-
-            <form onSubmit={handleUpdateStatus} className="p-6 space-y-4 text-xs">
+              <button
+                type="submit"
+                form="admin-ticket-form"
+                className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+                disabled={updating}
+              >
+                {updating ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  "Save Changes"
+                )}
+              </button>
+            </>
+          }
+        >
+          <form id="admin-ticket-form" onSubmit={handleUpdateStatus} className="space-y-4 text-xs">
               {updateSuccess && (
                 <div className="alert alert-success text-white text-xs p-3 rounded-xl flex items-center gap-2">
                   <CheckCircle2 size={16} />
@@ -495,7 +473,7 @@ export default function AdminTicketsPage() {
                   </span>
                 </label>
                 <select
-                  className="select select-bordered select-sm w-full font-bold text-black"
+                  className="select select-bordered select-sm w-full font-bold text-base-content"
                   value={editStatus}
                   onChange={(e) => setEditStatus(e.target.value as SupportTicketStatus)}
                 >
@@ -516,7 +494,7 @@ export default function AdminTicketsPage() {
                 <textarea
                   rows={4}
                   placeholder="Enter resolution details, tracking notes, or message for the reseller..."
-                  className="textarea textarea-bordered w-full text-xs text-black"
+                  className="textarea textarea-bordered w-full text-xs text-base-content"
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                 />
@@ -524,33 +502,9 @@ export default function AdminTicketsPage() {
                   These notes will be visible to the reseller when viewing their ticket details.
                 </span>
               </div>
-
-              {/* Footer Actions */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedTicket(null)}
-                  className="btn btn-ghost btn-sm"
-                  disabled={updating}
-                >
-                  Close
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-sm text-white font-bold"
-                  disabled={updating}
-                >
-                  {updating ? (
-                    <span className="loading loading-spinner loading-xs"></span>
-                  ) : (
-                    "Save Changes"
-                  )}
-                </button>
-              </div>
             </form>
-          </div>
-        </div>
+        </PanelModal>
       )}
-    </div>
+    </PanelPage>
   );
 }

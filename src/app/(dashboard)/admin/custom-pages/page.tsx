@@ -1,5 +1,8 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelModal from "@/components/panel/PanelModal";
+
 import React, { useEffect, useState } from "react";
 import {
   Plus,
@@ -170,27 +173,24 @@ export default function AdminCustomPagesPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-white text-black">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-black flex items-center gap-2">
-            <Layers className="w-7 h-7 text-primary" /> Dynamic Custom Pages
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Build, edit, and publish custom campaign landing pages with dynamic modular sections.
-          </p>
-        </div>
-        <button
-          onClick={handleOpenCreate}
-          className="btn btn-primary text-white flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> Create Custom Page
-        </button>
-      </div>
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-base-100 text-base-content">
+      <PanelPageHeader
+        title="Dynamic Custom Pages"
+        subtitle="Build, edit, and publish custom campaign landing pages with dynamic modular sections."
+        icon={Layers}
+        actions={
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+          >
+            <Plus size={16} /> Create Custom Page
+          </button>
+        }
+      />
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-xs border border-gray-200">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-base-100 p-4 rounded-xl shadow-sm border border-gray-200">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
           <input
@@ -198,14 +198,14 @@ export default function AdminCustomPagesPage() {
             placeholder="Search pages by title or slug..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="input input-bordered w-full pl-9 text-sm bg-white text-black"
+            className="input input-bordered w-full pl-9 text-sm bg-base-100 text-base-content"
           />
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="select select-bordered text-sm w-full sm:w-auto bg-white text-black"
+            className="select select-bordered text-sm w-full sm:w-auto bg-base-100 text-base-content"
           >
             <option value="">All Statuses</option>
             <option value="PUBLISHED">Published</option>
@@ -225,7 +225,7 @@ export default function AdminCustomPagesPage() {
       </div>
 
       {/* Data Table View */}
-      <div className="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
+      <div className="bg-base-100 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading custom pages...</div>
         ) : pages.length === 0 ? (
@@ -248,7 +248,7 @@ export default function AdminCustomPagesPage() {
               <tbody className="divide-y divide-gray-200">
                 {pages.map((page) => (
                   <tr key={page.id} className="hover:bg-gray-50">
-                    <td className="font-semibold text-black">
+                    <td className="font-semibold text-base-content">
                       {page.title}
                     </td>
                     <td className="text-xs font-mono text-gray-500">/pages/{page.slug}</td>
@@ -317,44 +317,52 @@ export default function AdminCustomPagesPage() {
 
       {/* Visual Section Builder Modal */}
       {isDrawerOpen && editingPage && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-3xl bg-white text-black rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col my-auto border border-gray-200">
-            {/* Drawer Header */}
-            <div className="p-5 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-              <h2 className="text-lg font-bold text-black flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                {editingPage.id ? "Edit Custom Page" : "Create Custom Page"}
-              </h2>
+        <PanelModal
+          open={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          title={editingPage.id ? "Edit Custom Page" : "Create Custom Page"}
+          size="lg"
+          footer={
+            <>
               <button
+                type="button"
                 onClick={() => setIsDrawerOpen(false)}
-                className="btn btn-sm btn-ghost btn-circle"
+                className="btn btn-ghost btn-sm rounded-xl"
               >
-                <X className="w-5 h-5" />
+                Cancel
               </button>
-            </div>
-
-            {/* Drawer Body Form */}
-            <form onSubmit={handleSavePage} className="p-6 space-y-6 flex-1 bg-white">
+              <button
+                type="submit"
+                form="custom-page-form"
+                disabled={saving}
+                className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+              >
+                {saving ? "Saving Page..." : "Save Custom Page"}
+              </button>
+            </>
+          }
+        >
+          <form id="custom-page-form" onSubmit={handleSavePage} className="space-y-6">
               {/* Basic Page Metadata */}
               <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <h3 className="font-semibold text-sm text-black">
+                <h3 className="font-semibold text-sm text-base-content">
                   Page Settings & Metadata
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="label-text text-xs font-semibold text-black">Page Title *</label>
+                    <label className="label-text text-xs font-semibold text-base-content">Page Title *</label>
                     <input
                       type="text"
                       value={editingPage.title || ""}
                       onChange={(e) => handleTitleChange(e.target.value)}
                       placeholder="e.g. Eid Special Campaign"
-                      className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                      className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                       required
                     />
                   </div>
                   <div>
-                    <label className="label-text text-xs font-semibold text-black">URL Slug *</label>
+                    <label className="label-text text-xs font-semibold text-base-content">URL Slug *</label>
                     <input
                       type="text"
                       value={editingPage.slug || ""}
@@ -363,7 +371,7 @@ export default function AdminCustomPagesPage() {
                       }
                       placeholder="eid-special-campaign"
                       disabled={editingPage.isSystem}
-                      className="input input-bordered w-full text-sm mt-1 font-mono bg-white text-black"
+                      className="input input-bordered w-full text-sm mt-1 font-mono bg-base-100 text-base-content"
                       required
                     />
                   </div>
@@ -371,7 +379,7 @@ export default function AdminCustomPagesPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="label-text text-xs font-semibold text-black">Publish Status</label>
+                    <label className="label-text text-xs font-semibold text-base-content">Publish Status</label>
                     <select
                       value={editingPage.status || "DRAFT"}
                       onChange={(e) =>
@@ -380,7 +388,7 @@ export default function AdminCustomPagesPage() {
                           status: e.target.value as CustomPageStatus,
                         }))
                       }
-                      className="select select-bordered w-full text-sm mt-1 bg-white text-black"
+                      className="select select-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                     >
                       <option value="DRAFT">DRAFT</option>
                       <option value="PUBLISHED">PUBLISHED</option>
@@ -389,32 +397,32 @@ export default function AdminCustomPagesPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="label-text text-xs font-semibold text-black">CTA Button Title</label>
+                      <label className="label-text text-xs font-semibold text-base-content">CTA Button Title</label>
                       <input
                         type="text"
                         value={editingPage.buttonTitle || ""}
                         onChange={(e) =>
                           setEditingPage((prev) => ({ ...prev, buttonTitle: e.target.value }))
                         }
-                        className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                        className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                       />
                     </div>
                     <div>
-                      <label className="label-text text-xs font-semibold text-black">CTA Link</label>
+                      <label className="label-text text-xs font-semibold text-base-content">CTA Link</label>
                       <input
                         type="text"
                         value={editingPage.buttonLink || ""}
                         onChange={(e) =>
                           setEditingPage((prev) => ({ ...prev, buttonLink: e.target.value }))
                         }
-                        className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                        className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                       />
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="label-text text-xs font-semibold text-black">SEO Meta Title</label>
+                  <label className="label-text text-xs font-semibold text-base-content">SEO Meta Title</label>
                   <input
                     type="text"
                     value={editingPage.metaTitle || ""}
@@ -422,25 +430,25 @@ export default function AdminCustomPagesPage() {
                       setEditingPage((prev) => ({ ...prev, metaTitle: e.target.value }))
                     }
                     placeholder="e.g. Eid Deals - Aarham Apparel"
-                    className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                    className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                   />
                 </div>
                 <div>
-                  <label className="label-text text-xs font-semibold text-black">SEO Meta Description</label>
+                  <label className="label-text text-xs font-semibold text-base-content">SEO Meta Description</label>
                   <textarea
                     value={editingPage.metaDescription || ""}
                     onChange={(e) =>
                       setEditingPage((prev) => ({ ...prev, metaDescription: e.target.value }))
                     }
                     placeholder="Exclusive discounts on Eid collection..."
-                    className="textarea textarea-bordered w-full text-sm mt-1 h-16 bg-white text-black"
+                    className="textarea textarea-bordered w-full text-sm mt-1 h-16 bg-base-100 text-base-content"
                   />
                 </div>
               </div>
 
               {/* Page WYSIWYG Content Block */}
               <div className="space-y-2">
-                <label className="label-text text-xs font-semibold text-black">Page Rich Text Content</label>
+                <label className="label-text text-xs font-semibold text-base-content">Page Rich Text Content</label>
                 <RichTextEditor
                   value={editingPage.content || ""}
                   onChange={(val) => setEditingPage((prev) => ({ ...prev, content: val }))}
@@ -451,7 +459,7 @@ export default function AdminCustomPagesPage() {
               {/* Dynamic Sections Manager */}
               <div className="space-y-4 border-t border-gray-200 pt-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm text-black">
+                  <h3 className="font-semibold text-sm text-base-content">
                     Dynamic Page Sections ({sections.length})
                   </h3>
                   <div className="dropdown dropdown-end">
@@ -460,7 +468,7 @@ export default function AdminCustomPagesPage() {
                     </label>
                     <ul
                       tabIndex={0}
-                      className="dropdown-content z-20 menu p-2 shadow-lg bg-white text-black rounded-box w-52 text-xs border border-gray-200"
+                      className="dropdown-content z-20 menu p-2 shadow-lg bg-base-100 text-base-content rounded-box w-52 text-xs border border-gray-200"
                     >
                       <li>
                         <button
@@ -540,10 +548,10 @@ export default function AdminCustomPagesPage() {
                     {sections.map((sec, idx) => (
                       <div
                         key={idx}
-                        className="bg-white border border-gray-200 rounded-lg p-4 space-y-3 relative shadow-xs text-black"
+                        className="bg-base-100 border border-gray-200 rounded-lg p-4 space-y-3 relative shadow-sm text-base-content"
                       >
                         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                          <div className="flex items-center gap-2 text-xs font-bold text-black">
+                          <div className="flex items-center gap-2 text-xs font-bold text-base-content">
                             <GripVertical className="w-4 h-4 text-gray-400 cursor-grab" />
                             Section #{idx + 1}: {sec.title}
                           </div>
@@ -579,7 +587,7 @@ export default function AdminCustomPagesPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                           <div>
-                            <label className="label-text text-[11px] font-medium text-black">Section Title</label>
+                            <label className="label-text text-[11px] font-medium text-base-content">Section Title</label>
                             <input
                               type="text"
                               value={sec.title || ""}
@@ -589,11 +597,11 @@ export default function AdminCustomPagesPage() {
                                   prev.map((s, i) => (i === idx ? { ...s, title: val } : s))
                                 );
                               }}
-                              className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                              className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                             />
                           </div>
                           <div>
-                            <label className="label-text text-[11px] font-medium text-black">Subtitle</label>
+                            <label className="label-text text-[11px] font-medium text-base-content">Subtitle</label>
                             <input
                               type="text"
                               value={sec.subtitle || ""}
@@ -603,11 +611,11 @@ export default function AdminCustomPagesPage() {
                                   prev.map((s, i) => (i === idx ? { ...s, subtitle: val } : s))
                                 );
                               }}
-                              className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                              className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                             />
                           </div>
                           <div>
-                            <label className="label-text text-[11px] font-medium text-black">Image URL</label>
+                            <label className="label-text text-[11px] font-medium text-base-content">Image URL</label>
                             <input
                               type="text"
                               value={sec.imageUrl || ""}
@@ -618,12 +626,12 @@ export default function AdminCustomPagesPage() {
                                 );
                               }}
                               placeholder="https://cdn.aarhamapparel.com/..."
-                              className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                              className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                             />
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="label-text text-[11px] font-medium text-black">Button Text</label>
+                              <label className="label-text text-[11px] font-medium text-base-content">Button Text</label>
                               <input
                                 type="text"
                                 value={sec.buttonText || ""}
@@ -633,11 +641,11 @@ export default function AdminCustomPagesPage() {
                                     prev.map((s, i) => (i === idx ? { ...s, buttonText: val } : s))
                                   );
                                 }}
-                                className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                                className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                               />
                             </div>
                             <div>
-                              <label className="label-text text-[11px] font-medium text-black">Button Link</label>
+                              <label className="label-text text-[11px] font-medium text-base-content">Button Link</label>
                               <input
                                 type="text"
                                 value={sec.buttonLink || ""}
@@ -647,12 +655,12 @@ export default function AdminCustomPagesPage() {
                                     prev.map((s, i) => (i === idx ? { ...s, buttonLink: val } : s))
                                   );
                                 }}
-                                className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                                className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                               />
                             </div>
                           </div>
                           <div className="md:col-span-2">
-                            <label className="label-text text-[11px] font-medium text-black">Description</label>
+                            <label className="label-text text-[11px] font-medium text-base-content">Description</label>
                             <textarea
                               value={sec.description || ""}
                               onChange={(e) => {
@@ -661,7 +669,7 @@ export default function AdminCustomPagesPage() {
                                   prev.map((s, i) => (i === idx ? { ...s, description: val } : s))
                                 );
                               }}
-                              className="textarea textarea-bordered textarea-xs w-full mt-1 h-12 bg-white text-black"
+                              className="textarea textarea-bordered textarea-xs w-full mt-1 h-12 bg-base-100 text-base-content"
                             />
                           </div>
                           {(() => {
@@ -675,7 +683,7 @@ export default function AdminCustomPagesPage() {
                             const contentKey = isVideo ? "videoLink" : "cardIcon";
                             return (
                               <div className="md:col-span-2">
-                                <label className="label-text text-[11px] font-medium text-black">
+                                <label className="label-text text-[11px] font-medium text-base-content">
                                   {isVideo ? "Video URL" : "Card Icon"}
                                 </label>
                                 <input
@@ -702,7 +710,7 @@ export default function AdminCustomPagesPage() {
                                       )
                                     );
                                   }}
-                                  className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                                  className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                                 />
                               </div>
                             );
@@ -714,26 +722,8 @@ export default function AdminCustomPagesPage() {
                 )}
               </div>
 
-              {/* Save Controls */}
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-200 sticky bottom-0 bg-white p-4">
-                <button
-                  type="button"
-                  onClick={() => setIsDrawerOpen(false)}
-                  className="btn btn-ghost text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="btn btn-primary text-white text-xs px-6"
-                >
-                  {saving ? "Saving Page..." : "Save Custom Page"}
-                </button>
-              </div>
             </form>
-          </div>
-        </div>
+        </PanelModal>
       )}
     </div>
   );

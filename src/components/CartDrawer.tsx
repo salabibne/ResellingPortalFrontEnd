@@ -49,7 +49,7 @@ export default function CartDrawer() {
 
       {/* Cart Backdrop & Drawer */}
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex justify-end bg-black/50 backdrop-blur-xs transition-opacity duration-300">
+        <div className="fixed inset-0 z-[100] flex justify-end bg-black/50 backdrop-blur-sm transition-opacity duration-300">
           {/* Backdrop Click */}
           <div
             className="fixed inset-0 cursor-pointer"

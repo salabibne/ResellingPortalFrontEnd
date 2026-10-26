@@ -3,20 +3,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   ShoppingBag,
-  Package,
   Clock,
   CheckCircle2,
   Truck,
   XCircle,
   Eye,
   Search,
-  Filter,
-  User,
-  Phone,
   MapPin,
-  FileText,
-  DollarSign,
-  TrendingUp,
   X,
   FileSpreadsheet,
   RefreshCw,
@@ -31,6 +24,14 @@ import {
   CourierTrackResult,
 } from "@/services/order.api";
 import CourierStatusBadge from "@/components/courier/CourierStatusBadge";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelTabs from "@/components/panel/PanelTabs";
+import PanelTable from "@/components/panel/PanelTable";
+import PanelEmpty from "@/components/panel/PanelEmpty";
+import PanelSkeleton from "@/components/panel/PanelSkeleton";
+import PanelModal from "@/components/panel/PanelModal";
+import StatusBadge from "@/components/panel/StatusBadge";
 import { exportOrdersToCSV } from "@/utils/csvExporter";
 
 export default function ResellerOrdersPage() {
@@ -190,7 +191,7 @@ export default function ResellerOrdersPage() {
         );
       case "in_review":
         return (
-          <span className="badge badge-warning text-slate-900 text-[10px] font-bold py-1.5 px-2 gap-1">
+          <span className="badge badge-warning text-base-content text-[10px] font-bold py-1.5 px-2 gap-1">
             <Clock size={10} /> In Review
           </span>
         );
@@ -215,7 +216,7 @@ export default function ResellerOrdersPage() {
         );
       case "partial_delivered":
         return (
-          <span className="badge badge-warning text-slate-900 font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
+          <span className="badge badge-warning text-base-content font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
             <CheckCircle2 size={10} /> Partial Delivered
           </span>
         );
@@ -245,7 +246,7 @@ export default function ResellerOrdersPage() {
         );
       case "partial_delivered_return_received":
         return (
-          <span className="badge badge-warning text-slate-900 font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
+          <span className="badge badge-warning text-base-content font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
             <CheckCircle2 size={10} /> Part. Return Received
           </span>
         );
@@ -259,7 +260,7 @@ export default function ResellerOrdersPage() {
       case "partial_delivered_return_proccessing":
       case "partial_delivered_return_rider_assigned":
         return (
-          <span className="badge badge-warning text-slate-900 font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+          <span className="badge badge-warning text-base-content font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
             <Truck size={10} /> Part. Return In Transit
           </span>
         );
@@ -278,50 +279,28 @@ export default function ResellerOrdersPage() {
     }
   };
 
-  const getStatusBadge = (status: OrderProcessingStatus) => {
-    switch (status) {
-      case "PENDING":
-        return <span className="badge badge-warning gap-1"><Clock size={12} /> Pending</span>;
-      case "CONFIRMED":
-        return <span className="badge badge-info gap-1"><CheckCircle2 size={12} /> Confirmed</span>;
-      case "PROCESSING":
-        return <span className="badge badge-secondary gap-1"><Package size={12} /> Processing</span>;
-      case "SHIPPED":
-        return <span className="badge badge-accent gap-1"><Truck size={12} /> Shipped</span>;
-      case "DELIVERED":
-        return <span className="badge badge-success text-white gap-1"><CheckCircle2 size={12} /> Delivered</span>;
-      case "CANCELLED":
-        return <span className="badge badge-error text-white gap-1"><XCircle size={12} /> Cancelled</span>;
-      case "RETURNED":
-        return <span className="badge badge-neutral gap-1">Returned</span>;
-      default:
-        return <span className="badge badge-ghost">{status}</span>;
-    }
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-base-100 p-6 rounded-2xl border border-base-200 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-extrabold text-base-content">My Reseller Orders</h1>
-          <p className="text-sm text-base-content/60 mt-1">
-            Track fulfillment status, end-customer information, and reseller profit for all orders placed.
-          </p>
-        </div>
-        <button
-          onClick={handleExportCSV}
-          disabled={exporting}
-          className="btn btn-sm btn-success text-white font-bold gap-2 self-start sm:self-auto"
-        >
-          {exporting ? (
-            <RefreshCw size={14} className="animate-spin" />
-          ) : (
-            <FileSpreadsheet size={14} />
-          )}
-          Export CSV
-        </button>
-      </div>
+    <PanelPage>
+      <PanelPageHeader
+        title="My Reseller Orders"
+        subtitle="Track fulfillment status, end-customer information, and reseller profit for all orders placed."
+        icon={ShoppingBag}
+        actions={
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            disabled={exporting}
+            className="btn btn-success btn-sm rounded-xl gap-2 text-white"
+          >
+            {exporting ? (
+              <RefreshCw size={16} className="animate-spin" />
+            ) : (
+              <FileSpreadsheet size={16} />
+            )}
+            Export CSV
+          </button>
+        }
+      />
 
 
       {/* Search & Filters Toolbar */}
@@ -392,43 +371,43 @@ export default function ResellerOrdersPage() {
 
         </div>
 
-        {/* Status Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-          <Filter size={16} className="text-base-content/40 shrink-0" />
-          {["ALL", "PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map((status) => (
-            <button
-              key={status}
-              className={`btn btn-xs ${selectedStatus === status ? "btn-primary" : "btn-outline"} shrink-0`}
-              onClick={() => {
-                setSelectedStatus(status);
-                setPage(1);
-              }}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
+        {/* Status tabs */}
+        <PanelTabs
+          ariaLabel="Filter orders by status"
+          value={selectedStatus}
+          onChange={(id) => {
+            setSelectedStatus(id);
+            setPage(1);
+          }}
+          tabs={["ALL", "PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map(
+            (status) => ({
+              id: status,
+              label:
+                status === "ALL"
+                  ? "All"
+                  : status.charAt(0) + status.slice(1).toLowerCase(),
+            })
+          )}
+        />
       </div>
 
       {/* Orders Table */}
-      <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="text-center py-16 p-4">
-            <ShoppingBag className="mx-auto text-base-content/30 mb-3" size={48} />
-            <h3 className="font-bold text-lg">No reseller orders found</h3>
-            <p className="text-sm text-base-content/60">
-              Placed orders on behalf of your customers will appear here.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="table table-zebra w-full">
+      {loading ? (
+        <PanelSkeleton variant="table" rows={8} />
+      ) : orders.length === 0 ? (
+        <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm">
+          <PanelEmpty
+            icon={ShoppingBag}
+            title="No reseller orders found"
+            text="Placed orders on behalf of your customers will appear here."
+          />
+        </div>
+      ) : (
+        <>
+          <div className="hidden md:block">
+            <PanelTable>
               <thead>
-                <tr className="bg-base-200/50 text-xs text-base-content/70">
+                <tr>
                   <th>Order Ref</th>
                   <th>Customer Info</th>
                   <th>Steadfast Courier</th>
@@ -487,7 +466,7 @@ export default function ResellerOrdersPage() {
                             </div>
                             <div>{renderCourierBadge(order.courierStatus)}</div>
                             {order.courierReturnStatus && (
-                              <span className="badge badge-warning text-slate-900 text-[9px] font-bold uppercase py-1 px-1.5">
+                              <span className="badge badge-warning text-base-content text-[9px] font-bold uppercase py-1 px-1.5">
                                 Return: {order.courierReturnStatus}
                               </span>
                             )}
@@ -533,7 +512,7 @@ export default function ResellerOrdersPage() {
                           </span>
                         )}
                       </td>
-                      <td>{getStatusBadge(order.processingStatus)}</td>
+                      <td><StatusBadge status={order.processingStatus} /></td>
                       <td>
                         <button
                           className="btn btn-ghost btn-xs gap-1 text-primary"
@@ -546,31 +525,77 @@ export default function ResellerOrdersPage() {
                   );
                 })}
               </tbody>
-            </table>
+            </PanelTable>
           </div>
-        )}
-      </div>
+
+          {/* Mobile stacked cards */}
+          <div className="md:hidden space-y-3">
+            {orders.map((order) => {
+              const displayRef =
+                order.orderRef || `#${order.id.substring(0, 8).toUpperCase()}`;
+              const customerName =
+                order.customerName || order.customer?.name || "N/A";
+              return (
+                <div
+                  key={order.id}
+                  className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-4 space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-mono font-bold text-xs text-primary truncate">
+                        {displayRef}
+                      </p>
+                      <p className="text-xs text-base-content/60 truncate">
+                        {customerName} ·{" "}
+                        {order.customerPhone || order.customer?.phone || "N/A"}
+                      </p>
+                    </div>
+                    <StatusBadge status={order.processingStatus} />
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-base-content/60">Selling Price</span>
+                    <span className="font-bold text-base-content">
+                      ৳
+                      {(
+                        order.resellerSellPrice || order.subtotal
+                      ).toLocaleString()}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm rounded-xl gap-2 w-full"
+                    onClick={() => openOrderDetails(order)}
+                  >
+                    <Eye size={16} /> View Details
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div className="modal modal-open">
-          <div className="modal-box w-full max-w-2xl bg-base-100 p-4 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-base-200 pb-3">
-              <div>
-                <h3 className="font-bold text-lg text-base-content">
-                  Order Details {selectedOrder.orderRef || `#${selectedOrder.id.substring(0, 8).toUpperCase()}`}
-                </h3>
-                <p className="text-xs text-base-content/60">
-                  Placed on {new Date(selectedOrder.createdAt).toLocaleString()}
-                </p>
-              </div>
-              <button
-                className="btn btn-ghost btn-circle btn-sm"
-                onClick={closeOrderDetails}
-              >
-                <X size={18} />
-              </button>
-            </div>
+        <PanelModal
+          open={!!selectedOrder}
+          onClose={closeOrderDetails}
+          title={`Order Details ${
+            selectedOrder.orderRef ||
+            `#${selectedOrder.id.substring(0, 8).toUpperCase()}`
+          }`}
+          size="lg"
+          footer={
+            <button
+              type="button"
+              className="btn btn-primary btn-sm rounded-xl"
+              onClick={closeOrderDetails}
+            >
+              Close
+            </button>
+          }
+        >
+          <div className="space-y-4">
 
             {/* Steadfast Courier Tracking Box */}
             <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 space-y-3">
@@ -713,7 +738,7 @@ export default function ResellerOrdersPage() {
                   </span>
                 )}
                 {selectedOrder.courierReturnStatus && (
-                  <span className="badge badge-warning text-slate-900 font-bold uppercase text-[10px]">
+                  <span className="badge badge-warning text-base-content font-bold uppercase text-[10px]">
                     Return: {selectedOrder.courierReturnStatus}
                   </span>
                 )}
@@ -838,14 +863,9 @@ export default function ResellerOrdersPage() {
               </div>
             )}
 
-            <div className="modal-action">
-              <button className="btn btn-primary btn-sm" onClick={closeOrderDetails}>
-                Close
-              </button>
-            </div>
           </div>
-        </div>
+        </PanelModal>
       )}
-    </div>
+    </PanelPage>
   );
 }

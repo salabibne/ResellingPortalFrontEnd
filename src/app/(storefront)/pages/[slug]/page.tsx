@@ -134,7 +134,7 @@ export default async function PublicCustomPage({ params }: PageProps) {
                     return (
                       <div
                         key={cardKey}
-                        className="rounded-2xl p-6 border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm text-center"
+                        className="rounded-2xl p-6 border bg-base-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm text-center"
                       >
                         {sec.imageUrl ? (
                           <img
@@ -166,7 +166,7 @@ export default async function PublicCustomPage({ params }: PageProps) {
                     return (
                       <div
                         key={cardKey}
-                        className="rounded-2xl overflow-hidden border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm flex flex-col"
+                        className="rounded-2xl overflow-hidden border bg-base-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm flex flex-col"
                       >
                         {sec.imageUrl && (
                           <img
@@ -195,7 +195,7 @@ export default async function PublicCustomPage({ params }: PageProps) {
                   return (
                     <div
                       key={cardKey}
-                      className="rounded-2xl p-6 border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm flex flex-col"
+                      className="rounded-2xl p-6 border bg-base-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm flex flex-col"
                     >
                       <div className="flex items-center gap-2 mb-3">
                         <span className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -243,7 +243,7 @@ export default async function PublicCustomPage({ params }: PageProps) {
             return (
               <section
                 key={`block-${blockIdx}`}
-                className="rounded-2xl p-6 sm:p-10 border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
+                className="rounded-2xl p-6 sm:p-10 border bg-base-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
               >
                 {sec.imageUrl && (
                   <div className="flex justify-center">
@@ -280,7 +280,7 @@ export default async function PublicCustomPage({ params }: PageProps) {
             return (
               <section
                 key={`block-${blockIdx}`}
-                className="rounded-2xl p-6 sm:p-10 border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm space-y-4"
+                className="rounded-2xl p-6 sm:p-10 border bg-base-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm space-y-4"
               >
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">{sec.title}</h3>
                 {embedUrl && (
@@ -313,9 +313,9 @@ export default async function PublicCustomPage({ params }: PageProps) {
               key={`block-${blockIdx}`}
               className={`rounded-2xl p-6 sm:p-10 border transition ${
                 isHero
-                  ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-xl"
+                  ? "bg-base-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-xl"
                   : isBanner
-                  ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm"
+                  ? "bg-base-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm"
                   : "bg-base-200/50 border-base-300 dark:bg-gray-800/40 dark:border-gray-700"
               }`}
             >

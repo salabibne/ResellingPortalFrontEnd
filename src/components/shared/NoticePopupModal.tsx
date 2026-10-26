@@ -107,11 +107,11 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
 
   if (isImageNotice) {
     return (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-300">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in duration-300">
         {/* Click outside backdrop to close */}
         <div className="absolute inset-0" onClick={handleClose} />
 
-        <div className="relative z-10 flex flex-col items-center gap-3 transition-all animate-in zoom-in-95 duration-200">
+        <div className="relative z-10 flex flex-col items-center gap-3 transition-all animate-scale-in duration-200">
           <div className="relative">
             <img
               src={notice.imageUrl!}
@@ -121,7 +121,7 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
             />
             <button
               onClick={handleClose}
-              className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all shadow-md backdrop-blur-xs"
+              className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all shadow-md backdrop-blur-sm"
               aria-label="Close notice modal"
             >
               <X size={18} />
@@ -153,12 +153,12 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in duration-300">
       {/* Click outside backdrop to close */}
       <div className="absolute inset-0" onClick={handleClose} />
 
       <div
-        className="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 z-10 transition-all transform scale-100 animate-in zoom-in-95 duration-200"
+        className="relative bg-base-100 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 z-10 transition-all transform scale-100 animate-scale-in duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="notice-modal-title"
@@ -166,7 +166,7 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
         {/* Floating Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all shadow-md backdrop-blur-xs"
+          className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all shadow-md backdrop-blur-sm"
           aria-label="Close notice modal"
         >
           <X size={18} />
@@ -205,7 +205,7 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
           {/* Title */}
           <h2
             id="notice-modal-title"
-            className="text-xl sm:text-2xl font-black text-slate-900 leading-snug tracking-tight"
+            className="text-xl sm:text-2xl font-black text-base-content leading-snug tracking-tight"
           >
             {notice.title}
           </h2>

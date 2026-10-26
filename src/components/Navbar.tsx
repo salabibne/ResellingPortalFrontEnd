@@ -150,7 +150,7 @@ function NavbarContent() {
                     className="h-8 sm:h-11 w-auto max-w-[40vw] sm:max-w-[45vw] object-contain shrink-0"
                     alt="Aarham Apparel"
                   >
-                    <div className="bg-white text-primary p-1.5 sm:p-2 rounded-xl group-hover:scale-105 transition-transform shrink-0">
+                    <div className="bg-base-100 text-primary p-1.5 sm:p-2 rounded-xl group-hover:scale-105 transition-transform shrink-0">
                       <ShoppingBag size={18} className="stroke-[2.5] sm:hidden" />
                       <ShoppingBag size={20} className="stroke-[2.5] hidden sm:block" />
                     </div>
@@ -217,7 +217,7 @@ function NavbarContent() {
                       </button>
 
                       <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <div className="bg-white text-gray-800 rounded-xl shadow-xl border border-gray-100 p-2 min-w-[200px] space-y-1">
+                        <div className="bg-base-100 text-base-content rounded-xl shadow-xl border border-gray-100 p-2 min-w-[200px] space-y-1">
                           <button
                             type="button"
                             onClick={() => handleCategoryClick(category.id)}
@@ -254,7 +254,7 @@ function NavbarContent() {
                     placeholder="Search apparel..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="input input-sm rounded-full bg-white/10 text-white placeholder-white/60 focus:bg-white focus:text-gray-900 focus:outline-none pl-9 pr-4 w-40 lg:w-56 transition-all"
+                    className="input input-sm rounded-full bg-white/10 text-white placeholder-white/60 focus:bg-base-100 focus:text-gray-900 focus:outline-none pl-9 pr-4 w-40 lg:w-56 transition-all"
                     aria-label="Search products"
                   />
                   <Search
@@ -291,7 +291,7 @@ function NavbarContent() {
                     </div>
                     <ul
                       tabIndex={0}
-                      className="mt-3 z-[50] p-2 shadow-lg menu menu-sm dropdown-content bg-white text-gray-800 rounded-xl w-52 border border-gray-100"
+                      className="mt-3 z-[50] p-2 shadow-lg menu menu-sm dropdown-content bg-base-100 text-base-content rounded-xl w-52 border border-gray-100"
                     >
                       <li className="px-3 py-2 text-xs text-gray-500 font-medium border-b border-gray-100">
                         Logged in as{" "}
@@ -395,7 +395,7 @@ function NavbarContent() {
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input input-sm w-full rounded-xl bg-white/15 text-white placeholder-white/70 focus:bg-white focus:text-gray-900 pl-9 pr-4 text-xs"
+                  className="input input-sm w-full rounded-xl bg-white/15 text-white placeholder-white/70 focus:bg-base-100 focus:text-gray-900 pl-9 pr-4 text-xs"
                   aria-label="Search products"
                 />
                 <Search

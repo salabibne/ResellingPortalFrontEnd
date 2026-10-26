@@ -1,5 +1,8 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelModal from "@/components/panel/PanelModal";
+
 import React, { useEffect, useState } from "react";
 import {
   ShoppingBag,
@@ -183,27 +186,24 @@ export default function AdminProductPagesPage() {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-white text-black">
-      {/* Page Title Header with Add Button */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-black flex items-center gap-2">
-            <ShoppingBag className="w-7 h-7 text-primary" /> Product Page CMS Config Builder
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Customize product details, add hero video showcases, and convert high-performing items into standalone landing pages.
-          </p>
-        </div>
-        <button
-          onClick={handleOpenCreateLanding}
-          className="btn btn-primary text-white flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> Create Product Landing Page
-        </button>
-      </div>
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-base-100 text-base-content">
+      <PanelPageHeader
+        title="Product Page CMS Config Builder"
+        subtitle="Customize product details, add hero video showcases, and convert high-performing items into standalone landing pages."
+        icon={ShoppingBag}
+        actions={
+          <button
+            type="button"
+            onClick={handleOpenCreateLanding}
+            className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+          >
+            <Plus size={16} /> Create Product Landing Page
+          </button>
+        }
+      />
 
       {/* Search Bar */}
-      <div className="bg-white p-4 rounded-xl shadow-xs border border-gray-200 flex items-center">
+      <div className="bg-base-100 p-4 rounded-xl shadow-sm border border-gray-200 flex items-center">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
           <input
@@ -211,13 +211,13 @@ export default function AdminProductPagesPage() {
             placeholder="Search products to configure..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="input input-bordered w-full pl-9 text-sm bg-white text-black"
+            className="input input-bordered w-full pl-9 text-sm bg-base-100 text-base-content"
           />
         </div>
       </div>
 
       {/* Product List Table */}
-      <div className="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
+      <div className="bg-base-100 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading products...</div>
         ) : filteredProducts.length === 0 ? (
@@ -249,7 +249,7 @@ export default function AdminProductPagesPage() {
                           className="w-12 h-12 object-cover rounded-lg border border-gray-200"
                         />
                         <div>
-                          <div className="font-bold text-black text-sm">
+                          <div className="font-bold text-base-content text-sm">
                             {prod.name}
                           </div>
                           <div className="text-xs text-gray-500">{prod.category?.name || "General"}</div>
@@ -296,36 +296,50 @@ export default function AdminProductPagesPage() {
 
       {/* Editor Modal */}
       {isDrawerOpen && selectedProduct && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-3xl bg-white text-black rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col my-auto border border-gray-200">
-            {/* Drawer Header */}
-            <div className="p-5 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-              <div>
-                <h2 className="text-lg font-bold text-black flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" /> Product CMS & Landing Page Config
-                </h2>
-                <p className="text-xs text-gray-500">Configuring: {selectedProduct.name}</p>
-              </div>
-              <button
-                onClick={() => setIsDrawerOpen(false)}
-                className="btn btn-sm btn-ghost btn-circle"
+        <PanelModal
+          open={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          title={`Product CMS & Landing Page Config — ${selectedProduct.name}`}
+          size="lg"
+          footer={
+            <>
+              <a
+                href={`/products/${selectedProduct.id}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-ghost btn-sm rounded-xl gap-2 text-info"
               >
-                <X className="w-5 h-5" />
+                <Eye size={16} /> Preview Page
+              </a>
+              <button
+                type="button"
+                onClick={() => setIsDrawerOpen(false)}
+                className="btn btn-ghost btn-sm rounded-xl"
+              >
+                Cancel
               </button>
-            </div>
-
-            {/* Editor Body */}
-            <form onSubmit={handleSaveConfig} className="p-6 space-y-6 flex-1 bg-white">
+              <button
+                type="submit"
+                form="product-page-form"
+                disabled={saving}
+                className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+              >
+                {saving ? "Saving Config..." : "Save Product CMS Config"}
+              </button>
+            </>
+          }
+        >
+          <form id="product-page-form" onSubmit={handleSaveConfig} className="space-y-6">
               {/* Product Selection Dropdown inside Form */}
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-1">
-                <label className="label-text text-xs font-semibold text-black">Target Product *</label>
+                <label className="label-text text-xs font-semibold text-base-content">Target Product *</label>
                 <select
                   value={selectedProduct?.id || ""}
                   onChange={(e) => {
                     const p = products.find((prod) => prod.id === e.target.value);
                     if (p) handleOpenConfigEditor(p);
                   }}
-                  className="select select-bordered w-full text-sm bg-white text-black"
+                  className="select select-bordered w-full text-sm bg-base-100 text-base-content"
                 >
                   {products.map((prod) => (
                     <option key={prod.id} value={prod.id}>
@@ -336,12 +350,12 @@ export default function AdminProductPagesPage() {
               </div>
               {/* Feature Toggles Card */}
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
-                <h3 className="font-semibold text-sm text-black flex items-center gap-2">
+                <h3 className="font-semibold text-sm text-base-content flex items-center gap-2">
                   <ToggleRight className="w-5 h-5 text-primary" /> Feature Toggles & Page Mode
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
-                  <label className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-200 cursor-pointer">
-                    <span className="font-semibold text-black">
+                  <label className="flex items-center justify-between p-2.5 bg-base-100 rounded-lg border border-gray-200 cursor-pointer">
+                    <span className="font-semibold text-base-content">
                       Standalone Landing Page Mode
                     </span>
                     <input
@@ -354,8 +368,8 @@ export default function AdminProductPagesPage() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-200 cursor-pointer">
-                    <span className="font-semibold text-black">
+                  <label className="flex items-center justify-between p-2.5 bg-base-100 rounded-lg border border-gray-200 cursor-pointer">
+                    <span className="font-semibold text-base-content">
                       Show Reviews Drawer
                     </span>
                     <input
@@ -368,8 +382,8 @@ export default function AdminProductPagesPage() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-200 cursor-pointer">
-                    <span className="font-semibold text-black">
+                  <label className="flex items-center justify-between p-2.5 bg-base-100 rounded-lg border border-gray-200 cursor-pointer">
+                    <span className="font-semibold text-base-content">
                       Show FAQ Accordion
                     </span>
                     <input
@@ -382,8 +396,8 @@ export default function AdminProductPagesPage() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-gray-200 cursor-pointer">
-                    <span className="font-semibold text-black">
+                  <label className="flex items-center justify-between p-2.5 bg-base-100 rounded-lg border border-gray-200 cursor-pointer">
+                    <span className="font-semibold text-base-content">
                       Show Related Products
                     </span>
                     <input
@@ -400,12 +414,12 @@ export default function AdminProductPagesPage() {
 
               {/* Title & Description Override */}
               <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <h3 className="font-semibold text-sm text-black">
+                <h3 className="font-semibold text-sm text-base-content">
                   Custom Content Overrides
                 </h3>
 
                 <div>
-                  <label className="label-text text-xs font-semibold text-black">Custom Landing Title</label>
+                  <label className="label-text text-xs font-semibold text-base-content">Custom Landing Title</label>
                   <input
                     type="text"
                     value={config.customTitle || ""}
@@ -413,25 +427,25 @@ export default function AdminProductPagesPage() {
                       setConfig((prev) => ({ ...prev, customTitle: e.target.value }))
                     }
                     placeholder="e.g. Premium Embroidered Panjabi - Special Edition"
-                    className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                    className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                   />
                 </div>
 
                 <div>
-                  <label className="label-text text-xs font-semibold text-black">Custom Landing Description</label>
+                  <label className="label-text text-xs font-semibold text-base-content">Custom Landing Description</label>
                   <textarea
                     value={config.customDescription || ""}
                     onChange={(e) =>
                       setConfig((prev) => ({ ...prev, customDescription: e.target.value }))
                     }
                     placeholder="Exclusive handcrafted designer Panjabi for festivals..."
-                    className="textarea textarea-bordered w-full text-sm mt-1 h-20 bg-white text-black"
+                    className="textarea textarea-bordered w-full text-sm mt-1 h-20 bg-base-100 text-base-content"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="label-text text-xs font-semibold text-black">Banner Image URL</label>
+                    <label className="label-text text-xs font-semibold text-base-content">Banner Image URL</label>
                     <input
                       type="text"
                       value={config.bannerImageUrl || ""}
@@ -439,11 +453,11 @@ export default function AdminProductPagesPage() {
                         setConfig((prev) => ({ ...prev, bannerImageUrl: e.target.value }))
                       }
                       placeholder="https://cdn.aarhamapparel.com/banner.webp"
-                      className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                      className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                     />
                   </div>
                   <div>
-                    <label className="label-text text-xs font-semibold text-black">Video URL (YouTube/Vimeo)</label>
+                    <label className="label-text text-xs font-semibold text-base-content">Video URL (YouTube/Vimeo)</label>
                     <input
                       type="text"
                       value={config.videoUrl || ""}
@@ -451,7 +465,7 @@ export default function AdminProductPagesPage() {
                         setConfig((prev) => ({ ...prev, videoUrl: e.target.value }))
                       }
                       placeholder="https://www.youtube.com/watch?v=..."
-                      className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                      className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                     />
                   </div>
                 </div>
@@ -475,28 +489,28 @@ export default function AdminProductPagesPage() {
 
               {/* SEO Overrides */}
               <div className="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <h3 className="font-semibold text-sm text-black">
+                <h3 className="font-semibold text-sm text-base-content">
                   SEO Overrides
                 </h3>
                 <div>
-                  <label className="label-text text-xs font-semibold text-black">Meta Title</label>
+                  <label className="label-text text-xs font-semibold text-base-content">Meta Title</label>
                   <input
                     type="text"
                     value={config.metaTitle || ""}
                     onChange={(e) => setConfig((prev) => ({ ...prev, metaTitle: e.target.value }))}
                     placeholder="Buy Luxury Panjabi Online | Aarham Apparel"
-                    className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                    className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                   />
                 </div>
                 <div>
-                  <label className="label-text text-xs font-semibold text-black">Meta Description</label>
+                  <label className="label-text text-xs font-semibold text-base-content">Meta Description</label>
                   <textarea
                     value={config.metaDescription || ""}
                     onChange={(e) =>
                       setConfig((prev) => ({ ...prev, metaDescription: e.target.value }))
                     }
                     placeholder="Top quality Panjabi at reseller prices..."
-                    className="textarea textarea-bordered w-full text-sm mt-1 h-16 bg-white text-black"
+                    className="textarea textarea-bordered w-full text-sm mt-1 h-16 bg-base-100 text-base-content"
                   />
                 </div>
               </div>
@@ -504,7 +518,7 @@ export default function AdminProductPagesPage() {
               {/* Product Showcase Dynamic Sections */}
               <div className="space-y-4 pt-4 border-t border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-sm text-black">
+                  <h3 className="font-semibold text-sm text-base-content">
                     Showcase Feature Sections ({sections.length})
                   </h3>
                   <button
@@ -519,10 +533,10 @@ export default function AdminProductPagesPage() {
                 {sections.map((sec, idx) => (
                   <div
                     key={idx}
-                    className="bg-white border border-gray-200 rounded-lg p-4 space-y-3 relative shadow-xs"
+                    className="bg-base-100 border border-gray-200 rounded-lg p-4 space-y-3 relative shadow-sm"
                   >
                     <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-                      <span className="font-bold text-xs text-black">
+                      <span className="font-bold text-xs text-base-content">
                         Section #{idx + 1}: {sec.title}
                       </span>
                       <button
@@ -536,7 +550,7 @@ export default function AdminProductPagesPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                       <div>
-                        <label className="label-text text-[11px] font-medium text-black">Title</label>
+                        <label className="label-text text-[11px] font-medium text-base-content">Title</label>
                         <input
                           type="text"
                           value={sec.title || ""}
@@ -546,11 +560,11 @@ export default function AdminProductPagesPage() {
                               prev.map((s, i) => (i === idx ? { ...s, title: val } : s))
                             );
                           }}
-                          className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                          className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                         />
                       </div>
                       <div>
-                        <label className="label-text text-[11px] font-medium text-black">Subtitle</label>
+                        <label className="label-text text-[11px] font-medium text-base-content">Subtitle</label>
                         <input
                           type="text"
                           value={sec.subtitle || ""}
@@ -560,11 +574,11 @@ export default function AdminProductPagesPage() {
                               prev.map((s, i) => (i === idx ? { ...s, subtitle: val } : s))
                             );
                           }}
-                          className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                          className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="label-text text-[11px] font-medium text-black">Image URL</label>
+                        <label className="label-text text-[11px] font-medium text-base-content">Image URL</label>
                         <input
                           type="text"
                           value={sec.imageUrl || ""}
@@ -574,11 +588,11 @@ export default function AdminProductPagesPage() {
                               prev.map((s, i) => (i === idx ? { ...s, imageUrl: val } : s))
                             );
                           }}
-                          className="input input-bordered input-xs w-full mt-1 bg-white text-black"
+                          className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="label-text text-[11px] font-medium text-black">Description</label>
+                        <label className="label-text text-[11px] font-medium text-base-content">Description</label>
                         <textarea
                           value={sec.description || ""}
                           onChange={(e) => {
@@ -587,7 +601,7 @@ export default function AdminProductPagesPage() {
                               prev.map((s, i) => (i === idx ? { ...s, description: val } : s))
                             );
                           }}
-                          className="textarea textarea-bordered textarea-xs w-full mt-1 h-12 bg-white text-black"
+                          className="textarea textarea-bordered textarea-xs w-full mt-1 h-12 bg-base-100 text-base-content"
                         />
                       </div>
                     </div>
@@ -595,38 +609,8 @@ export default function AdminProductPagesPage() {
                 ))}
               </div>
 
-              {/* Drawer Footer Buttons */}
-              <div className="pt-4 flex items-center justify-between border-t border-gray-200 sticky bottom-0 bg-white p-4">
-                {selectedProduct && (
-                  <a
-                    href={`/products/${selectedProduct.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn btn-ghost btn-xs text-info flex items-center gap-1"
-                  >
-                    <Eye className="w-3.5 h-3.5" /> Preview Page
-                  </a>
-                )}
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsDrawerOpen(false)}
-                    className="btn btn-ghost text-xs"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="btn btn-primary text-white text-xs px-6"
-                  >
-                    {saving ? "Saving Config..." : "Save Product CMS Config"}
-                  </button>
-                </div>
-              </div>
             </form>
-          </div>
-        </div>
+        </PanelModal>
       )}
     </div>
   );

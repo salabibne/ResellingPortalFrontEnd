@@ -9,11 +9,14 @@ import {
   CheckCircle2,
   Package,
   ShoppingCart,
-  DollarSign,
   ArrowRight,
   Sparkles,
   Wallet,
+  LayoutDashboard,
 } from "lucide-react";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelCard from "@/components/panel/PanelCard";
 import { orderApi, ResellerStats } from "@/services/order.api";
 
 export default function ResellerDashboardPage() {
@@ -36,29 +39,35 @@ export default function ResellerDashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <PanelPage>
+      <PanelPageHeader
+        title="Reseller Dashboard"
+        subtitle="Welcome back to the Reseller Hub."
+        icon={LayoutDashboard}
+      />
+
       {/* Banner / Welcome Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-secondary p-8 text-primary-content shadow-lg">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-secondary p-6 sm:p-8 text-primary-content border border-primary/20">
         <div className="relative z-10 max-w-2xl space-y-3">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md">
             <Sparkles size={14} /> Reseller Commerce Portal
           </span>
-          <h1 className="text-3xl font-extrabold tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             Welcome to Reseller Hub
-          </h1>
+          </h2>
           <p className="text-sm opacity-90 leading-relaxed">
             Browse our wholesale catalog at reseller prices, place orders on behalf of your end-customers, set your custom sell price, and track order fulfillment smoothly.
           </p>
           <div className="pt-2 flex flex-wrap gap-3">
             <Link
               href="/reseller/products"
-              className="btn btn-sm bg-white text-primary border-none hover:bg-white/90 font-bold"
+              className="btn btn-sm rounded-xl gap-2 bg-base-100 text-primary border-none hover:bg-white/90 font-bold"
             >
               <Package size={16} /> Browse Product Catalog
             </Link>
             <Link
               href="/reseller/cart"
-              className="btn btn-sm btn-outline border-white text-white hover:bg-white/10 font-bold"
+              className="btn btn-sm rounded-xl gap-2 btn-outline border-white text-white hover:bg-white/10 font-bold"
             >
               <ShoppingCart size={16} /> My Cart & Checkout
             </Link>
@@ -68,9 +77,8 @@ export default function ResellerDashboardPage() {
 
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Total Earned Profit */}
-        <div className="card bg-base-100 shadow-sm border border-base-200 p-5">
-          <div className="flex items-center justify-between">
+        <PanelCard className="p-5">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">
                 Earned Profit (Delivered & Paid)
@@ -82,15 +90,14 @@ export default function ResellerDashboardPage() {
                 Realized from completed orders
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold border border-emerald-100">
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold border border-emerald-100 shrink-0">
               <TrendingUp size={24} />
             </div>
           </div>
-        </div>
+        </PanelCard>
 
-        {/* Pending Profit */}
-        <div className="card bg-base-100 shadow-sm border border-base-200 p-5">
-          <div className="flex items-center justify-between">
+        <PanelCard className="p-5">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
                 Pending Profit
@@ -102,15 +109,14 @@ export default function ResellerDashboardPage() {
                 Realized upon Delivery & Payment
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold border border-amber-100">
+            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold border border-amber-100 shrink-0">
               <Clock size={24} />
             </div>
           </div>
-        </div>
+        </PanelCard>
 
-        {/* Total Reseller Orders */}
-        <div className="card bg-base-100 shadow-sm border border-base-200 p-5">
-          <div className="flex items-center justify-between">
+        <PanelCard className="p-5">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-bold text-base-content/60 uppercase tracking-wider">
                 Total Orders Placed
@@ -122,15 +128,14 @@ export default function ResellerDashboardPage() {
                 Across all statuses
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
               <ShoppingBag size={24} />
             </div>
           </div>
-        </div>
+        </PanelCard>
 
-        {/* Delivered Orders */}
-        <div className="card bg-base-100 shadow-sm border border-base-200 p-5">
-          <div className="flex items-center justify-between">
+        <PanelCard className="p-5">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-bold text-info uppercase tracking-wider">
                 Delivered Orders
@@ -142,69 +147,69 @@ export default function ResellerDashboardPage() {
                 Successfully delivered to customers
               </p>
             </div>
-            <div className="w-12 h-12 rounded-xl bg-info/10 text-info flex items-center justify-center font-bold">
+            <div className="w-12 h-12 rounded-xl bg-info/10 text-info flex items-center justify-center font-bold shrink-0">
               <CheckCircle2 size={24} />
             </div>
           </div>
-        </div>
+        </PanelCard>
       </div>
 
       {/* Quick Action Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card bg-base-100 border border-base-200 p-6 space-y-4 hover:shadow-md transition-shadow">
+        <PanelCard className="flex flex-col gap-4 hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 text-emerald-600 font-bold text-lg">
             <Wallet size={24} />
             <h2>Payouts & Wallet</h2>
           </div>
-          <p className="text-sm text-base-content/70">
+          <p className="text-sm text-base-content/70 flex-1">
             Request profit disbursements directly to your bKash, Nagad, Rocket, or Bank account, track review statuses, and view proof documents.
           </p>
           <div>
             <Link
               href="/reseller/payouts"
-              className="btn btn-success bg-emerald-600 hover:bg-emerald-700 text-white btn-sm flex items-center gap-2 w-fit"
+              className="btn btn-success btn-sm rounded-xl gap-2 text-white w-fit"
             >
               Withdraw Profit <ArrowRight size={16} />
             </Link>
           </div>
-        </div>
+        </PanelCard>
 
-        <div className="card bg-base-100 border border-base-200 p-6 space-y-4 hover:shadow-md transition-shadow">
+        <PanelCard className="flex flex-col gap-4 hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 text-primary font-bold text-lg">
             <Package size={24} />
             <h2>Product Catalog</h2>
           </div>
-          <p className="text-sm text-base-content/70">
+          <p className="text-sm text-base-content/70 flex-1">
             Explore active products with wholesale reseller prices. Select sizes, colors, and quantities to add to your cart.
           </p>
           <div>
             <Link
               href="/reseller/products"
-              className="btn btn-primary btn-sm flex items-center gap-2 w-fit"
+              className="btn btn-primary btn-sm rounded-xl gap-2 w-fit"
             >
               Browse Catalog <ArrowRight size={16} />
             </Link>
           </div>
-        </div>
+        </PanelCard>
 
-        <div className="card bg-base-100 border border-base-200 p-6 space-y-4 hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-3 text-secondary font-bold text-lg">
+        <PanelCard className="flex flex-col gap-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3 text-primary font-bold text-lg">
             <ShoppingBag size={24} />
             <h2>My Reseller Orders</h2>
           </div>
-          <p className="text-sm text-base-content/70">
+          <p className="text-sm text-base-content/70 flex-1">
             Track all orders placed on behalf of your customers, view processing status (Pending, Confirmed, Shipped, Delivered), and profit.
           </p>
           <div>
             <Link
               href="/reseller/orders"
-              className="btn btn-secondary btn-sm flex items-center gap-2 w-fit"
+              className="btn btn-outline btn-sm rounded-xl gap-2 w-fit"
             >
               View My Orders <ArrowRight size={16} />
             </Link>
           </div>
-        </div>
+        </PanelCard>
       </div>
-    </div>
+    </PanelPage>
   );
 }

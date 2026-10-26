@@ -1,5 +1,7 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Activity,
@@ -251,41 +253,43 @@ export default function InventoryMonitorPage() {
 
   return (
     <div className="space-y-6">
-      {/* ─── HEADER BANNER ─────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 rounded-2xl text-white shadow-xl">
-        <div>
-          <div className="flex items-center gap-2 text-indigo-400 text-sm font-semibold tracking-wide uppercase mb-1">
-            <Activity size={18} /> Real-Time Analytics
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Inventory Monitor</h1>
-          <p className="text-slate-300 text-sm mt-1">
-            Track stock levels, monitor low stock alerts, audit transaction logs & analyze movement summaries.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => exportInventoryStockToCSV(productsList, "master_inventory_stock")}
-            className="btn btn-sm btn-outline btn-success text-white border-emerald-500 hover:bg-emerald-600 gap-2 font-bold"
-            disabled={productsList.length === 0}
-            title="Download Complete 22-Column Inventory Master CSV"
-          >
-            <Download size={16} />
-            Export Master CSV
-          </button>
-          <button
-            onClick={handleRefresh}
-            className="btn btn-sm btn-ghost text-white border border-slate-700 hover:bg-slate-800 gap-2"
-          >
-            <RefreshCw size={16} className={(dashboardLoading || lowStockLoading || txLoading || summaryLoading) ? "animate-spin" : ""} />
-            Refresh
-          </button>
-        </div>
-      </div>
+      <PanelPageHeader
+        title="Inventory Monitor"
+        subtitle="Track stock levels, monitor low stock alerts, audit transaction logs & analyze movement summaries."
+        icon={Activity}
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => exportInventoryStockToCSV(productsList, "master_inventory_stock")}
+              className="btn btn-success btn-sm rounded-xl gap-2 text-white"
+              disabled={productsList.length === 0}
+              title="Download Complete 22-Column Inventory Master CSV"
+            >
+              <Download size={16} />
+              Export Master CSV
+            </button>
+            <button
+              type="button"
+              onClick={handleRefresh}
+              className="btn btn-outline btn-sm rounded-xl gap-2"
+            >
+              <RefreshCw
+                size={16}
+                className={
+                  dashboardLoading || lowStockLoading || txLoading || summaryLoading
+                    ? "animate-spin"
+                    : ""
+                }
+              />
+              Refresh
+            </button>
+          </>
+        }
+      />
 
       {/* ─── TAB NAVIGATION ────────────────────────────────────────── */}
-      <div className="bg-white p-2 rounded-xl shadow-sm border border-base-200 flex flex-wrap gap-2">
+      <div className="bg-base-100 p-2 rounded-xl shadow-sm border border-base-200 flex flex-wrap gap-2">
         <button
           onClick={() => setActiveTab("dashboard")}
           className={`flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold transition-all ${
@@ -340,7 +344,7 @@ export default function InventoryMonitorPage() {
       {activeTab === "dashboard" && (
         <div className="space-y-6">
           {/* Date Filter Bar */}
-          <div className="bg-white p-4 rounded-xl border border-base-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2 font-medium text-sm text-slate-700">
               <Calendar size={18} className="text-primary" />
               <span>Period Movement Date Range:</span>
@@ -352,7 +356,7 @@ export default function InventoryMonitorPage() {
                   type="date"
                   value={dashStartDate}
                   onChange={(e) => setDashStartDate(e.target.value)}
-                  className="input input-sm input-bordered text-black bg-white focus:input-primary"
+                  className="input input-sm input-bordered text-base-content bg-base-100 focus:input-primary"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -361,7 +365,7 @@ export default function InventoryMonitorPage() {
                   type="date"
                   value={dashEndDate}
                   onChange={(e) => setDashEndDate(e.target.value)}
-                  className="input input-sm input-bordered text-black bg-white focus:input-primary"
+                  className="input input-sm input-bordered text-base-content bg-base-100 focus:input-primary"
                 />
               </div>
               {(dashStartDate || dashEndDate) && (
@@ -379,14 +383,14 @@ export default function InventoryMonitorPage() {
           </div>
 
           {dashboardLoading ? (
-            <div className="h-64 flex items-center justify-center bg-white rounded-xl border border-base-200">
+            <div className="h-64 flex items-center justify-center bg-base-100 rounded-xl border border-base-200">
               <span className="loading loading-spinner loading-lg text-primary"></span>
             </div>
           ) : dashboardData ? (
             <>
               {/* KPI Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div className="bg-white p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
+                <div className="bg-base-100 p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Products</span>
                     <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
@@ -397,7 +401,7 @@ export default function InventoryMonitorPage() {
                   <p className="text-xs text-slate-500 mt-1">Unique active products</p>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
+                <div className="bg-base-100 p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Stock Units</span>
                     <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
@@ -410,7 +414,7 @@ export default function InventoryMonitorPage() {
                   <p className="text-xs text-slate-500 mt-1">Across all inventory records</p>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
+                <div className="bg-base-100 p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Stock Valuation</span>
                     <div className="p-2 bg-sky-50 text-sky-600 rounded-lg">
@@ -423,7 +427,7 @@ export default function InventoryMonitorPage() {
                   <p className="text-xs text-slate-500 mt-1">Total current stock value</p>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
+                <div className="bg-base-100 p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Low Stock Alerts</span>
                     <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
@@ -434,7 +438,7 @@ export default function InventoryMonitorPage() {
                   <p className="text-xs text-slate-500 mt-1">At or below alert limit</p>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
+                <div className="bg-base-100 p-5 rounded-2xl border border-base-200 shadow-sm relative overflow-hidden">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Out of Stock</span>
                     <div className="p-2 bg-rose-50 text-rose-600 rounded-lg">
@@ -449,7 +453,7 @@ export default function InventoryMonitorPage() {
               {/* Period Movement Breakdown */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Stock In vs Stock Out */}
-                <div className="bg-white p-6 rounded-2xl border border-base-200 shadow-sm space-y-4">
+                <div className="bg-base-100 p-6 rounded-2xl border border-base-200 shadow-sm space-y-4">
                   <div className="flex items-center justify-between border-b border-base-200 pb-3">
                     <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                       <Activity size={20} className="text-indigo-600" /> Total Period Movement
@@ -481,7 +485,7 @@ export default function InventoryMonitorPage() {
                 </div>
 
                 {/* Purpose Breakdown */}
-                <div className="bg-white p-6 rounded-2xl border border-base-200 shadow-sm space-y-4">
+                <div className="bg-base-100 p-6 rounded-2xl border border-base-200 shadow-sm space-y-4">
                   <div className="flex items-center justify-between border-b border-base-200 pb-3">
                     <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                       <Layers size={20} className="text-primary" /> Movement by Purpose
@@ -527,7 +531,7 @@ export default function InventoryMonitorPage() {
       {/* ─── TAB 2: LOW STOCK ALERTS CONTENT ──────────────────────── */}
       {activeTab === "low-stock" && (
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-xl border border-base-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <label className="cursor-pointer flex items-center gap-2 select-none">
                 <input
@@ -559,7 +563,7 @@ export default function InventoryMonitorPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-base-200 shadow-sm overflow-hidden">
+          <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden">
             {lowStockLoading ? (
               <div className="h-64 flex items-center justify-center">
                 <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -672,7 +676,7 @@ export default function InventoryMonitorPage() {
       {activeTab === "transactions" && (
         <div className="space-y-4">
           {/* Filters Bar */}
-          <div className="bg-white p-5 rounded-2xl border border-base-200 shadow-sm space-y-4">
+          <div className="bg-base-100 p-5 rounded-2xl border border-base-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-base-200 pb-3">
               <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
                 <Filter size={16} className="text-primary" /> Filter Transactions
@@ -716,7 +720,7 @@ export default function InventoryMonitorPage() {
                     setTxProductId(e.target.value);
                     setTxPage(1);
                   }}
-                  className="select select-sm select-bordered text-black bg-white w-full"
+                  className="select select-sm select-bordered text-base-content bg-base-100 w-full"
                 >
                   <option value="">All Products</option>
                   {productsList.map((p) => (
@@ -736,7 +740,7 @@ export default function InventoryMonitorPage() {
                     setTxStockType(e.target.value);
                     setTxPage(1);
                   }}
-                  className="select select-sm select-bordered text-black bg-white w-full"
+                  className="select select-sm select-bordered text-base-content bg-base-100 w-full"
                 >
                   <option value="">All Stock Types</option>
                   <option value="STOCK_IN">Stock In</option>
@@ -753,7 +757,7 @@ export default function InventoryMonitorPage() {
                     setTxPurpose(e.target.value);
                     setTxPage(1);
                   }}
-                  className="select select-sm select-bordered text-black bg-white w-full"
+                  className="select select-sm select-bordered text-base-content bg-base-100 w-full"
                 >
                   <option value="">All Purposes</option>
                   <option value="PURCHASE">Purchase</option>
@@ -775,7 +779,7 @@ export default function InventoryMonitorPage() {
                       setTxReference(e.target.value);
                       setTxPage(1);
                     }}
-                    className="input input-sm input-bordered text-black bg-white w-full pl-8"
+                    className="input input-sm input-bordered text-base-content bg-base-100 w-full pl-8"
                   />
                   <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400" />
                 </div>
@@ -791,7 +795,7 @@ export default function InventoryMonitorPage() {
                     setTxStartDate(e.target.value);
                     setTxPage(1);
                   }}
-                  className="input input-sm input-bordered text-black bg-white w-full"
+                  className="input input-sm input-bordered text-base-content bg-base-100 w-full"
                 />
               </div>
 
@@ -805,7 +809,7 @@ export default function InventoryMonitorPage() {
                     setTxEndDate(e.target.value);
                     setTxPage(1);
                   }}
-                  className="input input-sm input-bordered text-black bg-white w-full"
+                  className="input input-sm input-bordered text-base-content bg-base-100 w-full"
                 />
               </div>
 
@@ -818,7 +822,7 @@ export default function InventoryMonitorPage() {
                     setTxSortBy(e.target.value as any);
                     setTxPage(1);
                   }}
-                  className="select select-sm select-bordered text-black bg-white w-full"
+                  className="select select-sm select-bordered text-base-content bg-base-100 w-full"
                 >
                   <option value="createdAt">Date Created</option>
                   <option value="transactionQuantity">Quantity</option>
@@ -834,7 +838,7 @@ export default function InventoryMonitorPage() {
                     setTxSortOrder(e.target.value as any);
                     setTxPage(1);
                   }}
-                  className="select select-sm select-bordered text-black bg-white w-full"
+                  className="select select-sm select-bordered text-base-content bg-base-100 w-full"
                 >
                   <option value="desc">Descending (Newest / High)</option>
                   <option value="asc">Ascending (Oldest / Low)</option>
@@ -844,7 +848,7 @@ export default function InventoryMonitorPage() {
           </div>
 
           {/* Transactions Table */}
-          <div className="bg-white rounded-2xl border border-base-200 shadow-sm overflow-hidden">
+          <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden">
             {txLoading ? (
               <div className="h-64 flex items-center justify-center">
                 <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -897,7 +901,7 @@ export default function InventoryMonitorPage() {
                           <div className="text-xs text-slate-600 flex items-center gap-1 font-mono">
                             <span className="text-slate-400">{tx.stockBefore}</span>
                             <span>→</span>
-                            <span className="font-bold text-slate-900">{tx.stockAfter}</span>
+                            <span className="font-bold text-base-content">{tx.stockAfter}</span>
                           </div>
                         </td>
                         <td className="text-xs text-slate-600">
@@ -951,7 +955,7 @@ export default function InventoryMonitorPage() {
       {activeTab === "product-summary" && (
         <div className="space-y-4">
           {/* Filters */}
-          <div className="bg-white p-4 rounded-xl border border-base-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div className="bg-base-100 p-4 rounded-xl border border-base-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3">
               <select
                 value={summaryProductId}
@@ -959,7 +963,7 @@ export default function InventoryMonitorPage() {
                   setSummaryProductId(e.target.value);
                   setSummaryPage(1);
                 }}
-                className="select select-sm select-bordered text-black bg-white"
+                className="select select-sm select-bordered text-base-content bg-base-100"
               >
                 <option value="">All Products</option>
                 {productsList.map((p) => (
@@ -978,7 +982,7 @@ export default function InventoryMonitorPage() {
                     setSummaryStartDate(e.target.value);
                     setSummaryPage(1);
                   }}
-                  className="input input-sm input-bordered text-black bg-white"
+                  className="input input-sm input-bordered text-base-content bg-base-100"
                 />
               </div>
 
@@ -991,7 +995,7 @@ export default function InventoryMonitorPage() {
                     setSummaryEndDate(e.target.value);
                     setSummaryPage(1);
                   }}
-                  className="input input-sm input-bordered text-black bg-white"
+                  className="input input-sm input-bordered text-base-content bg-base-100"
                 />
               </div>
 
@@ -1028,11 +1032,11 @@ export default function InventoryMonitorPage() {
 
           {/* Product Cards */}
           {summaryLoading ? (
-            <div className="h-64 flex items-center justify-center bg-white rounded-xl border border-base-200">
+            <div className="h-64 flex items-center justify-center bg-base-100 rounded-xl border border-base-200">
               <span className="loading loading-spinner loading-lg text-primary"></span>
             </div>
           ) : productSummaries.length === 0 ? (
-            <div className="p-12 text-center bg-white rounded-2xl border border-base-200 text-slate-400">
+            <div className="p-12 text-center bg-base-100 rounded-2xl border border-base-200 text-slate-400">
               <Boxes size={48} className="mx-auto mb-3 opacity-60" />
               <p className="text-lg font-bold text-slate-700">No Product Summaries Found</p>
             </div>
@@ -1043,33 +1047,33 @@ export default function InventoryMonitorPage() {
                 return (
                   <div
                     key={item.productId}
-                    className="bg-white rounded-2xl border border-base-200 shadow-sm overflow-hidden transition-all"
+                    className="bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden transition-all"
                   >
                     <div className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-slate-50 border-b border-base-200">
                       <div>
-                        <h3 className="text-lg font-extrabold text-slate-900">{item.productName}</h3>
+                        <h3 className="text-lg font-extrabold text-base-content">{item.productName}</h3>
                         <p className="text-xs text-slate-500 mt-0.5">Product ID: {item.productId}</p>
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                        <div className="bg-white px-3 py-2 rounded-xl border border-base-200">
+                        <div className="bg-base-100 px-3 py-2 rounded-xl border border-base-200">
                           <span className="text-xs text-slate-400 uppercase font-bold">Total Stock</span>
                           <div className="text-lg font-black text-emerald-600">{item.totalStockUnits}</div>
                         </div>
 
-                        <div className="bg-white px-3 py-2 rounded-xl border border-base-200">
+                        <div className="bg-base-100 px-3 py-2 rounded-xl border border-base-200">
                           <span className="text-xs text-slate-400 uppercase font-bold">Stock Value</span>
                           <div className="text-lg font-black text-slate-800">
                             ৳{Number(item.totalStockValue).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                           </div>
                         </div>
 
-                        <div className="bg-white px-3 py-2 rounded-xl border border-base-200">
+                        <div className="bg-base-100 px-3 py-2 rounded-xl border border-base-200">
                           <span className="text-xs text-slate-400 uppercase font-bold">Purchase Price / Unit</span>
                           <div className="text-lg font-black text-indigo-600">৳{item.purchasePrice || item.avgCostPerUnit}</div>
                         </div>
 
-                        <div className="bg-white px-3 py-2 rounded-xl border border-base-200 flex items-center justify-center">
+                        <div className="bg-base-100 px-3 py-2 rounded-xl border border-base-200 flex items-center justify-center">
                           <button
                             onClick={() => setExpandedProduct(isExpanded ? null : item.productId)}
                             className="btn btn-sm btn-ghost text-primary gap-1 font-semibold"
@@ -1081,7 +1085,7 @@ export default function InventoryMonitorPage() {
                     </div>
 
                     {/* Period Movement Bar */}
-                    <div className="p-4 bg-white grid grid-cols-2 sm:grid-cols-4 gap-3 border-b border-base-200">
+                    <div className="p-4 bg-base-100 grid grid-cols-2 sm:grid-cols-4 gap-3 border-b border-base-200">
                       <div className="text-xs">
                         <span className="text-slate-400 font-medium">Purchased: </span>
                         <span className="font-bold text-indigo-600">+{item.periodMovement.totalPurchased}</span>
@@ -1106,7 +1110,7 @@ export default function InventoryMonitorPage() {
                         <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                           Size Level Stock Breakdown
                         </h4>
-                        <div className="overflow-x-auto bg-white rounded-xl border border-base-200">
+                        <div className="overflow-x-auto bg-base-100 rounded-xl border border-base-200">
                           <table className="table table-compact w-full">
                             <thead>
                               <tr className="bg-slate-100 text-slate-700 text-xs">
@@ -1122,7 +1126,7 @@ export default function InventoryMonitorPage() {
                                     {sb.sizeName || "Standard / Default Size"}
                                   </td>
                                   <td>
-                                    <span className="font-bold text-slate-900">{sb.currentStock}</span>
+                                    <span className="font-bold text-base-content">{sb.currentStock}</span>
                                   </td>
                                   <td className="text-slate-700">
                                     ৳{Number(sb.purchasePrice ?? sb.costPerUnit ?? 0).toFixed(2)}
@@ -1140,7 +1144,7 @@ export default function InventoryMonitorPage() {
 
               {/* Pagination */}
               {summaryMeta.totalPages > 1 && (
-                <div className="p-4 bg-white rounded-xl border border-base-200 flex items-center justify-between">
+                <div className="p-4 bg-base-100 rounded-xl border border-base-200 flex items-center justify-between">
                   <span className="text-xs font-medium text-slate-500">
                     Page {summaryPage} of {summaryMeta.totalPages}
                   </span>

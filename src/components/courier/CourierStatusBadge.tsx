@@ -10,11 +10,11 @@ const STATUS_TONES: Record<string, BadgeTone> = {
   },
   partial_delivered: {
     label: "Partial Delivered",
-    className: "badge-warning text-slate-900 border border-amber-400",
+    className: "badge-warning text-base-content border border-amber-400",
   },
   partial_delivered_return_received: {
     label: "Partial Delivered · Return Received",
-    className: "badge-warning text-slate-900 border border-amber-400",
+    className: "badge-warning text-base-content border border-amber-400",
   },
   cancelled: {
     label: "Cancelled",
@@ -34,15 +34,15 @@ const STATUS_TONES: Record<string, BadgeTone> = {
   },
   partial_delivered_return_proccessing: {
     label: "Partial · Return In Progress",
-    className: "badge-warning text-slate-900",
+    className: "badge-warning text-base-content",
   },
   partial_delivered_return_rider_assigned: {
     label: "Partial · Return Rider Assigned",
-    className: "badge-warning text-slate-900",
+    className: "badge-warning text-base-content",
   },
   in_review: {
     label: "In Review",
-    className: "badge-warning text-slate-900",
+    className: "badge-warning text-base-content",
   },
   pending: {
     label: "Pending",
@@ -62,11 +62,11 @@ const STATUS_TONES: Record<string, BadgeTone> = {
   },
   partial_delivered_approval_pending: {
     label: "Partial Delivered · Approval Pending",
-    className: "badge-warning text-slate-900",
+    className: "badge-warning text-base-content",
   },
   cancelled_approval_pending: {
     label: "Cancelled · Approval Pending",
-    className: "badge-warning text-slate-900",
+    className: "badge-warning text-base-content",
   },
   unknown_approval_pending: {
     label: "Unknown · Approval Pending",

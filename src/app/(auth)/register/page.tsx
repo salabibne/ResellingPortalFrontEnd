@@ -122,37 +122,37 @@ function RegisterForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <label className="label"><span className="label-text">Full Name</span></label>
-                <input type="text" placeholder="Abdur Rahim" className={`input input-bordered text-black w-full ${errors.name ? "input-error" : ""}`} {...register("name")} />
+                <input type="text" placeholder="Abdur Rahim" className={`input input-bordered text-base-content w-full ${errors.name ? "input-error" : ""}`} {...register("name")} />
                 {errors.name && <span className="label-text-alt text-error mt-1">{errors.name.message}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label"><span className="label-text">Email</span></label>
-                <input type="email" placeholder="abdurrahim@gmail.com" className={`input input-bordered text-black w-full ${errors.email ? "input-error" : ""}`} {...register("email")} />
+                <input type="email" placeholder="abdurrahim@gmail.com" className={`input input-bordered text-base-content w-full ${errors.email ? "input-error" : ""}`} {...register("email")} />
                 {errors.email && <span className="label-text-alt text-error mt-1">{errors.email.message}</span>}
               </div>
               
               <div className="form-control">
                 <label className="label"><span className="label-text">Phone Number</span></label>
-                <input type="tel" placeholder="01XXXXXXXXX" className={`input input-bordered text-black w-full ${errors.phone ? "input-error" : ""}`} {...register("phone")} />
+                <input type="tel" placeholder="01XXXXXXXXX" className={`input input-bordered text-base-content w-full ${errors.phone ? "input-error" : ""}`} {...register("phone")} />
                 {errors.phone && <span className="label-text-alt text-error mt-1">{errors.phone.message}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label"><span className="label-text">Secondary Phone (Optional)</span></label>
-                <input type="tel" placeholder="01XXXXXXXXX" className={`input input-bordered text-black w-full ${errors.secondaryPhone ? "input-error" : ""}`} {...register("secondaryPhone")} />
+                <input type="tel" placeholder="01XXXXXXXXX" className={`input input-bordered text-base-content w-full ${errors.secondaryPhone ? "input-error" : ""}`} {...register("secondaryPhone")} />
                 {errors.secondaryPhone && <span className="label-text-alt text-error mt-1">{errors.secondaryPhone.message}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label"><span className="label-text">Page Name</span></label>
-                <input type="text" placeholder="Your Page Name" className={`input input-bordered text-black w-full ${errors.pageName ? "input-error" : ""}`} {...register("pageName")} />
+                <input type="text" placeholder="Your Page Name" className={`input input-bordered text-base-content w-full ${errors.pageName ? "input-error" : ""}`} {...register("pageName")} />
                 {errors.pageName && <span className="label-text-alt text-error mt-1">{errors.pageName.message}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label"><span className="label-text">Password</span></label>
-                <input type="password" placeholder="********" className={`input input-bordered text-black w-full ${errors.password ? "input-error" : ""}`} {...register("password")} />
+                <input type="password" placeholder="********" className={`input input-bordered text-base-content w-full ${errors.password ? "input-error" : ""}`} {...register("password")} />
                 {errors.password && <span className="label-text-alt text-error mt-1">{errors.password.message}</span>}
               </div>
 
@@ -161,30 +161,30 @@ function RegisterForm() {
               <input type="hidden" {...register("role")} />
             </div>
 
-            <div className="divider text-black">Address Info</div>
+            <div className="divider text-base-content">Address Info</div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <label className="label"><span className="label-text">Present District</span></label>
-                <input type="text" placeholder="Dhaka" className={`input input-bordered text-black w-full ${errors.presentDistrict ? "input-error" : ""}`} {...register("presentDistrict")} />
+                <input type="text" placeholder="Dhaka" className={`input input-bordered text-base-content w-full ${errors.presentDistrict ? "input-error" : ""}`} {...register("presentDistrict")} />
                 {errors.presentDistrict && <span className="label-text-alt text-error mt-1">{errors.presentDistrict.message}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label"><span className="label-text">Present Thana</span></label>
-                <input type="text" placeholder="Mirpur" className={`input input-bordered text-black w-full ${errors.presentThana ? "input-error" : ""}`} {...register("presentThana")} />
+                <input type="text" placeholder="Mirpur" className={`input input-bordered text-base-content w-full ${errors.presentThana ? "input-error" : ""}`} {...register("presentThana")} />
                 {errors.presentThana && <span className="label-text-alt text-error mt-1">{errors.presentThana.message}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label"><span className="label-text">Permanent District</span></label>
-                <input type="text" placeholder="Dhaka" className={`input input-bordered text-black w-full ${errors.permanentDistrict ? "input-error" : ""}`} {...register("permanentDistrict")} />
+                <input type="text" placeholder="Dhaka" className={`input input-bordered text-base-content w-full ${errors.permanentDistrict ? "input-error" : ""}`} {...register("permanentDistrict")} />
                 {errors.permanentDistrict && <span className="label-text-alt text-error mt-1">{errors.permanentDistrict.message}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label"><span className="label-text">Permanent Thana</span></label>
-                <input type="text" placeholder="Mirpur" className={`input input-bordered text-black w-full ${errors.permanentThana ? "input-error" : ""}`} {...register("permanentThana")} />
+                <input type="text" placeholder="Mirpur" className={`input input-bordered text-base-content w-full ${errors.permanentThana ? "input-error" : ""}`} {...register("permanentThana")} />
                 {errors.permanentThana && <span className="label-text-alt text-error mt-1">{errors.permanentThana.message}</span>}
               </div>
             </div>

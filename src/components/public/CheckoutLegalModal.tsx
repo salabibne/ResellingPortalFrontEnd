@@ -30,9 +30,9 @@ export default function CheckoutLegalModal({ slug, isOpen, onClose }: CheckoutLe
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm flex justify-end p-0 sm:p-4">
-      <div className="w-full max-w-2xl bg-white dark:bg-gray-900 h-full sm:h-auto sm:max-h-[90vh] sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col my-auto border border-gray-200 dark:border-gray-700">
+      <div className="w-full max-w-2xl bg-base-100 dark:bg-gray-900 h-full sm:h-auto sm:max-h-[90vh] sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col my-auto border border-gray-200 dark:border-gray-700">
         {/* Drawer Header */}
-        <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-900">
+        <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-base-100 dark:bg-gray-900">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-primary" />
             <h3 className="font-bold text-base text-gray-900 dark:text-white">

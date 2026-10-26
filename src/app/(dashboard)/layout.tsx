@@ -2,19 +2,65 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Sidebar from "@/components/shared/Sidebar";
-import Header from "@/components/shared/Header";
+import {
+  LayoutDashboard,
+  Package,
+  FileText,
+  LogOut,
+} from "lucide-react";
+import PanelShell from "@/components/panel/PanelShell";
+import PanelButton from "@/components/panel/PanelButton";
+import type { PanelNavEntry } from "@/components/panel/PanelSidebar";
 import { useAuthStore } from "@/store/useAuthStore";
+
+const NAV_ITEMS: PanelNavEntry[] = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  {
+    id: "products",
+    label: "Products & Attributes",
+    icon: Package,
+    items: [
+      { href: "/dashboard/products", label: "Products Catalog" },
+      { href: "/product-attributes/categories", label: "Categories" },
+      { href: "/product-attributes/subcategories", label: "Subcategories" },
+      { href: "/product-attributes/child-categories", label: "Child Categories" },
+      { href: "/product-attributes/brands", label: "Brands" },
+      { href: "/product-attributes/colors", label: "Colors" },
+      { href: "/product-attributes/sizes", label: "Sizes" },
+      { href: "/product-attributes/age-variants", label: "Age Variants" },
+    ],
+  },
+  {
+    id: "advanced",
+    label: "Advanced Admin & CMS",
+    icon: FileText,
+    items: [
+      { href: "/inventory", label: "Inventory Adjust" },
+      { href: "/inventory-monitor", label: "Inventory Monitor" },
+      { href: "/orders", label: "Orders & Sales" },
+      { href: "/reseller", label: "Reseller Portal" },
+      { href: "/cms", label: "Base CMS Management" },
+      { href: "/admin/users", label: "User Management" },
+      { href: "/admin/withdrawals", label: "Reseller Withdrawals" },
+      { href: "/admin/courier/shipments", label: "Courier Management" },
+      { href: "/admin/courier", label: "Courier Policy Settings" },
+      { href: "/admin/product-pages", label: "Product Landing CMS" },
+      { href: "/admin/external-apis", label: "External API Integrations" },
+      { href: "/admin/legal-documents", label: "Legal Documents" },
+      { href: "/admin/notices", label: "Pop-up Notices" },
+      { href: "/admin/tickets", label: "Support Tickets" },
+    ],
+  },
+];
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isAuthenticated, hasHydrated } = useAuthStore();
+  const { user, isAuthenticated, hasHydrated, logout } = useAuthStore();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -48,21 +94,25 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-base-200/40">
-      {/* Mobile Drawer Backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs transition-opacity"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <Header onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-4 md:p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <PanelShell
+      theme="dark"
+      brand={
+        <h2 className="text-xl font-bold text-white tracking-wide truncate">
+          Aarham Apparel
+        </h2>
+      }
+      items={NAV_ITEMS}
+      footer={
+        <PanelButton
+          variant="danger-outline"
+          className="w-full"
+          onClick={logout}
+        >
+          <LogOut size={16} /> Logout
+        </PanelButton>
+      }
+    >
+      {children}
+    </PanelShell>
   );
 }

@@ -83,7 +83,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Out of Stock Overlay */}
         {isOutOfStock && (
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-20">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-20">
             <span className="bg-error text-white font-bold text-[10px] sm:text-xs uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg">
               Out of Stock
             </span>
@@ -102,7 +102,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </button>
             <Link
               href={`/shop/${product.id}`}
-              className="btn btn-square btn-xs sm:btn-sm btn-outline bg-white hover:bg-base-200 border-none shadow-lg rounded-lg sm:rounded-xl text-gray-800"
+              className="btn btn-square btn-xs sm:btn-sm btn-outline bg-base-100 hover:bg-base-200 border-none shadow-lg rounded-lg sm:rounded-xl text-base-content"
               title="View Details"
             >
               <Eye size={12} className="sm:w-3.5 sm:h-3.5" />

@@ -14,11 +14,13 @@ import {
   FileText,
   AlertCircle,
   CheckCircle2,
-  ArrowLeft,
   Package,
   AlertTriangle,
   Info,
 } from "lucide-react";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelEmpty from "@/components/panel/PanelEmpty";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
 import { orderApi, CourierPolicy, PaymentMethod } from "@/services/order.api";
 
@@ -141,47 +143,38 @@ export default function ResellerCartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-3xl mx-auto py-12 px-4 text-center space-y-4">
-        <div className="w-16 h-16 rounded-full bg-base-200 text-base-content/40 flex items-center justify-center mx-auto">
-          <ShoppingBag size={32} />
-        </div>
-        <h2 className="text-2xl font-bold text-base-content">
-          Your Cart is Empty
-        </h2>
-        <p className="text-sm text-base-content/60 max-w-md mx-auto">
-          Browse the product catalog to add products and place orders on behalf of your customers.
-        </p>
-        <Link href="/reseller/products" className="btn btn-primary font-bold">
-          Browse Product Catalog
-        </Link>
-      </div>
+      <PanelPage width="narrow">
+        <PanelEmpty
+          icon={ShoppingBag}
+          title="Your Cart is Empty"
+          text="Browse the product catalog to add products and place orders on behalf of your customers."
+          action={
+            <Link href="/reseller/products" className="btn btn-primary btn-sm rounded-xl">
+              Browse Product Catalog
+            </Link>
+          }
+        />
+      </PanelPage>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-20">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Link href="/reseller/products" className="btn btn-ghost btn-circle btn-sm shrink-0">
-            <ArrowLeft size={18} />
-          </Link>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-base-content">
-              Reseller Order Checkout
-            </h1>
-            <p className="text-xs text-base-content/60">
-              Enter customer details & set your custom selling price for each item.
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={clearCart}
-          className="btn btn-ghost btn-xs text-error gap-1 hover:bg-error/10 self-end sm:self-auto"
-        >
-          <Trash2 size={14} /> Clear Cart
-        </button>
-      </div>
+    <PanelPage width="narrow">
+      <PanelPageHeader
+        title="Reseller Order Checkout"
+        subtitle="Enter customer details & set your custom selling price for each item."
+        icon={ShoppingBag}
+        backHref="/reseller/products"
+        actions={
+          <button
+            type="button"
+            onClick={clearCart}
+            className="btn btn-ghost btn-sm rounded-xl gap-2 text-error hover:bg-error/10"
+          >
+            <Trash2 size={16} /> Clear Cart
+          </button>
+        }
+      />
 
       {errorMsg && (
         <div className="alert alert-error text-xs shadow-sm">
@@ -194,7 +187,7 @@ export default function ResellerCartPage() {
         {/* Left Column: Selected Products & Customer Form (2 Columns wide) */}
         <div className="lg:col-span-2 space-y-6">
           {/* 1. Selected Products List */}
-          <div className="card bg-base-100 border border-base-200 shadow-sm p-4 sm:p-5 space-y-4">
+          <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-4 sm:p-5 space-y-4">
             <h2 className="font-bold text-base flex items-center gap-2 text-base-content border-b border-base-200 pb-3">
               <Package size={18} className="text-primary" />
               <span>Selected Products ({items.length})</span>
@@ -336,7 +329,7 @@ export default function ResellerCartPage() {
           </div>
 
           {/* 2. Customer Information Form */}
-          <div className="card bg-base-100 border border-base-200 shadow-sm p-5 space-y-4">
+          <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-5 space-y-4">
             <h2 className="font-bold text-base flex items-center gap-2 text-base-content border-b border-base-200 pb-3">
               <User size={18} className="text-primary" />
               <span>Customer Information</span>
@@ -430,9 +423,9 @@ export default function ResellerCartPage() {
         </div>
 
         {/* Right Column: Courier Policy Info & Advance Charge Section */}
-        <div className="space-y-6">
+        <div className="space-y-6 self-start lg:sticky lg:top-4">
           {/* 3. Delivery & Courier Charge Info (Text Format) */}
-          <div className="card bg-base-100 border border-base-200 shadow-sm p-5 space-y-4">
+          <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-5 space-y-4">
             <h2 className="font-bold text-base flex items-center gap-2 text-base-content border-b border-base-200 pb-3">
               <Truck size={18} className="text-primary" />
               <span>Courier Charge Info</span>
@@ -511,7 +504,7 @@ export default function ResellerCartPage() {
           </div>
 
           {/* 4. Payment Method & Submit Action */}
-          <div className="card bg-base-100 border border-base-200 shadow-sm p-5 space-y-4">
+          <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-5 space-y-4">
             <div>
               <label className="text-xs font-bold text-base-content block mb-2">
                 Payment Method:
@@ -594,11 +587,11 @@ export default function ResellerCartPage() {
             <button
               type="submit"
               disabled={submitting || invalidPriceItems.length > 0}
-              className="btn btn-primary w-full shadow-lg font-extrabold text-base"
+              className="btn btn-primary btn-sm rounded-xl w-full text-white font-semibold"
             >
               {submitting ? (
                 <>
-                  <span className="loading loading-spinner loading-sm"></span>
+                  <span className="loading loading-spinner loading-xs"></span>
                   Placing Order...
                 </>
               ) : (
@@ -608,6 +601,6 @@ export default function ResellerCartPage() {
           </div>
         </div>
       </form>
-    </div>
+    </PanelPage>
   );
 }

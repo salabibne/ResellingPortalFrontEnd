@@ -84,7 +84,7 @@ export default function SectionLibrary({
                           type="button"
                           disabled={adding}
                           onClick={() => onAdd(definition.type, variant.id)}
-                          className="group rounded-lg border border-base-200 p-1 text-left transition-all hover:border-primary hover:bg-primary/5 disabled:opacity-50"
+                          className="group rounded-lg border border-base-200 p-1 text-left transition-colors hover:border-primary/40 hover:bg-base-200/60 disabled:opacity-50"
                         >
                           <VariantThumb type={definition.type} variant={variant.id} />
                           <span className="mt-1 flex items-center gap-1 text-[10px] font-bold leading-tight">

@@ -271,7 +271,7 @@ export default function ProductDetailPage() {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex flex-col justify-end p-6 md:p-12 text-white">
-              <span className="text-primary font-bold text-xs uppercase tracking-widest bg-white/20 backdrop-blur-xs px-3 py-1 rounded-full w-max mb-3">
+              <span className="text-primary font-bold text-xs uppercase tracking-widest bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full w-max mb-3">
                 Reseller Exclusive Special
               </span>
               <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
@@ -322,7 +322,7 @@ export default function ProductDetailPage() {
               </div>
 
               {isOutOfStock && (
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-20">
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-20">
                   <span className="bg-error text-white font-bold text-sm uppercase tracking-widest px-6 py-2 rounded-full shadow-2xl">
                     Out of Stock
                   </span>
@@ -637,7 +637,7 @@ export default function ProductDetailPage() {
                   return (
                     <div
                       key={sec.id || idx}
-                      className={`flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} gap-8 md:gap-12 items-center bg-base-100 rounded-3xl p-6 sm:p-8 border border-base-200 shadow-xs hover:shadow-md transition-shadow`}
+                      className={`flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} gap-8 md:gap-12 items-center bg-base-100 rounded-3xl p-6 sm:p-8 border border-base-200 shadow-sm hover:shadow-md transition-shadow`}
                     >
                       {sec.imageUrl && (
                         <div className="w-full md:w-1/2 overflow-hidden rounded-2xl aspect-[4/3] border border-base-200 shadow-sm group">

@@ -32,7 +32,7 @@ function PromoImageCard({ card }: { card: PromoCard }) {
           </p>
         )}
         {card.buttonText && (
-          <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-white px-3 py-1 text-[11px] font-bold text-slate-900">
+          <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-base-100 px-3 py-1 text-[11px] font-bold text-base-content">
             {card.buttonText} <ArrowRight size={11} />
           </span>
         )}

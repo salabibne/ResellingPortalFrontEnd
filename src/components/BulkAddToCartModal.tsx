@@ -113,7 +113,7 @@ export default function BulkAddToCartModal({ product, isOpen, onClose }: BulkAdd
   const primaryImg = product.images?.[0]?.imageUrl || "/placeholder.png";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-2 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4 animate-fade-in duration-200">
       <div className="bg-base-100 rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden border border-base-200">
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-base-200 flex items-center justify-between bg-primary text-primary-content">
@@ -190,7 +190,7 @@ export default function BulkAddToCartModal({ product, isOpen, onClose }: BulkAdd
               <p className="text-sm font-medium">No sizes configured for this product.</p>
             </div>
           ) : (
-            <div className="border border-base-200 rounded-2xl overflow-x-auto shadow-xs">
+            <div className="border border-base-200 rounded-2xl overflow-x-auto shadow-sm">
               <table className="table table-xs sm:table-sm w-full min-w-[500px]">
                 <thead>
                   <tr className="bg-base-200 text-base-content text-xs uppercase">

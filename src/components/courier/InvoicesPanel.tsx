@@ -112,10 +112,10 @@ export default function InvoicesPanel() {
         </div>
       )}
 
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="bg-base-100 rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+            <h2 className="text-sm font-extrabold text-base-content flex items-center gap-2">
               <Receipt size={16} className="text-primary" /> Courier Invoices / Payments
             </h2>
             <p className="text-[11px] text-slate-500 mt-0.5">
@@ -160,7 +160,7 @@ export default function InvoicesPanel() {
                       <span className="font-mono font-bold text-indigo-600 text-xs">
                         #{payment.id}
                       </span>
-                      <span className="font-black text-slate-900 text-sm">
+                      <span className="font-black text-base-content text-sm">
                         ৳{formatAmount(payment.amount)}
                       </span>
                     </div>
@@ -187,7 +187,7 @@ export default function InvoicesPanel() {
                           No consignment breakdown returned for this payment.
                         </p>
                       ) : (
-                        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-base-100">
                           <table className="table table-xs w-full text-[11px]">
                             <thead className="bg-slate-100 text-slate-600 uppercase text-[10px]">
                               <tr>

@@ -1,5 +1,9 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelSkeleton from "@/components/panel/PanelSkeleton";
+import StatusBadge from "@/components/panel/StatusBadge";
+
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   ShoppingBag,
@@ -500,47 +504,7 @@ export default function OrdersPage() {
     pendingProcessingStatus === "CANCELLED" || pendingProcessingStatus === "RETURNED";
 
   const renderProcessingBadge = (status: OrderProcessingStatus) => {
-    switch (status) {
-      case "PENDING":
-        return (
-          <span className="badge badge-warning text-slate-900 font-bold text-xs gap-1 py-2 px-3">
-            <Clock size={12} /> Pending
-          </span>
-        );
-      case "CONFIRMED":
-        return (
-          <span className="badge badge-info text-white font-bold text-xs gap-1 py-2 px-3">
-            <CheckCircle2 size={12} /> Confirmed
-          </span>
-        );
-      case "PROCESSING":
-        return (
-          <span className="badge badge-primary text-white font-bold text-xs gap-1 py-2 px-3">
-            <RefreshCw size={12} className="animate-spin" /> Processing
-          </span>
-        );
-      case "SHIPPED":
-        return (
-          <span className="badge badge-accent text-white font-bold text-xs gap-1 py-2 px-3">
-            <Truck size={12} /> Shipped
-          </span>
-        );
-      case "DELIVERED":
-        return (
-          <span className="badge badge-success text-white font-bold text-xs gap-1 py-2 px-3">
-            <CheckCircle2 size={12} /> Delivered
-          </span>
-        );
-      case "CANCELLED":
-      case "RETURNED":
-        return (
-          <span className="badge badge-error text-white font-bold text-xs gap-1 py-2 px-3">
-            <XCircle size={12} /> {status}
-          </span>
-        );
-      default:
-        return <span className="badge text-xs">{status}</span>;
-    }
+    return <StatusBadge status={status} />;
   };
 
   const renderPaymentBadge = (status: PaymentStatus) => {
@@ -553,7 +517,7 @@ export default function OrdersPage() {
         );
       case "PARTIAL":
         return (
-          <span className="badge badge-warning text-slate-900 font-bold text-xs py-1.5 px-2.5">
+          <span className="badge badge-warning text-base-content font-bold text-xs py-1.5 px-2.5">
             PARTIAL
           </span>
         );
@@ -584,7 +548,7 @@ export default function OrdersPage() {
         );
       case "in_review":
         return (
-          <span className="badge badge-warning text-slate-900 font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+          <span className="badge badge-warning text-base-content font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
             <Clock size={10} /> In Review
           </span>
         );
@@ -615,7 +579,7 @@ export default function OrdersPage() {
         );
       case "partial_delivered":
         return (
-          <span className="badge badge-warning text-slate-900 font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
+          <span className="badge badge-warning text-base-content font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
             <CheckCircle2 size={10} /> Partial Delivered
           </span>
         );
@@ -645,7 +609,7 @@ export default function OrdersPage() {
         );
       case "partial_delivered_return_received":
         return (
-          <span className="badge badge-warning text-slate-900 font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
+          <span className="badge badge-warning text-base-content font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
             <CheckCircle2 size={10} /> Part. Return Received
           </span>
         );
@@ -659,7 +623,7 @@ export default function OrdersPage() {
       case "partial_delivered_return_proccessing":
       case "partial_delivered_return_rider_assigned":
         return (
-          <span className="badge badge-warning text-slate-900 font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
+          <span className="badge badge-warning text-base-content font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
             <Truck size={10} /> Part. Return In Transit
           </span>
         );
@@ -674,16 +638,11 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <ShoppingBag className="text-primary" /> Order & Fulfillment Management
-          </h1>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Manage customer & reseller orders, track payments, update delivery status, and trigger stock restocks.
-          </p>
-        </div>
+      <PanelPageHeader
+        title="Order & Fulfillment Management"
+        subtitle="Manage customer & reseller orders, track payments, update delivery status, and trigger stock restocks."
+        icon={ShoppingBag}
+      />
 
         <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
           <button
@@ -715,8 +674,6 @@ export default function OrdersPage() {
           </button>
         </div>
 
-      </div>
-
       {courierSyncBannerMsg && (
         <div className="alert alert-info shadow-sm rounded-2xl text-white text-xs font-bold flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -735,12 +692,12 @@ export default function OrdersPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Total Orders */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div className="bg-base-100 p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Total Orders
             </div>
-            <div className="text-2xl font-black text-slate-900 mt-1">
+            <div className="text-2xl font-black text-base-content mt-1">
               {kpiMetrics.totalOrdersCount}
             </div>
           </div>
@@ -750,7 +707,7 @@ export default function OrdersPage() {
         </div>
 
         {/* Pending Orders */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div className="bg-base-100 p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Pending Orders
@@ -765,7 +722,7 @@ export default function OrdersPage() {
         </div>
 
         {/* Total Paid Revenue */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div className="bg-base-100 p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Collected Revenue
@@ -780,7 +737,7 @@ export default function OrdersPage() {
         </div>
 
         {/* Outstanding Due */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div className="bg-base-100 p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               Outstanding Due
@@ -820,7 +777,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Filter & Search Toolbar */}
-      <div className="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col gap-4">
+      <div className="bg-base-100 p-4 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* Search Input */}
           <div className="relative w-full md:w-72">
@@ -832,7 +789,7 @@ export default function OrdersPage() {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              className="input input-sm input-bordered w-full rounded-2xl pl-9 text-slate-900 text-xs"
+              className="input input-sm input-bordered w-full rounded-2xl pl-9 text-base-content text-xs"
             />
             <Search size={16} className="absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
           </div>
@@ -847,7 +804,7 @@ export default function OrdersPage() {
                 setStartDate(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl"
             />
             <span>To:</span>
             <input
@@ -857,7 +814,7 @@ export default function OrdersPage() {
                 setEndDate(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl"
             />
           </div>
 
@@ -872,7 +829,7 @@ export default function OrdersPage() {
                 setCustomerPhoneFilter(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-white text-slate-900 font-bold rounded-xl w-36"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl w-36"
             />
           </div>
 
@@ -885,7 +842,7 @@ export default function OrdersPage() {
                 setSelectedOrderType(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
             >
               <option value="ALL">All Order Types</option>
               <option value="RESELLER">Reseller Orders</option>
@@ -902,7 +859,7 @@ export default function OrdersPage() {
                 setSelectedProcessingStatus(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
             >
               <option value="ALL">All Statuses</option>
               <option value="PENDING">PENDING</option>
@@ -924,7 +881,7 @@ export default function OrdersPage() {
                 setSelectedCourierStatus(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
             >
               <option value="ALL">All Courier Statuses</option>
               <option value="NOT_SENT">Not Placed with Courier</option>
@@ -946,7 +903,7 @@ export default function OrdersPage() {
                 setSelectedPaymentStatus(e.target.value);
                 setPage(1);
               }}
-              className="select select-xs select-bordered bg-white text-slate-900 font-bold rounded-xl"
+              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl"
             >
               <option value="ALL">All Payments</option>
               <option value="DUE">DUE</option>
@@ -1017,10 +974,10 @@ export default function OrdersPage() {
       )}
 
       {/* Orders Data Table */}
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="bg-base-100 rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="h-64 flex items-center justify-center">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
+          <div className="p-4">
+            <PanelSkeleton variant="table" rows={8} />
           </div>
         ) : orders.length === 0 ? (
           <div className="p-12 text-center text-slate-400">
@@ -1099,7 +1056,7 @@ export default function OrdersPage() {
                         )}
                       </td>
                       <td>
-                        <div className="font-bold text-slate-900 text-sm">
+                        <div className="font-bold text-base-content text-sm">
                           {customerName}
                         </div>
                         <div className="text-xs text-slate-500">
@@ -1188,13 +1145,13 @@ export default function OrdersPage() {
 
       {/* ─── SLIDE-OVER ORDER FULFILLMENT DRAWER / MODAL ──────────────── */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-[100] flex justify-end bg-black/60 backdrop-blur-xs transition-opacity duration-300">
+        <div className="fixed inset-0 z-[100] flex justify-end bg-black/60 backdrop-blur-sm transition-opacity duration-300">
           <div
             className="fixed inset-0 cursor-pointer"
             onClick={() => setSelectedOrder(null)}
           />
 
-          <div className="relative w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col z-10 overflow-hidden text-slate-800">
+          <div className="relative w-full max-w-2xl bg-base-100 h-full shadow-2xl flex flex-col z-10 overflow-hidden text-slate-800">
             {/* Drawer Header */}
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
               <div>
@@ -1233,15 +1190,15 @@ export default function OrdersPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-slate-500 font-medium">Name:</span>{" "}
-                      <strong className="text-slate-900">{selectedOrder.reseller?.name || selectedOrder.customer?.name || "Reseller"}</strong>
+                      <strong className="text-base-content">{selectedOrder.reseller?.name || selectedOrder.customer?.name || "Reseller"}</strong>
                     </div>
                     <div>
                       <span className="text-slate-500 font-medium">Phone:</span>{" "}
-                      <strong className="text-slate-900">{selectedOrder.reseller?.phone || selectedOrder.customer?.phone || "N/A"}</strong>
+                      <strong className="text-base-content">{selectedOrder.reseller?.phone || selectedOrder.customer?.phone || "N/A"}</strong>
                     </div>
                     <div>
                       <span className="text-slate-500 font-medium">Email:</span>{" "}
-                      <strong className="text-slate-900">{selectedOrder.reseller?.email || selectedOrder.customer?.email || "N/A"}</strong>
+                      <strong className="text-base-content">{selectedOrder.reseller?.email || selectedOrder.customer?.email || "N/A"}</strong>
                     </div>
                     {selectedOrder.reseller?.pageName && (
                       <div>
@@ -1260,7 +1217,7 @@ export default function OrdersPage() {
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <div className="font-extrabold text-slate-900 text-sm">
+                    <div className="font-extrabold text-base-content text-sm">
                       {selectedOrder.customerName || selectedOrder.customer?.name || "Customer"}
                     </div>
                     <div className="text-slate-500 mt-0.5 flex items-center gap-1">
@@ -1315,7 +1272,7 @@ export default function OrdersPage() {
                     <span className="font-bold text-slate-500 flex items-center gap-1">
                       <FileText size={12} /> Optional Reseller Notes:
                     </span>
-                    <p className="text-slate-700 font-medium mt-1 bg-white p-2 rounded-lg border border-slate-200">
+                    <p className="text-slate-700 font-medium mt-1 bg-base-100 p-2 rounded-lg border border-slate-200">
                       {selectedOrder.notes}
                     </p>
                   </div>
@@ -1353,13 +1310,13 @@ export default function OrdersPage() {
                 {selectedOrder.courierTrackingCode || selectedOrder.courierConsignmentId ? (
                   /* Already Dispatched to Courier */
                   <div className="space-y-3">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-4 rounded-xl border border-indigo-100/80 shadow-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-base-100 p-4 rounded-xl border border-indigo-100/80 shadow-sm">
                       <div>
                         <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
                           Tracking Code
                         </span>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="font-mono text-sm font-black text-slate-900">
+                          <span className="font-mono text-sm font-black text-base-content">
                             {selectedOrder.courierTrackingCode || "N/A"}
                           </span>
                           {selectedOrder.courierTrackingCode && (
@@ -1415,7 +1372,7 @@ export default function OrdersPage() {
                           <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
                             Return Status
                           </span>
-                          <span className="badge badge-warning text-slate-900 font-bold text-[10px] uppercase mt-0.5">
+                          <span className="badge badge-warning text-base-content font-bold text-[10px] uppercase mt-0.5">
                             {selectedOrder.courierReturnStatus}
                           </span>
                           {selectedOrder.courierReturnReason && (
@@ -1431,7 +1388,7 @@ export default function OrdersPage() {
                       <button
                         onClick={handleSyncCourierStatus}
                         disabled={isSyncingCourier}
-                        className="btn btn-sm btn-outline btn-primary rounded-xl font-bold gap-2 flex-1 w-full shadow-xs"
+                        className="btn btn-sm btn-outline btn-primary rounded-xl font-bold gap-2 flex-1 w-full shadow-sm"
                       >
                         {isSyncingCourier ? (
                           <span className="loading loading-spinner loading-xs"></span>
@@ -1443,7 +1400,7 @@ export default function OrdersPage() {
                       <button
                         onClick={() => handleOpenTrackingTimeline(selectedOrder.id)}
                         disabled={loadingTrackingHistory}
-                        className="btn btn-sm btn-primary text-white rounded-xl font-bold gap-2 flex-1 w-full shadow-xs"
+                        className="btn btn-sm btn-primary text-white rounded-xl font-bold gap-2 flex-1 w-full shadow-sm"
                       >
                         {loadingTrackingHistory ? (
                           <span className="loading loading-spinner loading-xs"></span>
@@ -1465,7 +1422,7 @@ export default function OrdersPage() {
                         <select
                           value={courierDeliveryType}
                           onChange={(e) => setCourierDeliveryType(Number(e.target.value))}
-                          className="select select-sm select-bordered w-full bg-white text-slate-900 font-bold rounded-xl"
+                          className="select select-sm select-bordered w-full bg-base-100 text-base-content font-bold rounded-xl"
                         >
                           <option value={0}>Home Delivery (0)</option>
                           <option value={1}>Point Delivery / Hub Pick Up (1)</option>
@@ -1481,7 +1438,7 @@ export default function OrdersPage() {
                           value={courierCustomCod}
                           onChange={(e) => setCourierCustomCod(e.target.value)}
                           placeholder="COD Amount"
-                          className="input input-sm input-bordered w-full bg-white text-slate-900 font-bold rounded-xl"
+                          className="input input-sm input-bordered w-full bg-base-100 text-base-content font-bold rounded-xl"
                         />
                       </div>
                     </div>
@@ -1495,7 +1452,7 @@ export default function OrdersPage() {
                         value={courierNote}
                         onChange={(e) => setCourierNote(e.target.value)}
                         placeholder="e.g. Deliver before 4 PM, call on arrival"
-                        className="input input-sm input-bordered w-full bg-white text-slate-900 rounded-xl"
+                        className="input input-sm input-bordered w-full bg-base-100 text-base-content rounded-xl"
                       />
                     </div>
 
@@ -1556,7 +1513,7 @@ export default function OrdersPage() {
                     <select
                       value={pendingProcessingStatus}
                       onChange={(e) => setPendingProcessingStatus(e.target.value as OrderProcessingStatus)}
-                      className="select select-sm select-bordered w-full bg-white text-slate-900 font-bold rounded-xl"
+                      className="select select-sm select-bordered w-full bg-base-100 text-base-content font-bold rounded-xl"
                     >
                       <option value="PENDING">PENDING</option>
                       <option value="CONFIRMED">CONFIRMED</option>
@@ -1573,7 +1530,7 @@ export default function OrdersPage() {
                     <select
                       value={pendingPaymentStatus}
                       onChange={(e) => setPendingPaymentStatus(e.target.value as PaymentStatus)}
-                      className="select select-sm select-bordered w-full bg-white text-slate-900 font-bold rounded-xl"
+                      className="select select-sm select-bordered w-full bg-base-100 text-base-content font-bold rounded-xl"
                     >
                       <option value="DUE">DUE</option>
                       <option value="PAID">PAID</option>
@@ -1584,7 +1541,7 @@ export default function OrdersPage() {
                 </div>
 
                 {isRestockSelection && (
-                  <div className="alert alert-warning text-slate-900 text-xs font-bold rounded-xl p-3 flex items-start gap-2.5 border border-amber-300">
+                  <div className="alert alert-warning text-base-content text-xs font-bold rounded-xl p-3 flex items-start gap-2.5 border border-amber-300">
                     <ShieldAlert size={18} className="shrink-0 text-amber-700 mt-0.5" />
                     <div>
                       <span className="font-extrabold uppercase tracking-wide text-[11px] text-amber-900 block">Automatic Inventory Sync Warning</span>
@@ -1623,7 +1580,7 @@ export default function OrdersPage() {
                           />
                         </div>
                         <div>
-                          <div className="font-bold text-slate-900 text-xs">{item.product?.name || "Product"}</div>
+                          <div className="font-bold text-base-content text-xs">{item.product?.name || "Product"}</div>
                           <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
                             {item.productSize?.size?.name && <span>Size: {item.productSize.size.name}</span>}
                           </div>
@@ -1632,7 +1589,7 @@ export default function OrdersPage() {
 
                       <div className="text-right space-y-1">
                         <div className="text-xs font-bold text-slate-700">
-                          Qty: <span className="font-extrabold text-slate-900">{item.quantity}</span>
+                          Qty: <span className="font-extrabold text-base-content">{item.quantity}</span>
                         </div>
                         {selectedOrder.isResellerOrder ? (
                           <>
@@ -1645,7 +1602,7 @@ export default function OrdersPage() {
                           </>
                         ) : (
                           <div className="text-xs font-semibold text-slate-800">
-                            Sell Price: <span className="font-extrabold text-slate-900">৳{Number(item.snapshotPrice).toLocaleString()}</span>
+                            Sell Price: <span className="font-extrabold text-base-content">৳{Number(item.snapshotPrice).toLocaleString()}</span>
                           </div>
                         )}
                       </div>
@@ -1660,13 +1617,13 @@ export default function OrdersPage() {
                   <>
                     <div className="text-slate-600">
                       Reseller Subtotal:{" "}
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-base-content">
                         ৳ {Number(selectedOrder.resellerSellPrice || selectedOrder.total).toLocaleString()}
                       </span>
                     </div>
                     <div className="text-slate-600">
                       Courier Charge:{" "}
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-base-content">
                         {selectedOrder.isAdvanceCourierPaid ? (
                           <span className="text-emerald-600">
                             ৳ 0 (Advance courier fee was collected directly by reseller)
@@ -1687,7 +1644,7 @@ export default function OrdersPage() {
                         * Note: Reseller profit is earned by reseller.
                       </div>
                     </div>
-                    <div className="text-sm font-black text-slate-900 pt-2 border-t border-slate-200 flex justify-between items-center">
+                    <div className="text-sm font-black text-base-content pt-2 border-t border-slate-200 flex justify-between items-center">
                       <span>Total Bill:</span>
                       <span className="text-primary font-black text-base">
                         ৳ {(
@@ -1701,17 +1658,17 @@ export default function OrdersPage() {
                   <>
                     <div className="text-slate-600">
                       Subtotal:{" "}
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-base-content">
                         ৳ {Number(selectedOrder.subtotal).toLocaleString()}
                       </span>
                     </div>
                     <div className="text-slate-600">
                       Courier Charge:{" "}
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-base-content">
                         +৳ {Number(selectedOrder.courierCharge).toLocaleString()}
                       </span>
                     </div>
-                    <div className="text-sm font-black text-slate-900 pt-2 border-t border-slate-200">
+                    <div className="text-sm font-black text-base-content pt-2 border-t border-slate-200">
                       Grand Total:{" "}
                       <span className="text-primary">
                         ৳ {Number(selectedOrder.total).toLocaleString()}
@@ -1736,9 +1693,9 @@ export default function OrdersPage() {
       {/* Courier Charge Policy Settings Modal */}
       {isCourierModalOpen && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-lg bg-white p-6 space-y-4 rounded-3xl border border-slate-200">
+          <div className="modal-box max-w-lg bg-base-100 p-6 space-y-4 rounded-3xl border border-slate-200">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+              <h3 className="font-extrabold text-base text-base-content flex items-center gap-2">
                 <SlidersHorizontal size={18} className="text-primary" />
                 <span>Courier Charge Text & Policy Settings</span>
               </h3>
@@ -1758,7 +1715,7 @@ export default function OrdersPage() {
                 </label>
                 <input
                   type="text"
-                  className="input input-sm input-bordered w-full rounded-xl text-slate-900 font-bold"
+                  className="input input-sm input-bordered w-full rounded-xl text-base-content font-bold"
                   value={courierPolicyTitle}
                   onChange={(e) => setCourierPolicyTitle(e.target.value)}
                 />
@@ -1771,7 +1728,7 @@ export default function OrdersPage() {
                 <textarea
                   rows={4}
                   placeholder="e.g. Inside Dhaka City: ৳70 | Sub-Urban Dhaka: ৳100 | Outside Dhaka: ৳130. Advance courier fee is collected by reseller if applicable."
-                  className="textarea textarea-bordered w-full rounded-xl text-slate-900 text-xs"
+                  className="textarea textarea-bordered w-full rounded-xl text-base-content text-xs"
                   value={courierPolicyText}
                   onChange={(e) => setCourierPolicyText(e.target.value)}
                 />
@@ -1783,7 +1740,7 @@ export default function OrdersPage() {
                 </label>
                 <input
                   type="number"
-                  className="input input-sm input-bordered w-full rounded-xl text-slate-900 font-bold"
+                  className="input input-sm input-bordered w-full rounded-xl text-base-content font-bold"
                   value={courierDefaultCharge}
                   onChange={(e) => setCourierDefaultCharge(Number(e.target.value))}
                 />
@@ -1822,9 +1779,9 @@ export default function OrdersPage() {
       {/* Bulk Send to Steadfast Courier Modal */}
       {isBulkCourierModalOpen && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md bg-white p-6 space-y-4 rounded-3xl border border-slate-200">
+          <div className="modal-box max-w-md bg-base-100 p-6 space-y-4 rounded-3xl border border-slate-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2">
+              <h3 className="font-extrabold text-base text-base-content flex items-center gap-2">
                 <Truck size={18} className="text-primary" />
                 <span>Bulk Steadfast Dispatch</span>
               </h3>
@@ -1839,7 +1796,7 @@ export default function OrdersPage() {
 
             <div className="space-y-3 text-xs">
               <div className="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100 space-y-1">
-                <div className="font-extrabold text-slate-900 text-sm">
+                <div className="font-extrabold text-base-content text-sm">
                   {selectedOrderIds.length} Orders Selected
                 </div>
                 <p className="text-slate-600">
@@ -1854,7 +1811,7 @@ export default function OrdersPage() {
                 <select
                   value={bulkCourierDeliveryType}
                   onChange={(e) => setBulkCourierDeliveryType(Number(e.target.value))}
-                  className="select select-sm select-bordered w-full bg-white text-slate-900 font-bold rounded-xl"
+                  className="select select-sm select-bordered w-full bg-base-100 text-base-content font-bold rounded-xl"
                 >
                   <option value={0}>Home Delivery (0)</option>
                   <option value={1}>Point Delivery / Hub Pick Up (1)</option>
@@ -1897,13 +1854,13 @@ export default function OrdersPage() {
       {/* Live Steadfast Parcel Tracking Timeline Modal */}
       {isTrackingModalOpen && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-lg bg-white p-6 space-y-5 rounded-3xl border border-slate-200 text-slate-800">
+          <div className="modal-box max-w-lg bg-base-100 p-6 space-y-5 rounded-3xl border border-slate-200 text-slate-800">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider block">
                   Steadfast Courier Logistics
                 </span>
-                <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2 mt-0.5">
+                <h3 className="font-extrabold text-base text-base-content flex items-center gap-2 mt-0.5">
                   <Truck size={18} className="text-primary" />
                   <span>Parcel Journey Timeline</span>
                 </h3>
@@ -1927,7 +1884,7 @@ export default function OrdersPage() {
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs">
                   <div>
                     <span className="text-slate-400 block font-bold text-[10px] uppercase">Invoice / Ref</span>
-                    <strong className="text-slate-900 font-mono text-sm">{trackingTimelineData.orderRef || trackingTimelineData.orderId}</strong>
+                    <strong className="text-base-content font-mono text-sm">{trackingTimelineData.orderRef || trackingTimelineData.orderId}</strong>
                   </div>
                   <div>
                     <span className="text-slate-400 block font-bold text-[10px] uppercase">Tracking Code</span>
@@ -1952,11 +1909,11 @@ export default function OrdersPage() {
                     <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-indigo-100">
                       {trackingTimelineData.trackingEvents.map((event: any, idx: number) => (
                         <div key={idx} className="relative group">
-                          <div className="absolute -left-6 top-1 w-4 h-4 rounded-full bg-primary border-2 border-white shadow-xs flex items-center justify-center text-[8px] text-white font-bold">
+                          <div className="absolute -left-6 top-1 w-4 h-4 rounded-full bg-primary border-2 border-white shadow-sm flex items-center justify-center text-[8px] text-white font-bold">
                             {idx + 1}
                           </div>
-                          <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-2xs">
-                            <p className="text-xs font-bold text-slate-900">{event.text}</p>
+                          <div className="bg-base-100 p-3 rounded-xl border border-slate-100 shadow-2xs">
+                            <p className="text-xs font-bold text-base-content">{event.text}</p>
                             <span className="text-[10px] text-slate-400 block mt-1">
                               {new Date(event.created_at).toLocaleString()}
                             </span>
@@ -1989,13 +1946,13 @@ export default function OrdersPage() {
       {/* Customer Steadfast Delivery Reputation & Fraud Check Modal */}
       {isFraudModalOpen && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-md bg-white p-6 space-y-4 rounded-3xl border border-slate-200 text-slate-800">
+          <div className="modal-box max-w-md bg-base-100 p-6 space-y-4 rounded-3xl border border-slate-200 text-slate-800">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] font-bold text-info uppercase tracking-wider block">
                   Steadfast Courier Intelligence
                 </span>
-                <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-2 mt-0.5">
+                <h3 className="font-extrabold text-base text-base-content flex items-center gap-2 mt-0.5">
                   <ShieldAlert size={18} className="text-info" />
                   <span>Customer Delivery Record</span>
                 </h3>
@@ -2018,7 +1975,7 @@ export default function OrdersPage() {
               <div className="space-y-4 text-xs">
                 <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 flex items-center justify-between">
                   <span className="text-slate-500 font-bold">Checked Mobile:</span>
-                  <strong className="text-slate-900 font-mono text-sm">{fraudCheckData.phone}</strong>
+                  <strong className="text-base-content font-mono text-sm">{fraudCheckData.phone}</strong>
                 </div>
 
                 {/* Delivery & Cancellation Ratios */}
@@ -2067,7 +2024,7 @@ export default function OrdersPage() {
                   {fraudCheckData.fraud_categories && Object.keys(fraudCheckData.fraud_categories).length > 0 && (
                     <div className="pt-2 border-t border-slate-200 flex flex-wrap gap-1 mt-1">
                       {Object.entries(fraudCheckData.fraud_categories).map(([cat, count]) => (
-                        <span key={cat} className="badge badge-warning text-slate-900 font-bold text-[10px]">
+                        <span key={cat} className="badge badge-warning text-base-content font-bold text-[10px]">
                           {cat}: {String(count)}
                         </span>
                       ))}

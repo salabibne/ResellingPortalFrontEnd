@@ -66,7 +66,7 @@ export default function MyOrdersPage() {
     switch (status) {
       case "PENDING":
         return (
-          <span className="badge badge-warning text-slate-900 font-bold text-xs gap-1 py-2 px-3">
+          <span className="badge badge-warning text-base-content font-bold text-xs gap-1 py-2 px-3">
             <Clock size={12} /> Pending
           </span>
         );
@@ -116,7 +116,7 @@ export default function MyOrdersPage() {
         );
       case "DUE":
         return (
-          <span className="badge badge-warning text-slate-900 font-bold text-xs py-1.5 px-2.5">
+          <span className="badge badge-warning text-base-content font-bold text-xs py-1.5 px-2.5">
             DUE
           </span>
         );
@@ -188,7 +188,7 @@ export default function MyOrdersPage() {
               className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
                 selectedStatusFilter === st.value
                   ? "bg-primary text-white shadow-sm"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+                  : "bg-base-100 text-slate-600 border border-slate-200 hover:bg-slate-100"
               }`}
             >
               {st.label}
@@ -197,7 +197,7 @@ export default function MyOrdersPage() {
         </div>
 
         {/* Orders Table Container */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="bg-base-100 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
           {loading ? (
             <div className="h-64 flex items-center justify-center">
               <span className="loading loading-spinner loading-lg text-primary"></span>
@@ -249,7 +249,7 @@ export default function MyOrdersPage() {
                       </td>
                       <td>{renderProcessingBadge(ord.processingStatus)}</td>
                       <td>{renderPaymentBadge(ord.paymentStatus)}</td>
-                      <td className="font-black text-slate-900">
+                      <td className="font-black text-base-content">
                         ৳ {Number(ord.total).toLocaleString()}
                       </td>
                       <td className="text-right pr-6">

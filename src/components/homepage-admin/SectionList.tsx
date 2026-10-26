@@ -105,7 +105,7 @@ export default function SectionList({
                 selected
                   ? "border-primary bg-primary/5"
                   : overId === section.id
-                  ? "border-primary/60 bg-base-200"
+                  ? "border-dashed border-primary/70 bg-primary/[0.02]"
                   : "border-base-200 hover:border-base-300"
               } ${!section.isEnabled ? "opacity-60" : ""}`}
               role="button"

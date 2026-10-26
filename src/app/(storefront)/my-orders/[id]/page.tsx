@@ -129,7 +129,7 @@ export default function CustomerOrderDetailPage() {
       case "PAID":
         return <span className="badge badge-success text-white font-bold">PAID</span>;
       case "DUE":
-        return <span className="badge badge-warning text-slate-900 font-bold">DUE</span>;
+        return <span className="badge badge-warning text-base-content font-bold">DUE</span>;
       case "PARTIAL":
         return <span className="badge badge-info text-white font-bold">PARTIAL</span>;
       default:
@@ -149,7 +149,7 @@ export default function CustomerOrderDetailPage() {
         );
       case "in_review":
         return (
-          <span className="badge badge-warning text-slate-900 font-bold text-xs py-2 px-3 gap-1">
+          <span className="badge badge-warning text-base-content font-bold text-xs py-2 px-3 gap-1">
             <Clock size={12} /> In Review
           </span>
         );
@@ -168,7 +168,7 @@ export default function CustomerOrderDetailPage() {
         );
       case "partial_delivered":
         return (
-          <span className="badge badge-warning text-slate-900 font-extrabold text-xs py-2 px-3 gap-1 border border-amber-400">
+          <span className="badge badge-warning text-base-content font-extrabold text-xs py-2 px-3 gap-1 border border-amber-400">
             <CheckCircle2 size={12} /> Partially Delivered
           </span>
         );
@@ -193,7 +193,7 @@ export default function CustomerOrderDetailPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 print:hidden">
           <Link
             href="/my-orders"
-            className="btn btn-sm btn-ghost gap-2 text-slate-600 hover:text-slate-900 font-medium self-start"
+            className="btn btn-sm btn-ghost gap-2 text-slate-600 hover:text-base-content font-medium self-start"
           >
             <ArrowLeft size={16} /> Back to My Orders
           </Link>
@@ -209,14 +209,14 @@ export default function CustomerOrderDetailPage() {
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-3xl p-16 text-center border border-slate-200 shadow-sm">
+          <div className="bg-base-100 rounded-3xl p-16 text-center border border-slate-200 shadow-sm">
             <span className="loading loading-spinner loading-lg text-primary"></span>
             <p className="text-sm font-medium text-slate-500 mt-4">Loading order invoice details...</p>
           </div>
         ) : error || !order ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm max-w-lg mx-auto">
+          <div className="bg-base-100 rounded-3xl p-12 text-center border border-slate-200 shadow-sm max-w-lg mx-auto">
             <XCircle size={56} className="mx-auto text-red-500 mb-4" />
-            <h2 className="text-xl font-bold text-slate-900">Order Not Found</h2>
+            <h2 className="text-xl font-bold text-base-content">Order Not Found</h2>
             <p className="text-sm text-slate-500 mt-2 mb-6">{error}</p>
             <Link href="/my-orders" className="btn btn-primary rounded-full px-6">
               Return to My Orders
@@ -225,7 +225,7 @@ export default function CustomerOrderDetailPage() {
         ) : (
           <div className="space-y-6 sm:space-y-8">
             {/* Header Box */}
-            <div className="bg-white rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-200/80 shadow-sm space-y-6">
+            <div className="bg-base-100 rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-200/80 shadow-sm space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-6 gap-4">
                 <div>
                   <div className="flex items-center gap-2">
@@ -233,7 +233,7 @@ export default function CustomerOrderDetailPage() {
                       Invoice & Order Reference
                     </span>
                   </div>
-                  <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 break-all">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-base-content mt-1 break-all">
                     {order.orderRef || `#${order.id.toUpperCase()}`}
                   </h1>
                   <p className="text-xs text-slate-500 mt-1">
@@ -309,8 +309,8 @@ export default function CustomerOrderDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Left Column: Items Table */}
               <div className="lg:col-span-8 space-y-6">
-                <div className="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/80 shadow-sm">
-                  <h3 className="text-lg font-extrabold text-slate-900 border-b border-slate-100 pb-4 mb-4">
+                <div className="bg-base-100 rounded-3xl p-6 md:p-8 border border-slate-200/80 shadow-sm">
+                  <h3 className="text-lg font-extrabold text-base-content border-b border-slate-100 pb-4 mb-4">
                     Ordered Variant Items ({order.orderItems?.length || 0})
                   </h3>
 
@@ -328,7 +328,7 @@ export default function CustomerOrderDetailPage() {
                               />
                             </div>
                             <div>
-                              <h4 className="font-bold text-slate-900 text-base">
+                              <h4 className="font-bold text-base-content text-base">
                                 {item.product?.name || "Apparel Product"}
                               </h4>
                               <div className="flex flex-wrap gap-2 text-xs mt-1.5">
@@ -354,7 +354,7 @@ export default function CustomerOrderDetailPage() {
                             <div className="text-xs text-slate-500 font-medium">
                               ৳{Number(item.snapshotPrice).toLocaleString()} × {item.quantity}
                             </div>
-                            <div className="text-base font-black text-slate-900">
+                            <div className="text-base font-black text-base-content">
                               ৳{Number(item.subtotal).toLocaleString()}
                             </div>
                           </div>
@@ -380,7 +380,7 @@ export default function CustomerOrderDetailPage() {
                       {renderCourierBadge(order.courierStatus)}
                     </div>
 
-                    <div className="bg-white/10 backdrop-blur-xs p-4 rounded-2xl border border-white/10 space-y-2">
+                    <div className="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 space-y-2">
                       <div>
                         <span className="text-[10px] font-bold text-indigo-200 block uppercase tracking-wider">
                           Parcel Tracking Code
@@ -426,7 +426,7 @@ export default function CustomerOrderDetailPage() {
                         <div className="space-y-2.5 pl-3.5 border-l border-indigo-400/40 my-2">
                           {trackingEvents.map((ev, idx) => (
                             <div key={idx} className="relative text-xs">
-                              <span className="absolute -left-[18px] top-1 w-2 h-2 rounded-full bg-emerald-400 shadow-xs"></span>
+                              <span className="absolute -left-[18px] top-1 w-2 h-2 rounded-full bg-emerald-400 shadow-sm"></span>
                               <div className="font-bold text-white leading-tight">{ev.text}</div>
                               <div className="text-[10px] text-indigo-300 mt-0.5">{new Date(ev.created_at).toLocaleString()}</div>
                             </div>
@@ -439,18 +439,18 @@ export default function CustomerOrderDetailPage() {
                 )}
 
                 {/* Cost Summary Box */}
-                <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-3">
-                  <h3 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3">
+                <div className="bg-base-100 rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-3">
+                  <h3 className="text-base font-extrabold text-base-content border-b border-slate-100 pb-3">
                     Invoice Breakdown
                   </h3>
                   <div className="space-y-2 text-sm text-slate-600">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span className="font-bold text-slate-900">৳ {Number(order.subtotal).toLocaleString()}</span>
+                      <span className="font-bold text-base-content">৳ {Number(order.subtotal).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Courier Charge</span>
-                      <span className="font-bold text-slate-900">+৳ {Number(order.courierCharge).toLocaleString()}</span>
+                      <span className="font-bold text-base-content">+৳ {Number(order.courierCharge).toLocaleString()}</span>
                     </div>
                     {Number(order.discount) > 0 && (
                       <div className="flex justify-between text-emerald-600 font-semibold">
@@ -458,7 +458,7 @@ export default function CustomerOrderDetailPage() {
                         <span>-৳ {Number(order.discount).toLocaleString()}</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-base font-black text-slate-900 pt-3 border-t border-slate-200">
+                    <div className="flex justify-between text-base font-black text-base-content pt-3 border-t border-slate-200">
                       <span>Grand Total</span>
                       <span className="text-primary text-xl">৳ {Number(order.total).toLocaleString()}</span>
                     </div>
@@ -466,7 +466,7 @@ export default function CustomerOrderDetailPage() {
                 </div>
 
                 {/* Delivery & Payment Info */}
-                <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                <div className="bg-base-100 rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
                       <MapPin size={14} className="text-primary" /> Delivery Address
@@ -482,7 +482,7 @@ export default function CustomerOrderDetailPage() {
                     </div>
                     <div className="text-xs text-slate-700 space-y-1">
                       <div>
-                        Method: <span className="font-bold text-slate-900">{order.paymentMethod}</span>
+                        Method: <span className="font-bold text-base-content">{order.paymentMethod}</span>
                       </div>
                       <div>
                         Payment Status: {renderPaymentBadge(order.paymentStatus)}

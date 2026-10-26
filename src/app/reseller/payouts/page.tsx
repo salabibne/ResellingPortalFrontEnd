@@ -3,21 +3,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Wallet,
-  ArrowUpRight,
   Clock,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
   TrendingUp,
   FileText,
   Copy,
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  Search,
   RefreshCw,
   PlusCircle,
-  DollarSign,
   ShieldCheck,
   Building2,
   Smartphone,
@@ -30,6 +24,14 @@ import {
   PayoutMethod,
   WithdrawalStatus,
 } from "@/services/withdrawal.api";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelTabs from "@/components/panel/PanelTabs";
+import PanelTable from "@/components/panel/PanelTable";
+import PanelEmpty from "@/components/panel/PanelEmpty";
+import PanelSkeleton from "@/components/panel/PanelSkeleton";
+import PanelModal from "@/components/panel/PanelModal";
+import StatusBadge from "@/components/panel/StatusBadge";
 
 export default function ResellerPayoutsPage() {
   const [summary, setSummary] = useState<ResellerWalletSummary | null>(null);
@@ -163,43 +165,6 @@ export default function ResellerPayoutsPage() {
     showToast("Copied to clipboard!", "success");
   };
 
-  const renderStatusBadge = (status: WithdrawalStatus) => {
-    switch (status) {
-      case "COMPLETED":
-        return (
-          <span className="badge badge-success text-white font-bold gap-1 text-xs py-2 px-3">
-            <CheckCircle2 size={13} /> Completed
-          </span>
-        );
-      case "PENDING":
-        return (
-          <span className="badge badge-warning text-white font-bold gap-1 text-xs py-2 px-3">
-            <Clock size={13} /> Pending Review
-          </span>
-        );
-      case "PROCESSING":
-        return (
-          <span className="badge badge-info text-white font-bold gap-1 text-xs py-2 px-3">
-            <RefreshCw size={13} className="animate-spin" /> Processing
-          </span>
-        );
-      case "REJECTED":
-        return (
-          <span className="badge badge-error text-white font-bold gap-1 text-xs py-2 px-3">
-            <XCircle size={13} /> Rejected
-          </span>
-        );
-      case "CANCELLED":
-        return (
-          <span className="badge badge-neutral text-xs font-semibold py-2 px-3">
-            Cancelled
-          </span>
-        );
-      default:
-        return <span className="badge text-xs">{status}</span>;
-    }
-  };
-
   const getMethodIcon = (method: PayoutMethod) => {
     switch (method) {
       case "BANK_TRANSFER":
@@ -212,7 +177,7 @@ export default function ResellerPayoutsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PanelPage>
       {/* Toast Alert */}
       {toastMessage && (
         <div className="toast toast-top toast-end z-50">
@@ -226,31 +191,26 @@ export default function ResellerPayoutsPage() {
         </div>
       )}
 
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold tracking-wider uppercase mb-1">
-            <Wallet size={16} /> Reseller Profit Payouts
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Withdrawals & Wallet</h1>
-          <p className="text-slate-300 text-sm mt-1 max-w-xl">
-            Request withdrawals for earned profits from completed orders, manage payout accounts, and review official transaction proof documents.
-          </p>
-        </div>
-
-        <button
-          onClick={handleOpenRequestModal}
-          disabled={!summary || summary.withdrawableBalance < 100}
-          className="btn btn-primary bg-emerald-500 hover:bg-emerald-600 border-none text-white font-bold gap-2 px-6 shadow-lg shadow-emerald-500/20"
-        >
-          <PlusCircle size={20} /> Request Payout
-        </button>
-      </div>
+      <PanelPageHeader
+        title="Withdrawals & Wallet"
+        subtitle="Request withdrawals for earned profits from completed orders, manage payout accounts, and review official transaction proof documents."
+        icon={Wallet}
+        actions={
+          <button
+            type="button"
+            onClick={handleOpenRequestModal}
+            disabled={!summary || summary.withdrawableBalance < 100}
+            className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+          >
+            <PlusCircle size={16} /> Request Payout
+          </button>
+        }
+      />
 
       {/* ─── WALLET BALANCE KPI METRIC CARDS ───────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Available Withdrawable Balance */}
-        <div className="card bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/80 p-5 shadow-sm">
+        <div className="rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/80 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
@@ -270,7 +230,7 @@ export default function ResellerPayoutsPage() {
         </div>
 
         {/* Total Lifetime Earned Profit */}
-        <div className="card bg-white border border-base-200 p-5 shadow-sm">
+        <div className="bg-base-100 rounded-2xl border border-base-200 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -290,7 +250,7 @@ export default function ResellerPayoutsPage() {
         </div>
 
         {/* Pending Withdrawals */}
-        <div className="card bg-white border border-base-200 p-5 shadow-sm">
+        <div className="bg-base-100 rounded-2xl border border-base-200 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
@@ -310,7 +270,7 @@ export default function ResellerPayoutsPage() {
         </div>
 
         {/* Total Paid Out */}
-        <div className="card bg-white border border-base-200 p-5 shadow-sm">
+        <div className="bg-base-100 rounded-2xl border border-base-200 p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -331,79 +291,78 @@ export default function ResellerPayoutsPage() {
       </div>
 
       {/* ─── WITHDRAWAL HISTORY SECTION ───────────────────────────── */}
-      <div className="card bg-base-100 border border-base-200 shadow-sm overflow-hidden">
+      <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden">
         {/* Table Filter Header */}
-        <div className="p-4 border-b border-base-200 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <h2 className="font-extrabold text-base text-base-content">Payout History</h2>
-            <span className="badge badge-sm badge-neutral font-mono">{withdrawals.length} records</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setPage(1);
-              }}
-              className="select select-sm select-bordered bg-base-100 text-base-content font-medium"
-            >
-              <option value="">All Statuses</option>
-              <option value="PENDING">Pending Review</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
-
+        <div className="p-4 border-b border-base-200 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <h2 className="font-extrabold text-base text-base-content">Payout History</h2>
+              <span className="badge badge-sm badge-neutral font-mono">{withdrawals.length} records</span>
+            </div>
             <button
+              type="button"
               onClick={loadData}
-              className="btn btn-sm btn-ghost btn-square"
+              className="btn btn-ghost btn-sm btn-square rounded-xl"
+              aria-label="Refresh payouts"
               title="Refresh"
             >
               <RefreshCw size={16} />
             </button>
           </div>
+
+          <PanelTabs
+            ariaLabel="Filter payouts by status"
+            value={statusFilter}
+            onChange={(id) => {
+              setStatusFilter(id);
+              setPage(1);
+            }}
+            tabs={[
+              { id: "", label: "All" },
+              { id: "PENDING", label: "Pending" },
+              { id: "COMPLETED", label: "Completed" },
+              { id: "REJECTED", label: "Rejected" },
+              { id: "CANCELLED", label: "Cancelled" },
+            ]}
+          />
         </div>
 
         {/* Table Content */}
         {loading ? (
-          <div className="p-12 text-center">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
-            <p className="text-xs text-base-content/60 mt-2 font-medium">Loading withdrawal history...</p>
+          <div className="p-4">
+            <PanelSkeleton variant="table" rows={6} />
           </div>
         ) : withdrawals.length === 0 ? (
-          <div className="p-12 text-center space-y-3">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-base-200 flex items-center justify-center text-base-content/40">
-              <Wallet size={28} />
-            </div>
-            <h3 className="font-bold text-base text-base-content">No withdrawal requests found</h3>
-            <p className="text-xs text-base-content/60 max-w-sm mx-auto">
-              You have not submitted any withdrawal requests yet. When you earn profit from delivered orders, you can withdraw funds here.
-            </p>
-            {summary && summary.withdrawableBalance >= 100 && (
-              <button
-                onClick={handleOpenRequestModal}
-                className="btn btn-sm btn-primary mt-2 gap-2"
-              >
-                <PlusCircle size={16} /> Request First Payout
-              </button>
-            )}
-          </div>
+          <PanelEmpty
+            icon={Wallet}
+            title="No withdrawal requests found"
+            text="You have not submitted any withdrawal requests yet. When you earn profit from delivered orders, you can withdraw funds here."
+            action={
+              summary && summary.withdrawableBalance >= 100 ? (
+                <button
+                  type="button"
+                  onClick={handleOpenRequestModal}
+                  className="btn btn-primary btn-sm rounded-xl gap-2"
+                >
+                  <PlusCircle size={16} /> Request First Payout
+                </button>
+              ) : undefined
+            }
+          />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="table w-full text-sm">
-              <thead className="bg-base-200/50 text-base-content font-bold text-xs uppercase">
-                <tr>
-                  <th>Date & Request ID</th>
-                  <th>Amount</th>
-                  <th>Payout Method</th>
-                  <th>Account Details</th>
-                  <th>Status</th>
-                  <th>Proof & Details</th>
-                  <th className="text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-base-200">
+          <PanelTable>
+            <thead>
+              <tr>
+                <th>Date & Request ID</th>
+                <th>Amount</th>
+                <th>Payout Method</th>
+                <th>Account Details</th>
+                <th>Status</th>
+                <th>Proof & Details</th>
+                <th className="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
                 {withdrawals.map((w) => (
                   <tr key={w.id} className="hover:bg-base-200/30 transition-colors">
                     <td>
@@ -439,7 +398,7 @@ export default function ResellerPayoutsPage() {
                       )}
                     </td>
 
-                    <td>{renderStatusBadge(w.status)}</td>
+                    <td><StatusBadge status={w.status} /></td>
 
                     <td>
                       {w.status === "COMPLETED" ? (
@@ -473,8 +432,7 @@ export default function ResellerPayoutsPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+          </PanelTable>
         )}
 
         {/* Pagination Footer */}
@@ -505,23 +463,37 @@ export default function ResellerPayoutsPage() {
 
       {/* ─── MODAL 1: REQUEST PAYOUT MODAL ─────────────────────────── */}
       {isRequestModalOpen && (
-        <div className="modal modal-open">
-          <div className="modal-box w-full max-w-lg bg-base-100 text-base-content p-4 sm:p-6 rounded-2xl shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-base-200 pb-3">
-              <div>
-                <h3 className="text-lg font-bold">Request Profit Payout</h3>
-                <p className="text-xs text-base-content/60">
-                  Withdraw earned profit to your payment account.
-                </p>
-              </div>
+        <PanelModal
+          open={isRequestModalOpen}
+          onClose={() => setIsRequestModalOpen(false)}
+          title="Request Profit Payout"
+          size="md"
+          footer={
+            <>
               <button
+                type="button"
                 onClick={() => setIsRequestModalOpen(false)}
-                className="btn btn-sm btn-circle btn-ghost"
+                className="btn btn-ghost btn-sm rounded-xl"
               >
-                ✕
+                Cancel
               </button>
-            </div>
-
+              <button
+                type="submit"
+                form="payout-request-form"
+                disabled={isSubmitting}
+                className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+              >
+                {isSubmitting ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  <PlusCircle size={16} />
+                )}
+                Submit Payout Request
+              </button>
+            </>
+          }
+        >
+          <div className="space-y-4">
             {/* Current Balance Banner */}
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-center justify-between">
               <div>
@@ -535,7 +507,7 @@ export default function ResellerPayoutsPage() {
               <span className="badge badge-success text-white text-xs font-bold">Live Wallet</span>
             </div>
 
-            <form onSubmit={handleSubmitRequest} className="space-y-4">
+            <form id="payout-request-form" onSubmit={handleSubmitRequest} className="space-y-4">
               {/* Amount Input */}
               <div className="form-control">
                 <label className="label font-bold text-xs uppercase tracking-wider text-base-content">
@@ -639,58 +611,29 @@ export default function ResellerPayoutsPage() {
                 />
               </div>
 
-              {/* Modal Actions */}
-              <div className="modal-action border-t border-base-200 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsRequestModalOpen(false)}
-                  className="btn btn-sm btn-ghost"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="btn btn-sm btn-primary px-6 gap-2"
-                >
-                  {isSubmitting ? (
-                    <span className="loading loading-spinner loading-xs"></span>
-                  ) : (
-                    <PlusCircle size={16} />
-                  )}
-                  Submit Payout Request
-                </button>
-              </div>
             </form>
           </div>
-        </div>
+        </PanelModal>
       )}
 
       {/* ─── MODAL 2: VIEW PROOF & TRANSACTION DETAILS MODAL ──────── */}
       {selectedProofWithdrawal && (
-        <div className="modal modal-open">
-          <div className="modal-box w-full max-w-lg bg-base-100 text-base-content p-4 sm:p-6 rounded-2xl shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-base-200 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
-                  <ShieldCheck size={20} />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold">Transaction Proof Document</h3>
-                  <p className="text-xs text-base-content/60">
-                    Disbursement confirmation details
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSelectedProofWithdrawal(null)}
-                className="btn btn-sm btn-circle btn-ghost"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3 text-sm">
+        <PanelModal
+          open={!!selectedProofWithdrawal}
+          onClose={() => setSelectedProofWithdrawal(null)}
+          title="Transaction Proof Document"
+          size="md"
+          footer={
+            <button
+              type="button"
+              onClick={() => setSelectedProofWithdrawal(null)}
+              className="btn btn-primary btn-sm rounded-xl"
+            >
+              Close
+            </button>
+          }
+        >
+          <div className="space-y-3 text-sm">
               {/* Amount & Method Summary */}
               <div className="bg-base-200/50 p-3.5 rounded-xl flex items-center justify-between">
                 <div>
@@ -778,18 +721,8 @@ export default function ResellerPayoutsPage() {
                 </span>
               </div>
             </div>
-
-            <div className="modal-action">
-              <button
-                onClick={() => setSelectedProofWithdrawal(null)}
-                className="btn btn-sm btn-primary w-full"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+        </PanelModal>
       )}
-    </div>
+    </PanelPage>
   );
 }

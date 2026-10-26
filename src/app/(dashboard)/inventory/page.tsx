@@ -1,5 +1,7 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   RefreshCw,
@@ -265,7 +267,7 @@ export default function InventoryPage() {
   });
 
   return (
-    <div className="p-6 w-full flex flex-col h-full bg-base-200 text-black relative space-y-6">
+    <div className="p-6 w-full flex flex-col h-full bg-base-200 text-base-content relative space-y-6">
       {/* Top Global Progress Bar */}
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 z-50">
@@ -278,7 +280,7 @@ export default function InventoryPage() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="toast toast-top toast-end z-50 animate-in fade-in slide-in-from-top-4">
+        <div className="toast toast-top toast-end z-50 animate-fade-in">
           <div className="alert alert-success text-white shadow-xl flex items-center gap-2 rounded-xl">
             <CheckCircle size={20} />
             <span className="font-semibold">{toastMessage}</span>
@@ -286,23 +288,15 @@ export default function InventoryPage() {
         </div>
       )}
 
-      {/* Top Header & Quick Action */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-black flex items-center gap-3 tracking-tight">
-            <div className="p-2.5 bg-primary/10 rounded-2xl text-primary border border-primary/20 shadow-sm">
-              <RefreshCw size={28} />
-            </div>
-            Inventory & Stock Control
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Real-time stock monitoring per size variant, purchase additions, and audit logging
-          </p>
-        </div>
+      <PanelPageHeader
+        title="Inventory & Stock Control"
+        subtitle="Real-time stock monitoring per size variant, purchase additions, and audit logging"
+        icon={RefreshCw}
+      />
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => exportInventoryStockToCSV(filteredProducts, "master_inventory_stock")}
-            className="btn btn-outline btn-success shadow-sm hover:shadow-success/30 transition-all gap-2 rounded-xl text-black hover:text-white font-bold"
+            className="btn btn-outline btn-success shadow-sm hover:shadow-success/30 transition-all gap-2 rounded-xl text-base-content hover:text-white font-bold"
             disabled={isLoading || products.length === 0}
             title="Download Complete 22-Column Inventory Master Stock CSV with Financials & Margins"
           >
@@ -316,12 +310,11 @@ export default function InventoryPage() {
             <Plus size={20} /> Adjust Stock
           </button>
         </div>
-      </div>
 
       {/* RICH METRIC SUMMARY CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Stock */}
-        <div className="bg-white p-5 rounded-2xl border border-base-300 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
+        <div className="bg-base-100 p-5 rounded-2xl border border-base-300 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
           <div className="p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
             <Boxes size={26} />
           </div>
@@ -329,7 +322,7 @@ export default function InventoryPage() {
             <div className="text-xs font-bold uppercase tracking-wider text-gray-500">
               Total Store Stock
             </div>
-            <div className="text-2xl font-extrabold text-black mt-0.5">
+            <div className="text-2xl font-extrabold text-base-content mt-0.5">
               {totalStoreStock.toLocaleString()}{" "}
               <span className="text-xs font-normal text-gray-500">Units</span>
             </div>
@@ -337,7 +330,7 @@ export default function InventoryPage() {
         </div>
 
         {/* Active Products */}
-        <div className="bg-white p-5 rounded-2xl border border-base-300 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
+        <div className="bg-base-100 p-5 rounded-2xl border border-base-300 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
           <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100">
             <Package size={26} />
           </div>
@@ -345,14 +338,14 @@ export default function InventoryPage() {
             <div className="text-xs font-bold uppercase tracking-wider text-gray-500">
               Active Products
             </div>
-            <div className="text-2xl font-extrabold text-black mt-0.5">
+            <div className="text-2xl font-extrabold text-base-content mt-0.5">
               {products.length} <span className="text-xs font-normal text-gray-500">Items</span>
             </div>
           </div>
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="bg-white p-5 rounded-2xl border border-base-300 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
+        <div className="bg-base-100 p-5 rounded-2xl border border-base-300 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
           <div className="p-3.5 bg-amber-50 text-amber-600 rounded-2xl border border-amber-100">
             <AlertTriangle size={26} />
           </div>
@@ -367,7 +360,7 @@ export default function InventoryPage() {
         </div>
 
         {/* Inventory Value */}
-        <div className="bg-white p-5 rounded-2xl border border-base-300 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
+        <div className="bg-base-100 p-5 rounded-2xl border border-base-300 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
           <div className="p-3.5 bg-violet-50 text-violet-600 rounded-2xl border border-violet-100">
             <TrendingUp size={26} />
           </div>
@@ -383,13 +376,13 @@ export default function InventoryPage() {
       </div>
 
       {/* MAIN CONTENT AREA */}
-      <div className="bg-white rounded-2xl shadow-sm border border-base-300 overflow-hidden flex flex-col">
+      <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300 overflow-hidden flex flex-col">
         {/* Navigation Tabs */}
         <div className="bg-base-100 p-3 border-b border-base-300 flex flex-wrap justify-between items-center gap-3">
           <div className="flex gap-2">
             <button
               className={`btn btn-sm rounded-xl font-semibold gap-2 ${
-                activeTab === "overview" ? "btn-primary text-white shadow" : "btn-ghost text-black"
+                activeTab === "overview" ? "btn-primary text-white shadow" : "btn-ghost text-base-content"
               }`}
               onClick={() => setActiveTab("overview")}
             >
@@ -397,7 +390,7 @@ export default function InventoryPage() {
             </button>
             <button
               className={`btn btn-sm rounded-xl font-semibold gap-2 ${
-                activeTab === "history" ? "btn-primary text-white shadow" : "btn-ghost text-black"
+                activeTab === "history" ? "btn-primary text-white shadow" : "btn-ghost text-base-content"
               }`}
               onClick={() => setActiveTab("history")}
             >
@@ -405,7 +398,7 @@ export default function InventoryPage() {
             </button>
             <button
               className={`btn btn-sm rounded-xl font-semibold gap-2 ${
-                activeTab === "low-stock" ? "btn-primary text-white shadow" : "btn-ghost text-black"
+                activeTab === "low-stock" ? "btn-primary text-white shadow" : "btn-ghost text-base-content"
               }`}
               onClick={() => setActiveTab("low-stock")}
             >
@@ -424,7 +417,7 @@ export default function InventoryPage() {
                 <input
                   type="text"
                   placeholder="Search products by name..."
-                  className="input input-bordered input-sm w-full pl-10 bg-white text-black rounded-xl"
+                  className="input input-bordered input-sm w-full pl-10 bg-base-100 text-base-content rounded-xl"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -433,7 +426,7 @@ export default function InventoryPage() {
               <div className="flex items-center gap-2">
                 <Filter size={16} className="text-gray-500" />
                 <select
-                  className="select select-bordered select-sm bg-white text-black rounded-xl"
+                  className="select select-bordered select-sm bg-base-100 text-base-content rounded-xl"
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
                 >
@@ -446,7 +439,7 @@ export default function InventoryPage() {
                 </select>
 
                 <select
-                  className="select select-bordered select-sm bg-white text-black rounded-xl"
+                  className="select select-bordered select-sm bg-base-100 text-base-content rounded-xl"
                   value={stockStatusFilter}
                   onChange={(e) => setStockStatusFilter(e.target.value)}
                 >
@@ -472,7 +465,7 @@ export default function InventoryPage() {
             <div className="overflow-x-auto">
               <table className="table w-full border-collapse">
                 <thead>
-                  <tr className="bg-base-200/70 text-black text-xs uppercase tracking-wider">
+                  <tr className="bg-base-200/70 text-base-content text-xs uppercase tracking-wider">
                     <th className="py-3 px-4 font-bold">Product Item</th>
                     <th className="py-3 px-4 font-bold">Category / Brand</th>
                     <th className="py-3 px-4 font-bold text-center">Stock Breakdown Per Size</th>
@@ -536,7 +529,7 @@ export default function InventoryPage() {
                                   )}
                                 </div>
                                 <div>
-                                  <div className="font-bold text-black text-sm hover:text-primary transition-colors">
+                                  <div className="font-bold text-base-content text-sm hover:text-primary transition-colors">
                                     {p.name}
                                   </div>
                                   <div className="text-xs text-gray-500 mt-0.5">
@@ -549,7 +542,7 @@ export default function InventoryPage() {
 
                             {/* Category & Brand */}
                             <td className="py-4 px-4">
-                              <div className="text-sm font-semibold text-black">
+                              <div className="text-sm font-semibold text-base-content">
                                 {p.category?.name || "Uncategorized"}
                               </div>
                               <div className="text-xs text-gray-500">
@@ -574,7 +567,7 @@ export default function InventoryPage() {
                                             ? "bg-rose-50 text-rose-700 border-rose-200"
                                             : isInvLow
                                             ? "bg-amber-50 text-amber-700 border-amber-200"
-                                            : "bg-base-200 text-black border-base-300"
+                                            : "bg-base-200 text-base-content border-base-300"
                                         }`}
                                       >
                                         {sizeLabel}: <strong>{inv.currentStock}</strong>
@@ -657,7 +650,7 @@ export default function InventoryPage() {
                               <td colSpan={6} className="bg-base-200/50 p-5 border-t border-b border-base-300">
                                 <div className="space-y-4">
                                   <div className="flex items-center justify-between">
-                                    <h4 className="font-bold text-sm text-black flex items-center gap-2">
+                                    <h4 className="font-bold text-sm text-base-content flex items-center gap-2">
                                       <Layers size={16} className="text-primary" /> Size-wise Inventory Breakdown & Costs
                                     </h4>
                                     <span className="text-xs text-gray-600 font-medium">
@@ -686,10 +679,10 @@ export default function InventoryPage() {
                                         return (
                                           <div
                                             key={inv.id}
-                                            className="bg-white p-4 rounded-xl border border-base-300 shadow-sm flex flex-col justify-between space-y-3"
+                                            className="bg-base-100 p-4 rounded-xl border border-base-300 shadow-sm flex flex-col justify-between space-y-3"
                                           >
                                             <div className="flex justify-between items-center border-b pb-2">
-                                              <span className="font-extrabold text-black text-sm">
+                                              <span className="font-extrabold text-base-content text-sm">
                                                 Size: {sizeName}
                                               </span>
                                               <span
@@ -708,7 +701,7 @@ export default function InventoryPage() {
                                             <div className="text-xs text-gray-600 space-y-1.5">
                                               <div className="flex justify-between">
                                                 <span>Unit Purchase Price:</span>
-                                                <strong className="text-black">
+                                                <strong className="text-base-content">
                                                   ৳{Number(p.purchasePrice || 0).toFixed(2)}
                                                 </strong>
                                               </div>
@@ -781,7 +774,7 @@ export default function InventoryPage() {
             <div className="overflow-x-auto">
               <table className="table w-full">
                 <thead>
-                  <tr className="bg-base-200/70 text-black text-xs uppercase tracking-wider">
+                  <tr className="bg-base-200/70 text-base-content text-xs uppercase tracking-wider">
                     <th className="py-3 px-4 font-bold">Date & Time</th>
                     <th className="py-3 px-4 font-bold">Type & Purpose</th>
                     <th className="py-3 px-4 font-bold">Product / Size</th>
@@ -818,13 +811,13 @@ export default function InventoryPage() {
                                   <ArrowDownLeft size={14} /> STOCK OUT
                                 </span>
                               )}
-                              <span className="px-2 py-0.5 text-xs font-bold rounded-md bg-base-200 text-black border uppercase">
+                              <span className="px-2 py-0.5 text-xs font-bold rounded-md bg-base-200 text-base-content border uppercase">
                                 {tx.purpose}
                               </span>
                             </div>
                           </td>
                           <td className="py-3.5 px-4">
-                            <div className="font-semibold text-black text-sm">
+                            <div className="font-semibold text-base-content text-sm">
                               {tx.inventory?.product?.name || "Product"}
                             </div>
                             {sizeName && (
@@ -838,12 +831,12 @@ export default function InventoryPage() {
                           </td>
                           <td className="py-3.5 px-4 text-center text-sm font-mono">
                             <span className="text-gray-500">{tx.stockBefore}</span> &rarr;{" "}
-                            <strong className="text-black font-bold">{tx.stockAfter}</strong>
+                            <strong className="text-base-content font-bold">{tx.stockAfter}</strong>
                           </td>
                           <td className="py-3.5 px-4">
                             <div className="text-xs text-gray-700">
                               {tx.reference ? (
-                                <span className="font-bold text-black">Ref: {tx.reference}</span>
+                                <span className="font-bold text-base-content">Ref: {tx.reference}</span>
                               ) : (
                                 <span className="text-gray-400 italic">No Reference</span>
                               )}
@@ -883,7 +876,7 @@ export default function InventoryPage() {
             <div className="overflow-x-auto">
               <table className="table w-full">
                 <thead>
-                  <tr className="bg-base-200/70 text-black text-xs uppercase tracking-wider">
+                  <tr className="bg-base-200/70 text-base-content text-xs uppercase tracking-wider">
                     <th className="py-3 px-4 font-bold">Product Item</th>
                     <th className="py-3 px-4 font-bold">Size</th>
                     <th className="py-3 px-4 font-bold text-center">Current Stock</th>
@@ -901,7 +894,7 @@ export default function InventoryPage() {
                 ) : (
                   lowStockItems.map((item: any, idx) => (
                     <tr key={idx} className="hover:bg-base-100/80">
-                      <td className="py-3.5 px-4 font-bold text-black">
+                      <td className="py-3.5 px-4 font-bold text-base-content">
                         {item.product?.name || item.productName || "N/A"}
                       </td>
                       <td className="py-3.5 px-4 text-sm">
@@ -936,11 +929,11 @@ export default function InventoryPage() {
       {/* STOCK ADJUSTMENT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col relative animate-in zoom-in-95 duration-150 overflow-hidden border border-base-300">
+          <div className="bg-base-100 rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col relative animate-scale-in duration-150 overflow-hidden border border-base-300">
             {/* Header */}
             <div className="p-6 border-b border-base-200 flex justify-between items-center bg-base-100">
               <div>
-                <h2 className="text-xl font-bold text-black flex items-center gap-2">
+                <h2 className="text-xl font-bold text-base-content flex items-center gap-2">
                   <RefreshCw className="text-primary" size={24} /> Stock Adjustment Form
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">
@@ -949,7 +942,7 @@ export default function InventoryPage() {
               </div>
               <button
                 onClick={handleCloseModal}
-                className="btn btn-ghost btn-circle btn-sm text-black"
+                className="btn btn-ghost btn-circle btn-sm text-base-content"
                 disabled={isSubmitting}
               >
                 <X size={20} />
@@ -961,15 +954,15 @@ export default function InventoryPage() {
               {isSubmitting && (
                 <div className="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center gap-3">
                   <Loader2 className="animate-spin text-primary" size={36} />
-                  <p className="font-bold text-black">Executing Serializable Transaction...</p>
+                  <p className="font-bold text-base-content">Executing Serializable Transaction...</p>
                 </div>
               )}
 
               {/* Product Selection */}
               <div className="form-control">
-                <label className="label font-semibold text-black">Select Product *</label>
+                <label className="label font-semibold text-base-content">Select Product *</label>
                 <select
-                  className="select select-bordered w-full bg-white text-black rounded-xl"
+                  className="select select-bordered w-full bg-base-100 text-base-content rounded-xl"
                   value={selectedProductId}
                   onChange={(e) => setSelectedProductId(e.target.value)}
                   required
@@ -988,7 +981,7 @@ export default function InventoryPage() {
               {/* Product Size Inventory Selection */}
               {selectedProductId && (
                 <div className="form-control">
-                  <label className="label font-semibold text-black">Product Size / Variant</label>
+                  <label className="label font-semibold text-base-content">Product Size / Variant</label>
                   {isLoadingInventories ? (
                     <div className="flex items-center gap-2 text-sm text-gray-500 py-2">
                       <Loader2 className="animate-spin" size={16} /> Loading size inventories...
@@ -999,7 +992,7 @@ export default function InventoryPage() {
                     </div>
                   ) : (
                     <select
-                      className="select select-bordered w-full bg-white text-black rounded-xl"
+                      className="select select-bordered w-full bg-base-100 text-base-content rounded-xl"
                       value={formData.productSizeId}
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, productSizeId: e.target.value }))
@@ -1021,7 +1014,7 @@ export default function InventoryPage() {
                 <div className="bg-base-100 p-3.5 rounded-xl border border-base-300 flex justify-between items-center text-sm">
                   <div>
                     <span className="text-gray-500 block text-xs font-semibold">Current Stock</span>
-                    <strong className="text-lg text-black">{selectedInventory.currentStock} units</strong>
+                    <strong className="text-lg text-base-content">{selectedInventory.currentStock} units</strong>
                   </div>
                   <div className="text-right">
                     <span className="text-gray-500 block text-xs font-semibold">Purchase Price (Valuation Unit)</span>
@@ -1034,7 +1027,7 @@ export default function InventoryPage() {
 
               {/* Stock Mutation Type Toggle Buttons */}
               <div className="form-control">
-                <label className="label font-semibold text-black">Adjustment Type *</label>
+                <label className="label font-semibold text-base-content">Adjustment Type *</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -1042,7 +1035,7 @@ export default function InventoryPage() {
                     className={`btn rounded-xl flex items-center justify-center gap-2 ${
                       formData.stockType === "STOCK_IN"
                         ? "btn-success text-white shadow-md"
-                        : "btn-outline text-black bg-white"
+                        : "btn-outline text-base-content bg-base-100"
                     }`}
                   >
                     <TrendingUp size={18} /> STOCK IN (+)
@@ -1054,7 +1047,7 @@ export default function InventoryPage() {
                     className={`btn rounded-xl flex items-center justify-center gap-2 ${
                       formData.stockType === "STOCK_OUT"
                         ? "btn-error text-white shadow-md"
-                        : "btn-outline text-black bg-white"
+                        : "btn-outline text-base-content bg-base-100"
                     }`}
                   >
                     <TrendingDown size={18} /> STOCK OUT (-)
@@ -1064,9 +1057,9 @@ export default function InventoryPage() {
 
               {/* Transaction Purpose */}
               <div className="form-control">
-                <label className="label font-semibold text-black">Purpose *</label>
+                <label className="label font-semibold text-base-content">Purpose *</label>
                 <select
-                  className="select select-bordered w-full bg-white text-black rounded-xl"
+                  className="select select-bordered w-full bg-base-100 text-base-content rounded-xl"
                   value={formData.purpose}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -1092,11 +1085,11 @@ export default function InventoryPage() {
 
               {/* Quantity Input */}
               <div className="form-control">
-                <label className="label font-semibold text-black">Transaction Quantity *</label>
+                <label className="label font-semibold text-base-content">Transaction Quantity *</label>
                 <input
                   type="number"
                   min="1"
-                  className="input input-bordered w-full bg-white text-black rounded-xl"
+                  className="input input-bordered w-full bg-base-100 text-base-content rounded-xl"
                   value={formData.transactionQuantity}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -1110,13 +1103,13 @@ export default function InventoryPage() {
 
               {/* Reference */}
               <div className="form-control">
-                <label className="label font-semibold text-black">
+                <label className="label font-semibold text-base-content">
                   Reference / Invoice # <span className="text-xs text-gray-400 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. PO-2026-0042 or INV-9912"
-                  className="input input-bordered w-full bg-white text-black rounded-xl"
+                  className="input input-bordered w-full bg-base-100 text-base-content rounded-xl"
                   value={formData.reference}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, reference: e.target.value }))
@@ -1126,12 +1119,12 @@ export default function InventoryPage() {
 
               {/* Notes */}
               <div className="form-control">
-                <label className="label font-semibold text-black">
+                <label className="label font-semibold text-base-content">
                   Notes <span className="text-xs text-gray-400 font-normal">(Optional)</span>
                 </label>
                 <textarea
                   placeholder="Additional stock notes or comments..."
-                  className="textarea textarea-bordered w-full h-20 bg-white text-black rounded-xl"
+                  className="textarea textarea-bordered w-full h-20 bg-base-100 text-base-content rounded-xl"
                   value={formData.notes}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, notes: e.target.value }))
@@ -1143,7 +1136,7 @@ export default function InventoryPage() {
               <div className="pt-4 border-t border-base-200 flex justify-end gap-3">
                 <button
                   type="button"
-                  className="btn btn-ghost text-black rounded-xl"
+                  className="btn btn-ghost text-base-content rounded-xl"
                   onClick={handleCloseModal}
                   disabled={isSubmitting}
                 >

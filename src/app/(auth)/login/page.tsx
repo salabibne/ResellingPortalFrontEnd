@@ -83,7 +83,7 @@ function LoginForm() {
                 <input
                   type="email"
                   placeholder="email@example.com"
-                  className={`input text-black input-bordered w-full ${
+                  className={`input text-base-content input-bordered w-full ${
                     errors.email ? "input-error" : ""
                   }`}
                   {...register("email")}
@@ -104,7 +104,7 @@ function LoginForm() {
                 <input
                   type="password"
                   placeholder="********"
-                  className={`input input-bordered text-black w-full ${
+                  className={`input input-bordered text-base-content w-full ${
                     errors.password ? "input-error" : ""
                   }`}
                   {...register("password")}

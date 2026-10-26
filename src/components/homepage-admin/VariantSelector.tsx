@@ -39,10 +39,10 @@ export default function VariantSelector({ section, onChange }: VariantSelectorPr
               key={variant.id}
               type="button"
               onClick={() => onChange(variant.id)}
-              className={`rounded-xl border p-1.5 text-left transition-all ${
+              className={`rounded-xl border p-1.5 text-left transition-colors ${
                 selected
-                  ? "border-primary ring-2 ring-primary/40 bg-primary/5"
-                  : "border-base-200 hover:border-primary/40"
+                  ? "border-primary bg-primary/5"
+                  : "border-base-200 hover:border-primary/40 hover:bg-base-200/60"
               }`}
               aria-pressed={selected}
             >

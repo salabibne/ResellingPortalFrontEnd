@@ -71,7 +71,7 @@ export default function HomeProductsSection({
 
         <Link
           href={safeLink(buttonLink, "/shop")}
-          className="btn btn-sm sm:btn-md btn-outline btn-primary rounded-xl gap-2 font-bold self-start md:self-auto shrink-0 shadow-xs"
+          className="btn btn-sm sm:btn-md btn-outline btn-primary rounded-xl gap-2 font-bold self-start md:self-auto shrink-0 shadow-sm"
         >
           <span>{buttonText}</span>
           <ArrowRight size={16} />

@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Plus, Edit2, Trash2, X, Loader2, AlertCircle, CheckCircle, ExternalLink, RefreshCw } from "lucide-react";
 import cmsApi, { CMSModuleType, CommonStatus } from "@/services/cms.api";
+import PanelCard from "@/components/panel/PanelCard";
+import PanelModal from "@/components/panel/PanelModal";
 
 export type FieldFieldType = "text" | "textarea" | "email" | "url" | "select";
 
@@ -282,34 +284,36 @@ export default function CmsManager({ module, onSaved }: Props) {
   };
 
   return (
-    <div className="w-full flex flex-col gap-6 text-black">
+    <div className="w-full flex flex-col gap-6">
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-base-100 p-6 rounded-2xl shadow-sm border border-base-300">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-black flex items-center gap-2">
-            {config.title}
-          </h1>
-          <p className="text-sm text-base-content/70 mt-1">{config.description}</p>
+      <PanelCard>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-base-content">{config.title}</h2>
+            <p className="text-sm text-base-content/60 mt-1">{config.description}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={fetchRecords}
+              className="btn btn-ghost btn-sm rounded-xl gap-2"
+              title="Refresh Data"
+              disabled={isLoading}
+            >
+              <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
+              Refresh
+            </button>
+            <button
+              type="button"
+              onClick={(e) => handleOpenForm(null, e)}
+              className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+              disabled={isLoading}
+            >
+              <Plus size={16} /> Add Entry
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={fetchRecords}
-            className="btn btn-ghost btn-sm gap-2"
-            title="Refresh Data"
-            disabled={isLoading}
-          >
-            <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
-            Refresh
-          </button>
-          <button
-            onClick={(e) => handleOpenForm(null, e)}
-            className="btn btn-primary gap-2"
-            disabled={isLoading}
-          >
-            <Plus size={18} /> Add Entry
-          </button>
-        </div>
-      </div>
+      </PanelCard>
 
       {/* Feedback Alerts */}
       {feedback && (
@@ -333,7 +337,7 @@ export default function CmsManager({ module, onSaved }: Props) {
         <div className="overflow-x-auto">
           <table className="table w-full">
             <thead>
-              <tr className="bg-base-200 text-black font-bold">
+              <tr className="bg-base-200 text-base-content font-bold">
                 <th className="w-12">#</th>
                 {config.fields.map((f) => (
                   <th key={f.name} className="whitespace-nowrap">{f.label}</th>
@@ -362,7 +366,7 @@ export default function CmsManager({ module, onSaved }: Props) {
               ) : (
                 records.map((record, index) => (
                   <tr key={record.id || index} className="hover:bg-base-200/50 transition-colors border-b">
-                    <td className="font-semibold text-black/70">{index + 1}</td>
+                    <td className="font-semibold text-base-content/70">{index + 1}</td>
                     {config.fields.map((f) => {
                       const val = record[f.name];
                       const isUrl = f.type === "url" || (typeof val === "string" && val.startsWith("http"));
@@ -430,127 +434,123 @@ export default function CmsManager({ module, onSaved }: Props) {
 
       {/* Creation / Edit Form Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-base-100 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative animate-in zoom-in-95 duration-150 overflow-hidden">
-            {/* Modal Header (Pinned) */}
-            <div className="p-6 pb-4 border-b border-base-200 shrink-0 relative">
+        <PanelModal
+          open={isFormOpen}
+          onClose={handleCloseForm}
+          title={currentRecord ? `Edit ${config.title}` : `Create ${config.title}`}
+          size="lg"
+          footer={
+            <>
               <button
                 type="button"
+                className="btn btn-ghost btn-sm rounded-xl"
                 onClick={handleCloseForm}
-                className="btn btn-ghost btn-sm btn-circle absolute top-5 right-5"
                 disabled={isSubmitting}
               >
-                <X size={20} />
+                Cancel
               </button>
-              <h2 className="text-2xl font-bold text-black pr-10">
-                {currentRecord ? `Edit ${config.title}` : `Create ${config.title}`}
-              </h2>
-              <p className="text-xs text-base-content/60 mt-1">
-                Fill out the required fields below. Click save to publish changes.
-              </p>
+              <button
+                type="submit"
+                form="cms-entry-form"
+                className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <Loader2 className="animate-spin" size={16} />
+                ) : currentRecord ? (
+                  "Update Entry"
+                ) : (
+                  "Create Entry"
+                )}
+              </button>
+            </>
+          }
+        >
+          <form id="cms-entry-form" onSubmit={handleSave} className="flex flex-col gap-4">
+            <p className="text-xs text-base-content/60 -mt-1">
+              Fill out the required fields below. Click save to publish changes.
+            </p>
+            {config.fields.map((field) => (
+              <div className="form-control w-full" key={field.name}>
+                <label className="label py-1">
+                  <span className="label-text font-semibold text-base-content">
+                    {field.label} {field.required && <span className="text-error">*</span>}
+                  </span>
+                </label>
+                {field.type === "textarea" ? (
+                  <textarea
+                    className="textarea textarea-bordered w-full"
+                    rows={3}
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ""}
+                    onChange={(e) => handleInputChange(field.name, e.target.value)}
+                    required={field.required}
+                  />
+                ) : (
+                  <input
+                    type={field.type === "url" ? "text" : field.type}
+                    className="input input-bordered w-full"
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || ""}
+                    onChange={(e) => handleInputChange(field.name, e.target.value)}
+                    required={field.required}
+                  />
+                )}
+              </div>
+            ))}
+
+            {/* Status Select */}
+            <div className="form-control w-full">
+              <label className="label py-1">
+                <span className="label-text font-semibold text-base-content">Status</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={formData.status || "ACTIVE"}
+                onChange={(e) => handleInputChange("status", e.target.value)}
+                required
+              >
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="PENDING">PENDING</option>
+                <option value="DEACTIVATED">DEACTIVATED</option>
+              </select>
             </div>
-
-            {/* Modal Body & Footer */}
-            <form onSubmit={handleSave} className="flex flex-col flex-1 overflow-hidden">
-              <div className="p-6 flex-1 overflow-y-auto flex flex-col gap-4">
-                {config.fields.map((field) => (
-                  <div className="form-control w-full" key={field.name}>
-                    <label className="label py-1">
-                      <span className="label-text font-semibold text-black">
-                        {field.label} {field.required && <span className="text-error">*</span>}
-                      </span>
-                    </label>
-                    {field.type === "textarea" ? (
-                      <textarea
-                        className="textarea textarea-bordered w-full text-black bg-white focus:textarea-primary"
-                        rows={3}
-                        placeholder={field.placeholder}
-                        value={formData[field.name] || ""}
-                        onChange={(e) => handleInputChange(field.name, e.target.value)}
-                        required={field.required}
-                      />
-                    ) : (
-                      <input
-                        type={field.type === "url" ? "text" : field.type}
-                        className="input input-bordered w-full text-black bg-white focus:input-primary"
-                        placeholder={field.placeholder}
-                        value={formData[field.name] || ""}
-                        onChange={(e) => handleInputChange(field.name, e.target.value)}
-                        required={field.required}
-                      />
-                    )}
-                  </div>
-                ))}
-
-                {/* Status Select */}
-                <div className="form-control w-full">
-                  <label className="label py-1">
-                    <span className="label-text font-semibold text-black">Status</span>
-                  </label>
-                  <select
-                    className="select select-bordered w-full text-black bg-white focus:select-primary"
-                    value={formData.status || "ACTIVE"}
-                    onChange={(e) => handleInputChange("status", e.target.value)}
-                    required
-                  >
-                    <option value="ACTIVE">ACTIVE</option>
-                    <option value="PENDING">PENDING</option>
-                    <option value="DEACTIVATED">DEACTIVATED</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Modal Footer (Pinned) */}
-              <div className="p-4 px-6 border-t border-base-200 bg-base-200/40 flex gap-3 justify-end shrink-0">
-                <button
-                  type="button"
-                  className="btn btn-ghost text-black"
-                  onClick={handleCloseForm}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary px-8" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <Loader2 className="animate-spin" size={18} />
-                  ) : currentRecord ? (
-                    "Update Entry"
-                  ) : (
-                    "Create Entry"
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+          </form>
+        </PanelModal>
       )}
 
       {/* Delete Confirmation Modal */}
       {deleteTargetId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-base-100 rounded-2xl shadow-2xl p-6 w-full max-w-md animate-in zoom-in-95 duration-150">
-            <h3 className="text-xl font-bold text-black mb-2">Confirm Deletion</h3>
-            <p className="text-sm text-base-content/70 mb-6">
-              Are you sure you want to delete this {config.title} entry? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-3">
+        <PanelModal
+          open={!!deleteTargetId}
+          onClose={() => setDeleteTargetId(null)}
+          title="Confirm Deletion"
+          size="sm"
+          footer={
+            <>
               <button
-                className="btn btn-ghost"
+                type="button"
+                className="btn btn-ghost btn-sm rounded-xl"
                 onClick={() => setDeleteTargetId(null)}
                 disabled={isSubmitting}
               >
                 Cancel
               </button>
               <button
-                className="btn btn-error text-white"
+                type="button"
+                className="btn btn-error btn-sm rounded-xl gap-2 text-white"
                 onClick={handleDeleteConfirm}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : "Delete"}
+                {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : "Delete"}
               </button>
-            </div>
-          </div>
-        </div>
+            </>
+          }
+        >
+          <p className="text-sm text-base-content/70">
+            Are you sure you want to delete this {config.title} entry? This action cannot be undone.
+          </p>
+        </PanelModal>
       )}
     </div>
   );

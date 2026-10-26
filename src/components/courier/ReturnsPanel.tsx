@@ -19,7 +19,7 @@ import {
 } from "@/services/order.api";
 
 const STATUS_STYLES: Record<string, string> = {
-  pending: "badge-warning text-slate-900",
+  pending: "badge-warning text-base-content",
   approved: "badge-info text-white",
   processing: "badge-info text-white",
   completed: "badge-success text-white",
@@ -177,11 +177,11 @@ export default function ReturnsPanel({ onReturnCreated }: ReturnsPanelProps) {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4"
+          className="bg-base-100 p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4"
         >
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <h2 className="text-base font-extrabold text-base-content flex items-center gap-2">
                 <RotateCcw size={18} className="text-primary" /> New Return Request
               </h2>
               <p className="text-[11px] text-slate-500 mt-0.5">
@@ -206,7 +206,7 @@ export default function ReturnsPanel({ onReturnCreated }: ReturnsPanelProps) {
               <select
                 value={selectedOrderId}
                 onChange={(e) => setSelectedOrderId(e.target.value)}
-                className="select select-sm select-bordered w-full rounded-xl text-slate-900"
+                className="select select-sm select-bordered w-full rounded-xl text-base-content"
                 required
               >
                 <option value="">
@@ -241,7 +241,7 @@ export default function ReturnsPanel({ onReturnCreated }: ReturnsPanelProps) {
                 rows={2}
                 maxLength={500}
                 placeholder="Why is this parcel being returned?"
-                className="textarea textarea-bordered w-full rounded-xl text-slate-900"
+                className="textarea textarea-bordered w-full rounded-xl text-base-content"
               />
             </div>
           </div>
@@ -271,10 +271,10 @@ export default function ReturnsPanel({ onReturnCreated }: ReturnsPanelProps) {
         </form>
       )}
 
-      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="bg-base-100 rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+            <h2 className="text-sm font-extrabold text-base-content flex items-center gap-2">
               <RotateCcw size={16} className="text-primary" /> Steadfast Return Requests
             </h2>
             <p className="text-[11px] text-slate-500 mt-0.5">

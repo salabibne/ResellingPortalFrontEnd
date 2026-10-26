@@ -88,7 +88,7 @@ export default function TeamSection({ title: overrideTitle, description: overrid
                 <div className="relative bg-base-200/60 rounded-xl p-3.5 sm:p-4 border border-base-300/60 mt-2">
                   <Quote
                     size={18}
-                    className="text-primary/40 absolute -top-2.5 -left-2.5 bg-base-100 rounded-full p-0.5 border border-base-300 shadow-xs"
+                    className="text-primary/40 absolute -top-2.5 -left-2.5 bg-base-100 rounded-full p-0.5 border border-base-300 shadow-sm"
                   />
                   <p className="text-xs sm:text-sm text-base-content/80 italic leading-relaxed pt-1">
                     &ldquo;{member.message}&rdquo;

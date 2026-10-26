@@ -188,9 +188,9 @@ export default function PickupsPanel() {
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
         <form
           onSubmit={handleSubmit}
-          className="xl:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4"
+          className="xl:col-span-2 bg-base-100 p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4"
         >
-          <h2 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+          <h2 className="text-base font-extrabold text-base-content border-b border-slate-100 pb-3 flex items-center gap-2">
             <PackageCheck size={18} className="text-primary" /> New Pickup Request
           </h2>
 
@@ -204,7 +204,7 @@ export default function PickupsPanel() {
                 onChange={(e) => setAddress(e.target.value)}
                 rows={2}
                 placeholder="Warehouse / pickup address"
-                className="textarea textarea-bordered w-full rounded-xl text-slate-900"
+                className="textarea textarea-bordered w-full rounded-xl text-base-content"
                 required
               />
             </div>
@@ -219,7 +219,7 @@ export default function PickupsPanel() {
                   value={contactNumber}
                   onChange={(e) => setContactNumber(e.target.value)}
                   placeholder="01XXXXXXXXX"
-                  className="input input-sm input-bordered w-full rounded-xl text-slate-900"
+                  className="input input-sm input-bordered w-full rounded-xl text-base-content"
                   required
                 />
               </div>
@@ -234,7 +234,7 @@ export default function PickupsPanel() {
                   value={estimQty}
                   onChange={(e) => setEstimQty(e.target.value)}
                   placeholder="e.g. 20"
-                  className="input input-sm input-bordered w-full rounded-xl text-slate-900"
+                  className="input input-sm input-bordered w-full rounded-xl text-base-content"
                 />
               </div>
             </div>
@@ -257,7 +257,7 @@ export default function PickupsPanel() {
               <select
                 value={policeStationId}
                 onChange={(e) => setPoliceStationId(e.target.value)}
-                className="select select-sm select-bordered w-full rounded-xl text-slate-900"
+                className="select select-sm select-bordered w-full rounded-xl text-base-content"
               >
                 <option value="">Select police station (optional)</option>
                 {stations.map((station) => (
@@ -278,7 +278,7 @@ export default function PickupsPanel() {
                 value={addressId}
                 onChange={(e) => setAddressId(e.target.value)}
                 placeholder="Steadfast saved address ID (optional)"
-                className="input input-sm input-bordered w-full rounded-xl text-slate-900"
+                className="input input-sm input-bordered w-full rounded-xl text-base-content"
               />
             </div>
 
@@ -291,7 +291,7 @@ export default function PickupsPanel() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Pickup instructions"
-                className="input input-sm input-bordered w-full rounded-xl text-slate-900"
+                className="input input-sm input-bordered w-full rounded-xl text-base-content"
               />
             </div>
           </div>
@@ -310,9 +310,9 @@ export default function PickupsPanel() {
           </button>
         </form>
 
-        <div className="xl:col-span-3 bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="xl:col-span-3 bg-base-100 rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+            <h2 className="text-sm font-extrabold text-base-content flex items-center gap-2">
               <MapPin size={16} className="text-primary" /> Pickup History
             </h2>
             <button

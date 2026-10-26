@@ -8,11 +8,11 @@ import {
   Check,
   Package,
   ArrowRight,
-  Sparkles,
-  Tag,
-  Layers,
-  Filter,
 } from "lucide-react";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelEmpty from "@/components/panel/PanelEmpty";
+import PanelSkeleton from "@/components/panel/PanelSkeleton";
 import { productApi, Product } from "@/services/product.api";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
 
@@ -84,7 +84,11 @@ export default function ResellerProductsPage() {
 
   // Extract unique categories
   const categories = Array.from(
-    new Set(products.map((p) => p.category?.name).filter(Boolean))
+    new Set(
+      products
+        .map((p) => p.category?.name)
+        .filter((name): name is string => Boolean(name))
+    )
   );
 
   const filteredProducts = products.filter((p) => {
@@ -125,32 +129,24 @@ export default function ResellerProductsPage() {
   };
 
   return (
-    <div className="space-y-6 pb-24">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-base-100 p-6 rounded-2xl border border-base-200 shadow-sm">
-        <div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-2">
-            <Tag size={14} /> Product Catalog
-          </span>
-          <h1 className="text-2xl font-extrabold text-base-content">
-            Reseller Products Section
-          </h1>
-          <p className="text-sm text-base-content/60 mt-1">
-            Compare retail market prices with wholesale reseller costs (`resellerPrice`) and add items to your cart.
-          </p>
-        </div>
-
-        <Link
-          href="/reseller/cart"
-          className="btn btn-primary flex items-center gap-2 shadow-md"
-        >
-          <ShoppingCart size={18} />
-          <span>My Cart ({totalCartCount})</span>
-        </Link>
-      </div>
+    <PanelPage className="pb-24">
+      <PanelPageHeader
+        title="Reseller Products"
+        subtitle="Compare retail prices with wholesale reseller costs and add items to your cart."
+        icon={Package}
+        actions={
+          <Link
+            href="/reseller/cart"
+            className="btn btn-primary btn-sm rounded-xl gap-2"
+          >
+            <ShoppingCart size={16} />
+            <span>My Cart ({totalCartCount})</span>
+          </Link>
+        }
+      />
 
       {/* Search & Category Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-base-100 p-4 rounded-xl border border-base-200">
+      <div className="flex flex-wrap items-center gap-2">
         <div className="relative w-full sm:w-80">
           <Search
             className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40"
@@ -159,49 +155,36 @@ export default function ResellerProductsPage() {
           <input
             type="text"
             placeholder="Search products..."
-            className="input input-bordered pl-10 w-full input-sm"
+            className="input input-bordered input-sm rounded-xl pl-10 w-full"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
-          <Filter size={16} className="text-base-content/40" />
-          <button
-            className={`btn btn-xs ${
-              selectedCategory === "ALL" ? "btn-primary" : "btn-outline"
-            }`}
-            onClick={() => setSelectedCategory("ALL")}
-          >
-            All Categories
-          </button>
+        <select
+          aria-label="Filter by category"
+          className="select select-bordered select-sm rounded-xl w-full sm:w-auto"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          <option value="ALL">All Categories</option>
           {categories.map((cat) => (
-            <button
-              key={cat}
-              className={`btn btn-xs ${
-                selectedCategory === cat ? "btn-primary" : "btn-outline"
-              }`}
-              onClick={() => setSelectedCategory(cat!)}
-            >
+            <option key={cat} value={cat}>
               {cat}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       </div>
 
       {/* Product Grid */}
       {loading ? (
-        <div className="flex justify-center py-16">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-        </div>
+        <PanelSkeleton variant="cards" rows={8} />
       ) : filteredProducts.length === 0 ? (
-        <div className="text-center py-16 bg-base-100 rounded-xl border border-base-200">
-          <Package className="mx-auto text-base-content/30 mb-3" size={48} />
-          <h3 className="font-bold text-lg">No products found</h3>
-          <p className="text-sm text-base-content/60">
-            Try searching for something else or reset your filter.
-          </p>
-        </div>
+        <PanelEmpty
+          icon={Package}
+          title="No products found"
+          text="Try searching for something else or reset your filter."
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => {
@@ -226,11 +209,11 @@ export default function ResellerProductsPage() {
             return (
               <div
                 key={product.id}
-                className="card bg-base-100 border border-base-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                className="bg-base-100 border border-base-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between overflow-hidden"
               >
                 <div>
                   {/* Product Image & Badges */}
-                  <div className="relative aspect-square w-full overflow-hidden rounded-t-xl bg-base-200">
+                  <div className="relative aspect-square w-full overflow-hidden bg-base-200">
                     <img
                       src={primaryImg}
                       alt={product.name}
@@ -353,7 +336,7 @@ export default function ResellerProductsPage() {
                 </div>
 
                 {/* Footer Action */}
-                <div className="p-4 pt-0 space-y-2">
+                <div className="p-4 pt-0 space-y-2 mt-auto">
                   <div className="flex items-center gap-2">
                     <div className="join border border-base-300 rounded-lg">
                       <button
@@ -390,7 +373,7 @@ export default function ResellerProductsPage() {
                     </div>
 
                     <button
-                      className={`btn btn-sm flex-1 ${
+                      className={`btn btn-sm rounded-xl gap-2 flex-1 ${
                         addedSuccessId === product.id
                           ? "btn-success text-white"
                           : "btn-primary"
@@ -433,12 +416,14 @@ export default function ResellerProductsPage() {
           </div>
           <Link
             href="/reseller/cart"
-            className="btn btn-primary btn-sm px-5 flex items-center gap-2 shadow-md"
+            className="btn btn-primary btn-sm rounded-xl gap-2"
           >
             Checkout Order <ArrowRight size={16} />
           </Link>
         </div>
       )}
-    </div>
+
+      <div className="h-16" aria-hidden="true" />
+    </PanelPage>
   );
 }

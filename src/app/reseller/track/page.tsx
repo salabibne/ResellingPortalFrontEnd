@@ -9,6 +9,10 @@ import {
 } from "lucide-react";
 import { Order, orderApi } from "@/services/order.api";
 import TrackPanel from "@/components/courier/TrackPanel";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelEmpty from "@/components/panel/PanelEmpty";
+import PanelSkeleton from "@/components/panel/PanelSkeleton";
 
 function getErrorMessage(err: any): string {
   if (!err?.response) {
@@ -65,26 +69,23 @@ export default function ResellerTrackPage() {
   }));
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-base-100 p-6 rounded-2xl border border-base-200 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-extrabold text-base-content flex items-center gap-2">
-            <Truck className="text-primary" /> Track a Parcel
-          </h1>
-          <p className="text-sm text-base-content/60 mt-1">
-            Select one of your booked consignments to see its current Steadfast
-            status and journey.
-          </p>
-        </div>
-        <button
-          onClick={loadOrders}
-          disabled={loading}
-          className="btn btn-sm btn-outline rounded-xl font-bold gap-2 self-start sm:self-auto"
-        >
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-          Refresh
-        </button>
-      </div>
+    <PanelPage width="narrow">
+      <PanelPageHeader
+        title="Track a Parcel"
+        subtitle="Select one of your booked consignments to see its current Steadfast status and journey."
+        icon={Truck}
+        actions={
+          <button
+            type="button"
+            onClick={loadOrders}
+            disabled={loading}
+            className="btn btn-outline btn-sm rounded-xl gap-2"
+          >
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+            Refresh
+          </button>
+        }
+      />
 
       {errorMsg && (
         <div className="alert alert-error text-white text-xs font-bold shadow-sm flex items-start gap-2">
@@ -101,22 +102,19 @@ export default function ResellerTrackPage() {
       )}
 
       {loading ? (
-        <div className="bg-base-100 rounded-2xl border border-base-200 p-16 flex items-center justify-center">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-        </div>
+        <PanelSkeleton variant="form" rows={2} />
       ) : options.length === 0 ? (
-        <div className="bg-base-100 rounded-2xl border border-base-200 p-12 text-center">
-          <Truck size={48} className="mx-auto mb-3 text-base-content/30" />
-          <h2 className="text-lg font-bold text-base-content">
-            No booked consignments yet
-          </h2>
-          <p className="text-sm text-base-content/60 mt-1 mb-5">
-            Once the admin places one of your orders with Steadfast, its
-            consignment ID will appear here.
-          </p>
-          <Link href="/reseller/orders" className="btn btn-primary btn-sm rounded-xl">
-            View My Orders
-          </Link>
+        <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm">
+          <PanelEmpty
+            icon={Truck}
+            title="No booked consignments yet"
+            text="Once the admin places one of your orders with Steadfast, its consignment ID will appear here."
+            action={
+              <Link href="/reseller/orders" className="btn btn-primary btn-sm rounded-xl">
+                View My Orders
+              </Link>
+            }
+          />
         </div>
       ) : (
         <TrackPanel
@@ -127,6 +125,6 @@ export default function ResellerTrackPage() {
           description="Choose one of your booked consignments. Tracking is read-only and only includes your own orders."
         />
       )}
-    </div>
+    </PanelPage>
   );
 }

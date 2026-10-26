@@ -28,14 +28,14 @@ export default function RichTextEditor({
   };
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden bg-white text-black">
+    <div className="border border-gray-300 rounded-lg overflow-hidden bg-base-100 text-base-content">
       {/* Editor Toolbar Header */}
       <div className="flex flex-wrap items-center justify-between border-b border-gray-200 bg-gray-50 p-2 gap-2">
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => insertFormatting("<strong>", "</strong>")}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="Bold"
           >
             <Bold className="w-4 h-4" />
@@ -43,7 +43,7 @@ export default function RichTextEditor({
           <button
             type="button"
             onClick={() => insertFormatting("<em>", "</em>")}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="Italic"
           >
             <Italic className="w-4 h-4" />
@@ -52,7 +52,7 @@ export default function RichTextEditor({
           <button
             type="button"
             onClick={() => insertFormatting("<h1>", "</h1>")}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="Heading 1"
           >
             <Heading1 className="w-4 h-4" />
@@ -60,7 +60,7 @@ export default function RichTextEditor({
           <button
             type="button"
             onClick={() => insertFormatting("<h2>", "</h2>")}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="Heading 2"
           >
             <Heading2 className="w-4 h-4" />
@@ -68,7 +68,7 @@ export default function RichTextEditor({
           <button
             type="button"
             onClick={() => insertFormatting("<h3>", "</h3>")}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="Heading 3"
           >
             <Heading3 className="w-4 h-4" />
@@ -77,7 +77,7 @@ export default function RichTextEditor({
           <button
             type="button"
             onClick={() => insertFormatting("<p>", "</p>")}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="Paragraph"
           >
             <FileText className="w-4 h-4" />
@@ -85,7 +85,7 @@ export default function RichTextEditor({
           <button
             type="button"
             onClick={() => insertFormatting("<ul>\n  <li>", "</li>\n</ul>")}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="List"
           >
             <List className="w-4 h-4" />
@@ -93,7 +93,7 @@ export default function RichTextEditor({
           <button
             type="button"
             onClick={() => insertFormatting('<blockquote>"', '"</blockquote>')}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="Blockquote"
           >
             <Quote className="w-4 h-4" />
@@ -101,7 +101,7 @@ export default function RichTextEditor({
           <button
             type="button"
             onClick={() => insertFormatting('<a href="https://">', "</a>")}
-            className="p-1.5 rounded hover:bg-gray-200 text-black transition"
+            className="p-1.5 rounded hover:bg-gray-200 text-base-content transition"
             title="Link"
           >
             <LinkIcon className="w-4 h-4" />
@@ -115,8 +115,8 @@ export default function RichTextEditor({
             onClick={() => setActiveTab("write")}
             className={`px-2.5 py-1 rounded transition font-medium flex items-center gap-1 ${
               activeTab === "write"
-                ? "bg-white shadow-xs text-primary"
-                : "text-gray-700 hover:text-black"
+                ? "bg-base-100 shadow-sm text-primary"
+                : "text-gray-700 hover:text-base-content"
             }`}
           >
             <FileText className="w-3.5 h-3.5" /> Text
@@ -126,8 +126,8 @@ export default function RichTextEditor({
             onClick={() => setActiveTab("code")}
             className={`px-2.5 py-1 rounded transition font-medium flex items-center gap-1 ${
               activeTab === "code"
-                ? "bg-white shadow-xs text-primary"
-                : "text-gray-700 hover:text-black"
+                ? "bg-base-100 shadow-sm text-primary"
+                : "text-gray-700 hover:text-base-content"
             }`}
           >
             <Code className="w-3.5 h-3.5" /> HTML
@@ -137,8 +137,8 @@ export default function RichTextEditor({
             onClick={() => setActiveTab("preview")}
             className={`px-2.5 py-1 rounded transition font-medium flex items-center gap-1 ${
               activeTab === "preview"
-                ? "bg-white shadow-xs text-primary"
-                : "text-gray-700 hover:text-black"
+                ? "bg-base-100 shadow-sm text-primary"
+                : "text-gray-700 hover:text-base-content"
             }`}
           >
             <Eye className="w-3.5 h-3.5" /> Preview
@@ -147,13 +147,13 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor Content Area */}
-      <div className="p-3 bg-white text-black" style={{ minHeight }}>
+      <div className="p-3 bg-base-100 text-base-content" style={{ minHeight }}>
         {activeTab === "write" && (
           <textarea
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            className="w-full h-full min-h-[220px] bg-white resize-y outline-none font-sans text-sm text-black"
+            className="w-full h-full min-h-[220px] bg-base-100 resize-y outline-none font-sans text-sm text-base-content"
           />
         )}
 
@@ -168,7 +168,7 @@ export default function RichTextEditor({
 
         {activeTab === "preview" && (
           <div
-            className="prose max-w-none text-sm text-black leading-relaxed min-h-[220px]"
+            className="prose max-w-none text-sm text-base-content leading-relaxed min-h-[220px]"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(value || "<p className='text-gray-400 italic'>Nothing to preview</p>") }}
           />
         )}

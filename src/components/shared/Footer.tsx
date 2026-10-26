@@ -14,7 +14,7 @@ export default function Footer() {
     <footer className="bg-base-200 text-base-content mt-auto border-t border-base-300">
       <div className="footer p-6 sm:p-10 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         <aside className="max-w-xs">
-          <Link href="/" className="flex items-center gap-2 text-2xl font-bold mb-3 text-black">
+          <Link href="/" className="flex items-center gap-2 text-2xl font-bold mb-3 text-base-content">
             <BrandLogo className="h-10 sm:h-12 w-auto max-w-[60%] object-contain" alt="Aarham Apparel">
               <ShoppingBag className="text-primary" size={28} />
               Aarham Apparel
@@ -44,7 +44,7 @@ export default function Footer() {
 
         {/* Dynamic Contact Info from CMS */}
         <nav>
-          <h6 className="footer-title text-black">Contact Us</h6>
+          <h6 className="footer-title text-base-content">Contact Us</h6>
           {contact ? (
             <div className="flex flex-col gap-2.5 text-sm text-base-content/80">
               {contact.phone && (
@@ -93,7 +93,7 @@ export default function Footer() {
         </nav>
 
         <nav>
-          <h6 className="footer-title text-black">Company</h6>
+          <h6 className="footer-title text-base-content">Company</h6>
           <Link href="/about" className="link link-hover">About Us</Link>
           <Link href="/shop" className="link link-hover">Shop Collection</Link>
           <Link href="/checkout" className="link link-hover">Checkout</Link>
@@ -127,7 +127,7 @@ function FooterLegalNav() {
 
   return (
     <nav>
-      <h6 className="footer-title text-black">Legal & Compliance</h6>
+      <h6 className="footer-title text-base-content">Legal & Compliance</h6>
       {docs.length > 0 ? (
         docs.map((doc) => (
           <Link key={doc.id} href={`/legal/${doc.slug}`} className="link link-hover">

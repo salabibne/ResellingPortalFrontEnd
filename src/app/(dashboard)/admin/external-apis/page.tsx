@@ -1,5 +1,8 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelModal from "@/components/panel/PanelModal";
+
 import React, { useEffect, useState } from "react";
 import {
   Globe,
@@ -154,30 +157,27 @@ export default function AdminExternalApisPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-white text-black">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-black flex items-center gap-2">
-            <Globe className="w-7 h-7 text-primary" /> External API Integration Manager
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Configure, manage, and monitor payment gateways (bKash/Nagad), courier APIs (Steadfast/Pathao), and tracking pixels.
-          </p>
-        </div>
-        <button
-          onClick={handleOpenCreate}
-          className="btn btn-primary text-white flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> Add Integration
-        </button>
-      </div>
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-base-100 text-base-content">
+      <PanelPageHeader
+        title="External API Integration Manager"
+        subtitle="Configure, manage, and monitor payment gateways (bKash/Nagad), courier APIs (Steadfast/Pathao), and tracking pixels."
+        icon={Globe}
+        actions={
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+          >
+            <Plus size={16} /> Add Integration
+          </button>
+        }
+      />
 
       {/* Integration Cards Grid */}
       {loading ? (
         <div className="p-8 text-center text-gray-500">Loading API integrations...</div>
       ) : integrations.length === 0 ? (
-        <div className="bg-white p-12 text-center text-gray-500 rounded-xl border border-gray-200">
+        <div className="bg-base-100 p-12 text-center text-gray-500 rounded-xl border border-gray-200">
           No external integrations configured yet. Click &ldquo;+ Add Integration&rdquo; to connect your first third-party API.
         </div>
       ) : (
@@ -185,7 +185,7 @@ export default function AdminExternalApisPage() {
           {integrations.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-xl shadow-xs border border-gray-200 p-5 flex flex-col justify-between hover:shadow-md transition text-black"
+              className="bg-base-100 rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between hover:shadow-md transition text-base-content"
             >
               <div className="space-y-3">
                 <div className="flex items-start justify-between">
@@ -194,7 +194,7 @@ export default function AdminExternalApisPage() {
                       {item.apiName.charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-bold text-black text-base">
+                      <h3 className="font-bold text-base-content text-base">
                         {item.apiName}
                       </h3>
                       <div className="mt-0.5">{getStatusBadge(item.status)}</div>
@@ -210,7 +210,7 @@ export default function AdminExternalApisPage() {
                   <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                     Endpoint URL
                   </div>
-                  <div className="text-xs font-mono text-black truncate">
+                  <div className="text-xs font-mono text-base-content truncate">
                     {item.apiUrl}
                   </div>
                 </div>
@@ -256,26 +256,34 @@ export default function AdminExternalApisPage() {
 
       {/* Secure Credentials Modal */}
       {isModalOpen && editingApi && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-black border border-gray-200">
-            {/* Modal Header */}
-            <div className="p-5 border-b border-gray-200 flex items-center justify-between bg-white">
-              <h2 className="text-lg font-bold text-black flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-primary" />
-                {editingApi.id ? "Configure Integration" : "Add Integration"}
-              </h2>
+        <PanelModal
+          open={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title={editingApi.id ? "Configure Integration" : "Add Integration"}
+          size="md"
+          footer={
+            <>
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="btn btn-sm btn-ghost btn-circle"
+                className="btn btn-ghost btn-sm rounded-xl"
               >
-                <X className="w-5 h-5" />
+                Cancel
               </button>
-            </div>
-
-            {/* Modal Body Form */}
-            <form onSubmit={handleSave} className="p-6 space-y-4 overflow-y-auto bg-white">
+              <button
+                type="submit"
+                form="integration-form"
+                disabled={saving}
+                className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+              >
+                {saving ? "Saving..." : "Save Integration"}
+              </button>
+            </>
+          }
+        >
+          <form id="integration-form" onSubmit={handleSave} className="space-y-4">
               <div>
-                <label className="label-text text-xs font-semibold text-black">Integration Name *</label>
+                <label className="label-text text-xs font-semibold text-base-content">Integration Name *</label>
                 <input
                   type="text"
                   value={editingApi.apiName || ""}
@@ -283,13 +291,13 @@ export default function AdminExternalApisPage() {
                     setEditingApi((prev) => ({ ...prev, apiName: e.target.value }))
                   }
                   placeholder="e.g. bKash Payment Gateway / Steadfast Courier"
-                  className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                  className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                   required
                 />
               </div>
 
               <div>
-                <label className="label-text text-xs font-semibold text-black">API Base Endpoint URL *</label>
+                <label className="label-text text-xs font-semibold text-base-content">API Base Endpoint URL *</label>
                 <input
                   type="url"
                   value={editingApi.apiUrl || ""}
@@ -297,13 +305,13 @@ export default function AdminExternalApisPage() {
                     setEditingApi((prev) => ({ ...prev, apiUrl: e.target.value }))
                   }
                   placeholder="https://tokenized.sandbox.bka.sh/v1.2.0-beta"
-                  className="input input-bordered w-full text-sm mt-1 font-mono bg-white text-black"
+                  className="input input-bordered w-full text-sm mt-1 font-mono bg-base-100 text-base-content"
                   required
                 />
               </div>
 
               <div>
-                <label className="label-text text-xs font-semibold text-black">Status</label>
+                <label className="label-text text-xs font-semibold text-base-content">Status</label>
                 <select
                   value={editingApi.status || "ACTIVE"}
                   onChange={(e) =>
@@ -312,7 +320,7 @@ export default function AdminExternalApisPage() {
                       status: e.target.value as IntegrationStatus,
                     }))
                   }
-                  className="select select-bordered w-full text-sm mt-1 bg-white text-black"
+                  className="select select-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                 >
                   <option value="ACTIVE">ACTIVE</option>
                   <option value="DEACTIVATED">DEACTIVATED</option>
@@ -321,7 +329,7 @@ export default function AdminExternalApisPage() {
               </div>
 
               <div>
-                <label className="label-text text-xs font-semibold text-black">Description</label>
+                <label className="label-text text-xs font-semibold text-base-content">Description</label>
                 <input
                   type="text"
                   value={editingApi.description || ""}
@@ -329,14 +337,14 @@ export default function AdminExternalApisPage() {
                     setEditingApi((prev) => ({ ...prev, description: e.target.value }))
                   }
                   placeholder="e.g. Parcel creation & tokenized checkout"
-                  className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                  className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                 />
               </div>
 
               {/* Secure Credentials Field */}
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <label className="label-text text-xs font-semibold text-black flex items-center gap-1">
+                  <label className="label-text text-xs font-semibold text-base-content flex items-center gap-1">
                     <KeyRound className="w-3.5 h-3.5 text-amber-500" /> Masked Credentials (JSON or Key-Value)
                   </label>
                   <button
@@ -364,7 +372,7 @@ export default function AdminExternalApisPage() {
                         setEditingApi((prev) => ({ ...prev, credentials: e.target.value }))
                       }
                       rows={5}
-                      className="textarea textarea-bordered w-full font-mono text-xs text-black bg-gray-50 p-3"
+                      className="textarea textarea-bordered w-full font-mono text-xs text-base-content bg-gray-50 p-3"
                     />
                   ) : (
                     <input
@@ -373,7 +381,7 @@ export default function AdminExternalApisPage() {
                       onChange={(e) =>
                         setEditingApi((prev) => ({ ...prev, credentials: e.target.value }))
                       }
-                      className="input input-bordered w-full text-xs font-mono bg-white text-black"
+                      className="input input-bordered w-full text-xs font-mono bg-base-100 text-base-content"
                     />
                   )}
                 </div>
@@ -416,26 +424,8 @@ export default function AdminExternalApisPage() {
                 </div>
               )}
 
-              {/* Modal Footer Buttons */}
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="btn btn-ghost text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="btn btn-primary text-white text-xs px-6"
-                >
-                  {saving ? "Saving..." : "Save Integration"}
-                </button>
-              </div>
             </form>
-          </div>
-        </div>
+        </PanelModal>
       )}
     </div>
   );

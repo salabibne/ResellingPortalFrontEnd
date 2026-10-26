@@ -54,3 +54,39 @@ option:focus {
   background-color: #2563eb;
   color: #ffffff;
 }
+
+@layer components {
+  /* Shared panel table (see src/components/panel/PanelTable.tsx) */
+  .panel-table thead th {
+    @apply text-xs uppercase text-base-content/60;
+  }
+
+  .panel-table tbody tr {
+    @apply transition-colors;
+  }
+
+  .panel-table tbody tr:hover {
+    @apply bg-base-200/50;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar for tab rows */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-slide-in-left {
+    animation: none !important;
+  }
+}

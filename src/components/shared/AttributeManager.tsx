@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Plus, Edit2, X, Loader2 } from "lucide-react";
+import { Plus, Edit2, Loader2 } from "lucide-react";
 import api from "@/services/axios";
+import PanelPage from "@/components/panel/PanelPage";
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelTable from "@/components/panel/PanelTable";
+import PanelModal from "@/components/panel/PanelModal";
+import StatusBadge from "@/components/panel/StatusBadge";
 
 export type FieldConfig = {
   name: string;
@@ -145,31 +150,32 @@ export default function AttributeManager({ config }: Props) {
   };
 
   return (
-    <div className="p-6 w-full flex flex-col h-full bg-base-200 text-black">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-black">{config.title}</h1>
-        <button
-          onClick={(e) => handleOpenForm(null, e)}
-          className="btn btn-primary flex items-center gap-2"
-          disabled={isLoading}
-        >
-          <Plus size={20} /> Create New
-        </button>
-      </div>
+    <PanelPage>
+      <PanelPageHeader
+        title={config.title}
+        actions={
+          <button
+            type="button"
+            onClick={(e) => handleOpenForm(null, e)}
+            className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+            disabled={isLoading}
+          >
+            <Plus size={16} /> Create New
+          </button>
+        }
+      />
 
       <div className="flex gap-6 h-full items-start relative">
         {/* List View */}
-        <div className="bg-base-100 rounded-box shadow-md flex-1 overflow-hidden w-full">
-          <div className="overflow-x-auto">
-            <table className="table w-full">
+        <PanelTable className="flex-1">
               <thead>
                 <tr>
-                  <th className="text-black">SL</th>
+                  <th className="text-base-content">SL</th>
                   {config.fields.map((f) => (
-                    <th className="text-black" key={f.name}>{f.label}</th>
+                    <th className="text-base-content" key={f.name}>{f.label}</th>
                   ))}
-                  <th className="text-black text-center">Status</th>
-                  <th className="text-right text-black">Actions</th>
+                  <th className="text-base-content text-center">Status</th>
+                  <th className="text-right text-base-content">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -181,7 +187,7 @@ export default function AttributeManager({ config }: Props) {
                   </tr>
                 ) : records.length === 0 ? (
                   <tr>
-                    <td colSpan={config.fields.length + 2} className="text-center py-8 text-black/50">
+                    <td colSpan={config.fields.length + 2} className="text-center py-8 text-base-content/50">
                       No records found. Click &ldquo;Create New&rdquo; to add one.
                     </td>
                   </tr>
@@ -191,20 +197,18 @@ export default function AttributeManager({ config }: Props) {
                       key={record.id}
                       className="hover:bg-base-200 transition-colors"
                     >
-                      <td className="text-black">{index + 1}</td>
+                      <td className="text-base-content">{index + 1}</td>
                       {config.fields.map((f) => (
                         <td key={f.name}>
                           {renderFieldValue(record, f)}
                         </td>
                       ))}
                       <td className="text-center">
-                        {(record.status === 'ACTIVE' || record.status === 'active') && <button className="btn btn-xs btn-success text-white">Active</button>}
-                        {(record.status === 'PENDING' || record.status === 'pending') && <button className="btn btn-xs btn-warning text-white">Pending</button>}
-                        {(record.status === 'DEACTIVATED' || record.status === 'deactivated') && <button className="btn btn-xs btn-error text-white">Deactivated</button>}
-                        {!['ACTIVE', 'PENDING', 'DEACTIVATED', 'active', 'pending', 'deactivated'].includes(record.status) && record.status && (
-                          <button className="btn btn-xs capitalize">{record.status.toLowerCase()}</button>
+                        {record.status ? (
+                          <StatusBadge status={record.status} />
+                        ) : (
+                          <span className="text-base-content/40">-</span>
                         )}
-                        {!record.status && <span className="text-gray-400">-</span>}
                       </td>
                       <td className="text-right">
                         <button
@@ -218,34 +222,52 @@ export default function AttributeManager({ config }: Props) {
                   ))
                 )}
               </tbody>
-            </table>
-          </div>
-        </div>
+        </PanelTable>
 
         {/* Form View (Modal) */}
         {isFormOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-base-100 rounded-box shadow-2xl p-6 w-full max-w-lg relative animate-in zoom-in-95 fade-in duration-200">
-              <button
-                onClick={handleCloseForm}
-                className="btn btn-ghost btn-sm btn-circle absolute top-4 right-4"
-                disabled={isSubmitting}
-              >
-                <X size={20} />
-              </button>
-              <h2 className="text-2xl font-bold mb-6 text-black">
-                {currentRecord ? `Edit ${config.title}` : `Create ${config.title}`}
-              </h2>
-              <form onSubmit={handleSave} className="flex flex-col gap-4">
+          <PanelModal
+            open={isFormOpen}
+            onClose={handleCloseForm}
+            title={currentRecord ? `Edit ${config.title}` : `Create ${config.title}`}
+            size="md"
+            footer={
+              <>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm rounded-xl"
+                  onClick={handleCloseForm}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  form="attribute-form"
+                  className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="animate-spin" size={16} />
+                  ) : currentRecord ? (
+                    "Update"
+                  ) : (
+                    "Save"
+                  )}
+                </button>
+              </>
+            }
+          >
+              <form id="attribute-form" onSubmit={handleSave} className="flex flex-col gap-4">
                 {config.fields.map((field) => (
                   <div className="form-control w-full" key={field.name}>
                     <label className="label">
-                      <span className="label-text font-semibold text-black">{field.label}</span>
+                      <span className="label-text font-semibold text-base-content">{field.label}</span>
                     </label>
                     {field.type === "text" && (
                       <input
                         type="text"
-                        className="input input-bordered w-full text-black bg-white"
+                        className="input input-bordered w-full text-base-content bg-base-100"
                         value={formData[field.name] || ""}
                         onChange={(e) => handleInputChange(field.name, e.target.value)}
                         required
@@ -261,7 +283,7 @@ export default function AttributeManager({ config }: Props) {
                         />
                         <input
                           type="text"
-                          className="input input-bordered flex-1 text-black bg-white"
+                          className="input input-bordered flex-1 text-base-content bg-base-100"
                           placeholder="#000000"
                           value={formData[field.name] || ""}
                           onChange={(e) => handleInputChange(field.name, e.target.value)}
@@ -271,7 +293,7 @@ export default function AttributeManager({ config }: Props) {
                     )}
                     {field.type === "select" && (
                       <select
-                        className="select select-bordered w-full text-black bg-white"
+                        className="select select-bordered w-full text-base-content bg-base-100"
                         value={formData[field.name] || ""}
                         onChange={(e) => handleInputChange(field.name, e.target.value)}
                         required
@@ -291,10 +313,10 @@ export default function AttributeManager({ config }: Props) {
                 
                 <div className="form-control w-full">
                   <label className="label">
-                    <span className="label-text font-semibold text-black">Status</span>
+                    <span className="label-text font-semibold text-base-content">Status</span>
                   </label>
                   <select
-                    className="select select-bordered w-full text-black bg-white"
+                    className="select select-bordered w-full text-base-content bg-base-100"
                     value={formData.status || "ACTIVE"}
                     onChange={(e) => handleInputChange('status', e.target.value)}
                     required
@@ -305,19 +327,10 @@ export default function AttributeManager({ config }: Props) {
                   </select>
                 </div>
 
-                <div className="mt-8 flex gap-3 justify-end">
-                  <button type="button" className="btn btn-ghost text-black" onClick={handleCloseForm} disabled={isSubmitting}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary px-8" disabled={isSubmitting}>
-                    {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : currentRecord ? "Update" : "Save"}
-                  </button>
-                </div>
               </form>
-            </div>
-          </div>
+          </PanelModal>
         )}
       </div>
-    </div>
+    </PanelPage>
   );
 }

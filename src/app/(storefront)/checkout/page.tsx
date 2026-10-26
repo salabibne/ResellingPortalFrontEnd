@@ -140,10 +140,10 @@ export default function CheckoutPage() {
             <ArrowLeft size={16} /> Back to Shop
           </button>
           <ChevronRight size={14} />
-          <span className="text-slate-900 font-semibold">Checkout</span>
+          <span className="text-base-content font-semibold">Checkout</span>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight mb-6 sm:mb-8">
           Complete Your Order
         </h1>
 
@@ -158,7 +158,7 @@ export default function CheckoutPage() {
         )}
 
         {cartItems.length === 0 ? (
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center border border-slate-200 shadow-sm max-w-xl mx-auto my-8 sm:my-12">
+          <div className="bg-base-100 rounded-2xl sm:rounded-3xl p-8 sm:p-12 text-center border border-slate-200 shadow-sm max-w-xl mx-auto my-8 sm:my-12">
             <ShoppingBag size={48} className="mx-auto text-slate-300 mb-4" />
             <h2 className="text-lg sm:text-xl font-bold text-slate-800">Your Cart is Empty</h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-2 mb-6">
@@ -176,13 +176,13 @@ export default function CheckoutPage() {
             {/* Left Column: Form Controls */}
             <div className="lg:col-span-7 space-y-6">
               {/* Shipping Address */}
-              <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+              <div className="bg-base-100 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
                 <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                   <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
                     <MapPin size={20} />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-slate-900">Shipping Address</h2>
+                    <h2 className="text-lg font-bold text-base-content">Shipping Address</h2>
                     <p className="text-xs text-slate-500">Provide complete delivery details</p>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export default function CheckoutPage() {
                     {...register("shippingAddress")}
                     rows={3}
                     placeholder="House / Flat No, Road Name, Area, Police Station, City & Postal Code..."
-                    className={`textarea textarea-bordered w-full text-slate-900 focus:outline-none focus:border-primary rounded-xl text-sm ${
+                    className={`textarea textarea-bordered w-full text-base-content focus:outline-none focus:border-primary rounded-xl text-sm ${
                       errors.shippingAddress ? "textarea-error" : ""
                     }`}
                   />
@@ -226,19 +226,19 @@ export default function CheckoutPage() {
                     type="text"
                     {...register("notes")}
                     placeholder="e.g. Please call 30 minutes prior to delivery"
-                    className="input input-bordered w-full text-slate-900 focus:outline-none focus:border-primary rounded-xl text-sm"
+                    className="input input-bordered w-full text-base-content focus:outline-none focus:border-primary rounded-xl text-sm"
                   />
                 </div>
               </div>
 
               {/* Payment Method Selection */}
-              <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+              <div className="bg-base-100 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
                 <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
                   <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
                     <CreditCard size={20} />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-slate-900">Payment Method</h2>
+                    <h2 className="text-lg font-bold text-base-content">Payment Method</h2>
                     <p className="text-xs text-slate-500">Choose how you&apos;d like to pay for your order</p>
                   </div>
                 </div>
@@ -248,8 +248,8 @@ export default function CheckoutPage() {
                   <label
                     className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                       selectedPaymentMethod === "CASH_ON_DELIVERY"
-                        ? "border-primary bg-primary/5 shadow-xs"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-slate-200 hover:border-slate-300 bg-base-100"
                     }`}
                   >
                     <input
@@ -259,7 +259,7 @@ export default function CheckoutPage() {
                       className="radio radio-primary radio-sm mt-0.5"
                     />
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                      <div className="flex items-center gap-2 font-bold text-base-content text-sm">
                         <Truck size={18} className="text-indigo-600" /> Cash on Delivery
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
@@ -272,8 +272,8 @@ export default function CheckoutPage() {
                   <label
                     className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                       selectedPaymentMethod === "BKASH"
-                        ? "border-pink-500 bg-pink-50/50 shadow-xs"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
+                        ? "border-pink-500 bg-pink-50/50 shadow-sm"
+                        : "border-slate-200 hover:border-slate-300 bg-base-100"
                     }`}
                   >
                     <input
@@ -283,7 +283,7 @@ export default function CheckoutPage() {
                       className="radio radio-secondary radio-sm mt-0.5"
                     />
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                      <div className="flex items-center gap-2 font-bold text-base-content text-sm">
                         <Smartphone size={18} className="text-pink-600" /> bKash Wallet
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
@@ -296,8 +296,8 @@ export default function CheckoutPage() {
                   <label
                     className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                       selectedPaymentMethod === "NAGAD"
-                        ? "border-orange-500 bg-orange-50/50 shadow-xs"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
+                        ? "border-orange-500 bg-orange-50/50 shadow-sm"
+                        : "border-slate-200 hover:border-slate-300 bg-base-100"
                     }`}
                   >
                     <input
@@ -307,7 +307,7 @@ export default function CheckoutPage() {
                       className="radio radio-accent radio-sm mt-0.5"
                     />
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                      <div className="flex items-center gap-2 font-bold text-base-content text-sm">
                         <Smartphone size={18} className="text-orange-600" /> Nagad Wallet
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
@@ -320,8 +320,8 @@ export default function CheckoutPage() {
                   <label
                     className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                       selectedPaymentMethod === "BANK_TRANSFER"
-                        ? "border-blue-600 bg-blue-50/50 shadow-xs"
-                        : "border-slate-200 hover:border-slate-300 bg-white"
+                        ? "border-blue-600 bg-blue-50/50 shadow-sm"
+                        : "border-slate-200 hover:border-slate-300 bg-base-100"
                     }`}
                   >
                     <input
@@ -331,7 +331,7 @@ export default function CheckoutPage() {
                       className="radio radio-info radio-sm mt-0.5"
                     />
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 font-bold text-slate-900 text-sm">
+                      <div className="flex items-center gap-2 font-bold text-base-content text-sm">
                         <Building2 size={18} className="text-blue-600" /> Bank Transfer
                       </div>
                       <p className="text-xs text-slate-500 mt-1">
@@ -351,8 +351,8 @@ export default function CheckoutPage() {
 
             {/* Right Column: Summary Breakdown */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-6 sticky top-24">
-                <h2 className="text-xl font-extrabold text-slate-900 border-b border-slate-100 pb-4">
+              <div className="bg-base-100 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-sm space-y-6 sticky top-24">
+                <h2 className="text-xl font-extrabold text-base-content border-b border-slate-100 pb-4">
                   Order Summary
                 </h2>
 
@@ -368,7 +368,7 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-bold text-slate-900 truncate">
+                        <h4 className="text-xs font-bold text-base-content truncate">
                           {item.product?.name}
                         </h4>
                         <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
@@ -384,7 +384,7 @@ export default function CheckoutPage() {
                           Qty: {item.quantity} × ৳{Number(item.unitPrice).toLocaleString()}
                         </div>
                       </div>
-                      <div className="text-xs font-extrabold text-slate-900">
+                      <div className="text-xs font-extrabold text-base-content">
                         ৳{Number(item.subtotal).toLocaleString()}
                       </div>
                     </div>
@@ -395,11 +395,11 @@ export default function CheckoutPage() {
                 <div className="space-y-2.5 pt-2 border-t border-slate-100 text-sm">
                   <div className="flex justify-between text-slate-600">
                     <span>Subtotal</span>
-                    <span className="font-bold text-slate-900">৳ {subtotal.toLocaleString()}</span>
+                    <span className="font-bold text-base-content">৳ {subtotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-slate-600">
                     <span>Courier Charge</span>
-                    <span className="font-bold text-slate-900">+৳ {courierCharge.toLocaleString()}</span>
+                    <span className="font-bold text-base-content">+৳ {courierCharge.toLocaleString()}</span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-emerald-600 font-semibold">
@@ -408,7 +408,7 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  <div className="flex justify-between text-base font-black text-slate-900 pt-3 border-t border-slate-200">
+                  <div className="flex justify-between text-base font-black text-base-content pt-3 border-t border-slate-200">
                     <span>Grand Total</span>
                     <span className="text-primary text-xl">৳ {grandTotal.toLocaleString()}</span>
                   </div>

@@ -1,5 +1,8 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelSkeleton from "@/components/panel/PanelSkeleton";
+
 import React, { useState, useEffect } from "react";
 import { Truck, Save, CheckCircle2, AlertCircle, RefreshCw, Eye, Info, Users, User } from "lucide-react";
 import { orderApi, CourierPolicy } from "@/services/order.api";
@@ -65,32 +68,28 @@ export default function AdminCourierPage() {
 
   if (loading) {
     return (
-      <div className="h-96 flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
+      <div className="max-w-6xl mx-auto">
+        <PanelSkeleton variant="form" rows={4} />
       </div>
     );
   }
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-20">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <Truck className="text-primary" /> Courier Charge Text Policy Management
-          </h1>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Configure courier charge policy text & default fees. Updates reflect instantly across both **Reseller Checkout** and **Normal Customer Checkout**.
-          </p>
-        </div>
-
-        <button
-          onClick={loadPolicy}
-          className="btn btn-sm btn-outline rounded-xl font-bold gap-2 self-start md:self-auto"
-        >
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} /> Refresh
-        </button>
-      </div>
+      <PanelPageHeader
+        title="Courier Charge Text Policy Management"
+        subtitle="Configure courier charge policy text & default fees. Updates reflect instantly across both Reseller Checkout and Normal Customer Checkout."
+        icon={Truck}
+        actions={
+          <button
+            type="button"
+            onClick={loadPolicy}
+            className="btn btn-outline btn-sm rounded-xl gap-2"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} /> Refresh
+          </button>
+        }
+      />
 
       {successMsg && (
         <div className="alert alert-success text-xs font-bold text-white shadow-sm flex items-center gap-2">
@@ -108,8 +107,8 @@ export default function AdminCourierPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Form Card */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-5">
-          <h2 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+        <div className="bg-base-100 p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-5">
+          <h2 className="text-base font-extrabold text-base-content border-b border-slate-100 pb-3 flex items-center gap-2">
             <Truck size={18} className="text-primary" />
             <span>Edit Courier Charge Policy</span>
           </h2>
@@ -122,7 +121,7 @@ export default function AdminCourierPage() {
               <input
                 type="text"
                 required
-                className="input input-sm input-bordered w-full rounded-xl font-bold text-slate-900"
+                className="input input-sm input-bordered w-full rounded-xl font-bold text-base-content"
                 placeholder="e.g. Standard Courier Charge Policy"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -137,7 +136,7 @@ export default function AdminCourierPage() {
                 rows={5}
                 required
                 placeholder="Write your courier rates instructions... e.g. Inside Dhaka: ৳70 | Sub-Urban Dhaka: ৳100 | Outside Dhaka: ৳130. Advance courier fee applies."
-                className="textarea textarea-bordered w-full rounded-xl text-slate-900 text-xs font-medium"
+                className="textarea textarea-bordered w-full rounded-xl text-base-content text-xs font-medium"
                 value={chargeText}
                 onChange={(e) => setChargeText(e.target.value)}
               />
@@ -154,7 +153,7 @@ export default function AdminCourierPage() {
                 type="number"
                 min="0"
                 required
-                className="input input-sm input-bordered w-full rounded-xl font-bold text-slate-900"
+                className="input input-sm input-bordered w-full rounded-xl font-bold text-base-content"
                 value={defaultCharge}
                 onChange={(e) => setDefaultCharge(Number(e.target.value))}
               />
@@ -204,7 +203,7 @@ export default function AdminCourierPage() {
           </div>
 
           {/* Normal Customer Checkout Preview Card */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
+          <div className="bg-base-100 p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                 <User size={14} className="text-emerald-600" /> Normal Customer Checkout Preview (/checkout)
@@ -222,7 +221,7 @@ export default function AdminCourierPage() {
               </p>
             </div>
             <div className="text-[11px] text-slate-500">
-              Applied Courier Fee: <strong className="text-slate-900">৳{defaultCharge}</strong>
+              Applied Courier Fee: <strong className="text-base-content">৳{defaultCharge}</strong>
             </div>
           </div>
         </div>

@@ -1,5 +1,8 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+import PanelModal from "@/components/panel/PanelModal";
+
 import React, { useEffect, useState } from "react";
 import {
   FileText,
@@ -116,27 +119,24 @@ export default function AdminLegalDocumentsPage() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-white text-black">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-black flex items-center gap-2">
-            <FileText className="w-7 h-7 text-primary" /> Legal Documents Manager
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Create, version control, and publish legal agreements (Terms & Conditions, Privacy Policy, Return & Refund Policy, Reseller Agreement).
-          </p>
-        </div>
-        <button
-          onClick={handleOpenCreate}
-          className="btn btn-primary text-white flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> Create Legal Document
-        </button>
-      </div>
+    <div className="p-6 max-w-7xl mx-auto space-y-6 bg-base-100 text-base-content">
+      <PanelPageHeader
+        title="Legal Documents Manager"
+        subtitle="Create, version control, and publish legal agreements (Terms & Conditions, Privacy Policy, Return & Refund Policy, Reseller Agreement)."
+        icon={FileText}
+        actions={
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+          >
+            <Plus size={16} /> Create Legal Document
+          </button>
+        }
+      />
 
       {/* Document List Table */}
-      <div className="bg-white rounded-xl shadow-xs border border-gray-200 overflow-hidden">
+      <div className="bg-base-100 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading legal documents...</div>
         ) : documents.length === 0 ? (
@@ -160,7 +160,7 @@ export default function AdminLegalDocumentsPage() {
               <tbody className="divide-y divide-gray-200">
                 {documents.map((doc) => (
                   <tr key={doc.id} className="hover:bg-gray-50">
-                    <td className="font-semibold text-black flex items-center gap-2">
+                    <td className="font-semibold text-base-content flex items-center gap-2">
                       <FileText className="w-4 h-4 text-primary" />
                       {doc.title}
                     </td>
@@ -239,43 +239,51 @@ export default function AdminLegalDocumentsPage() {
 
       {/* Editor Modal */}
       {isDrawerOpen && editingDoc && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-3xl bg-white text-black rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto flex flex-col my-auto border border-gray-200">
-            {/* Drawer Header */}
-            <div className="p-5 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-              <h2 className="text-lg font-bold text-black flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" />
-                {editingDoc.id ? "Edit Legal Document" : "Create Legal Document"}
-              </h2>
+        <PanelModal
+          open={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          title={editingDoc.id ? "Edit Legal Document" : "Create Legal Document"}
+          size="lg"
+          footer={
+            <>
               <button
+                type="button"
                 onClick={() => setIsDrawerOpen(false)}
-                className="btn btn-sm btn-ghost btn-circle"
+                className="btn btn-ghost btn-sm rounded-xl"
               >
-                <X className="w-5 h-5" />
+                Cancel
               </button>
-            </div>
-
-            {/* Drawer Body Form */}
-            <form onSubmit={handleSave} className="p-6 space-y-6 flex-1 bg-white">
+              <button
+                type="submit"
+                form="legal-doc-form"
+                disabled={saving}
+                className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+              >
+                {saving ? "Saving Document..." : "Save Legal Document"}
+              </button>
+            </>
+          }
+        >
+          <form id="legal-doc-form" onSubmit={handleSave} className="space-y-6">
               <div className="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <h3 className="font-semibold text-sm text-black">
+                <h3 className="font-semibold text-sm text-base-content">
                   Document Settings & Versioning
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="label-text text-xs font-semibold text-black">Document Title *</label>
+                    <label className="label-text text-xs font-semibold text-base-content">Document Title *</label>
                     <input
                       type="text"
                       value={editingDoc.title || ""}
                       onChange={(e) => handleTitleChange(e.target.value)}
                       placeholder="e.g. Return & Refund Policy"
-                      className="input input-bordered w-full text-sm mt-1 bg-white text-black"
+                      className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                       required
                     />
                   </div>
                   <div>
-                    <label className="label-text text-xs font-semibold text-black flex items-center justify-between">
+                    <label className="label-text text-xs font-semibold text-base-content flex items-center justify-between">
                       <span>URL Slug *</span>
                       {editingDoc.isSystem && (
                         <span className="text-[10px] text-amber-600 font-bold flex items-center gap-0.5">
@@ -291,7 +299,7 @@ export default function AdminLegalDocumentsPage() {
                       }
                       placeholder="return-refund-policy"
                       disabled={editingDoc.isSystem}
-                      className="input input-bordered w-full text-sm mt-1 font-mono bg-white text-black"
+                      className="input input-bordered w-full text-sm mt-1 font-mono bg-base-100 text-base-content"
                       required
                     />
                   </div>
@@ -299,7 +307,7 @@ export default function AdminLegalDocumentsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="label-text text-xs font-semibold text-black">Document Version *</label>
+                    <label className="label-text text-xs font-semibold text-base-content">Document Version *</label>
                     <input
                       type="text"
                       value={editingDoc.version || "1.0"}
@@ -307,12 +315,12 @@ export default function AdminLegalDocumentsPage() {
                         setEditingDoc((prev) => ({ ...prev, version: e.target.value }))
                       }
                       placeholder="e.g. 1.0 or 1.2"
-                      className="input input-bordered w-full text-sm mt-1 font-mono bg-white text-black"
+                      className="input input-bordered w-full text-sm mt-1 font-mono bg-base-100 text-base-content"
                       required
                     />
                   </div>
                   <div>
-                    <label className="label-text text-xs font-semibold text-black">Publication Status</label>
+                    <label className="label-text text-xs font-semibold text-base-content">Publication Status</label>
                     <select
                       value={editingDoc.status || "DRAFT"}
                       onChange={(e) =>
@@ -321,7 +329,7 @@ export default function AdminLegalDocumentsPage() {
                           status: e.target.value as LegalDocumentStatus,
                         }))
                       }
-                      className="select select-bordered w-full text-sm mt-1 bg-white text-black"
+                      className="select select-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                     >
                       <option value="DRAFT">DRAFT</option>
                       <option value="PUBLISHED">PUBLISHED</option>
@@ -333,7 +341,7 @@ export default function AdminLegalDocumentsPage() {
 
               {/* Rich Text Editor */}
               <div className="space-y-2">
-                <label className="label-text text-xs font-semibold text-black">
+                <label className="label-text text-xs font-semibold text-base-content">
                   Document Content (WYSIWYG & HTML)
                 </label>
                 <RichTextEditor
@@ -344,26 +352,8 @@ export default function AdminLegalDocumentsPage() {
                 />
               </div>
 
-              {/* Drawer Footer Controls */}
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-gray-200 sticky bottom-0 bg-white p-4">
-                <button
-                  type="button"
-                  onClick={() => setIsDrawerOpen(false)}
-                  className="btn btn-ghost text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="btn btn-primary text-white text-xs px-6"
-                >
-                  {saving ? "Saving Document..." : "Save Legal Document"}
-                </button>
-              </div>
             </form>
-          </div>
-        </div>
+        </PanelModal>
       )}
     </div>
   );

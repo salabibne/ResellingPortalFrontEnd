@@ -1,5 +1,7 @@
 "use client";
 
+import PanelPageHeader from "@/components/panel/PanelPageHeader";
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Plus,
@@ -405,7 +407,7 @@ export default function AdminProductsPage() {
   );
 
   return (
-    <div className="p-6 w-full flex flex-col h-full bg-base-200 text-black relative">
+    <div className="p-6 w-full flex flex-col h-full bg-base-200 text-base-content relative">
       {/* Top Global Data Loading Progress Line */}
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 z-50">
@@ -416,24 +418,21 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      {/* Top Header & Action */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-black flex items-center gap-2">
-            <Package className="text-primary" size={32} /> Products Management
-          </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Manage your store items, pricing, attributes, and stock setup
-          </p>
-        </div>
-        <button
-          onClick={() => handleOpenForm(null)}
-          className="btn btn-primary flex items-center gap-2 text-white"
-          disabled={isLoading}
-        >
-          <Plus size={20} /> Add New Product
-        </button>
-      </div>
+      <PanelPageHeader
+        title="Products Management"
+        subtitle="Manage your store items, pricing, attributes, and stock setup"
+        icon={Package}
+        actions={
+          <button
+            type="button"
+            onClick={() => handleOpenForm(null)}
+            className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
+            disabled={isLoading}
+          >
+            <Plus size={16} /> Add New Product
+          </button>
+        }
+      />
 
       {/* Search and Filters Bar */}
       <div className="bg-base-100 p-4 rounded-box shadow-sm mb-6 flex flex-wrap items-center gap-4">
@@ -442,14 +441,14 @@ export default function AdminProductsPage() {
           <input
             type="text"
             placeholder="Search products by name..."
-            className="input input-bordered w-full pl-10 bg-white text-black"
+            className="input input-bordered w-full pl-10 bg-base-100 text-base-content"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
         <select
-          className="select select-bordered bg-white text-black min-w-[160px]"
+          className="select select-bordered bg-base-100 text-base-content min-w-[160px]"
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
         >
@@ -462,7 +461,7 @@ export default function AdminProductsPage() {
         </select>
 
         <select
-          className="select select-bordered bg-white text-black min-w-[160px]"
+          className="select select-bordered bg-base-100 text-base-content min-w-[160px]"
           value={brandFilter}
           onChange={(e) => setBrandFilter(e.target.value)}
         >
@@ -475,7 +474,7 @@ export default function AdminProductsPage() {
         </select>
 
         <select
-          className="select select-bordered bg-white text-black min-w-[140px]"
+          className="select select-bordered bg-base-100 text-base-content min-w-[140px]"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
@@ -492,12 +491,12 @@ export default function AdminProductsPage() {
           <table className="table w-full">
             <thead>
               <tr className="bg-base-200">
-                <th className="text-black">Product</th>
-                <th className="text-black">Category / Brand</th>
-                <th className="text-black">Prices (New / Old / Reseller)</th>
-                <th className="text-black text-center">Attributes & Variants</th>
-                <th className="text-black text-center">Status</th>
-                <th className="text-right text-black">Actions</th>
+                <th className="text-base-content">Product</th>
+                <th className="text-base-content">Category / Brand</th>
+                <th className="text-base-content">Prices (New / Old / Reseller)</th>
+                <th className="text-base-content text-center">Attributes & Variants</th>
+                <th className="text-base-content text-center">Status</th>
+                <th className="text-right text-base-content">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -544,7 +543,7 @@ export default function AdminProductsPage() {
                             </div>
                           </div>
                           <div>
-                            <div className="font-bold text-black flex items-center gap-2">
+                            <div className="font-bold text-base-content flex items-center gap-2">
                               {product.name}
                               {product.showAsNewArrival && (
                                 <span className="badge badge-secondary badge-xs font-semibold">
@@ -561,7 +560,7 @@ export default function AdminProductsPage() {
 
                       {/* Category & Brand */}
                       <td>
-                        <div className="text-sm font-medium text-black">
+                        <div className="text-sm font-medium text-base-content">
                           {product.category?.name || "N/A"}
                         </div>
                         <div className="text-xs text-gray-500">
@@ -648,11 +647,11 @@ export default function AdminProductsPage() {
       {/* CREATE / EDIT MODAL */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-base-100 rounded-box shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col relative animate-in zoom-in-95 duration-150 overflow-hidden">
+          <div className="bg-base-100 rounded-box shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col relative animate-scale-in duration-150 overflow-hidden">
             {/* Modal Header */}
-            <div className="p-6 border-b border-base-300 flex justify-between items-center bg-white">
+            <div className="p-6 border-b border-base-300 flex justify-between items-center bg-base-100">
               <div>
-                <h2 className="text-2xl font-bold text-black flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-base-content flex items-center gap-2">
                   <Package className="text-primary" size={24} />
                   {currentProduct ? `Edit Product: ${currentProduct.name}` : "Create New Product"}
                 </h2>
@@ -667,7 +666,7 @@ export default function AdminProductsPage() {
               </div>
               <button
                 onClick={handleCloseForm}
-                className="btn btn-ghost btn-circle btn-sm text-black"
+                className="btn btn-ghost btn-circle btn-sm text-base-content"
                 disabled={isSubmitting}
               >
                 <X size={20} />
@@ -688,9 +687,9 @@ export default function AdminProductsPage() {
                     disabled={!isAccessible}
                     className={`py-3 px-4 text-sm font-semibold border-b-2 flex items-center gap-2 transition-all ${
                       isActive
-                        ? "border-primary text-primary bg-white"
+                        ? "border-primary text-primary bg-base-100"
                         : isAccessible
-                        ? "border-transparent text-gray-700 hover:text-black"
+                        ? "border-transparent text-gray-700 hover:text-base-content"
                         : "border-transparent text-gray-400 opacity-60 cursor-not-allowed"
                     }`}
                     onClick={() => isAccessible && setActiveTab(tab.id)}
@@ -708,7 +707,7 @@ export default function AdminProductsPage() {
               {isSubmitting && (
                 <div className="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center gap-3">
                   <Loader2 className="animate-spin text-primary" size={40} />
-                  <p className="font-bold text-black text-lg">Saving Product Details...</p>
+                  <p className="font-bold text-base-content text-lg">Saving Product Details...</p>
                 </div>
               )}
 
@@ -716,10 +715,10 @@ export default function AdminProductsPage() {
               {activeTab === "general" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="form-control md:col-span-2">
-                    <label className="label font-semibold text-black">Product Name *</label>
+                    <label className="label font-semibold text-base-content">Product Name *</label>
                     <input
                       type="text"
-                      className="input input-bordered w-full bg-white text-black"
+                      className="input input-bordered w-full bg-base-100 text-base-content"
                       placeholder="e.g. Premium Cotton Casual Shirt"
                       value={formData.name}
                       onChange={(e) => handleInputChange("name", e.target.value)}
@@ -728,9 +727,9 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="form-control">
-                    <label className="label font-semibold text-black">Category *</label>
+                    <label className="label font-semibold text-base-content">Category *</label>
                     <select
-                      className="select select-bordered w-full bg-white text-black"
+                      className="select select-bordered w-full bg-base-100 text-base-content"
                       value={formData.categoryId}
                       onChange={(e) => handleInputChange("categoryId", e.target.value)}
                       required
@@ -747,11 +746,11 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="form-control">
-                    <label className="label font-semibold text-black">
+                    <label className="label font-semibold text-base-content">
                       Subcategory <span className="text-xs text-gray-400 font-normal">(Optional)</span>
                     </label>
                     <select
-                      className="select select-bordered w-full bg-white text-black"
+                      className="select select-bordered w-full bg-base-100 text-base-content"
                       value={formData.subcategoryId || ""}
                       onChange={(e) => handleInputChange("subcategoryId", e.target.value)}
                       disabled={!formData.categoryId}
@@ -766,11 +765,11 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="form-control">
-                    <label className="label font-semibold text-black">
+                    <label className="label font-semibold text-base-content">
                       Child Category <span className="text-xs text-gray-400 font-normal">(Optional)</span>
                     </label>
                     <select
-                      className="select select-bordered w-full bg-white text-black"
+                      className="select select-bordered w-full bg-base-100 text-base-content"
                       value={formData.childCategoryId || ""}
                       onChange={(e) => handleInputChange("childCategoryId", e.target.value)}
                       disabled={!formData.subcategoryId}
@@ -785,9 +784,9 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="form-control">
-                    <label className="label font-semibold text-black">Brand *</label>
+                    <label className="label font-semibold text-base-content">Brand *</label>
                     <select
-                      className="select select-bordered w-full bg-white text-black"
+                      className="select select-bordered w-full bg-base-100 text-base-content"
                       value={formData.brandId}
                       onChange={(e) => handleInputChange("brandId", e.target.value)}
                       required
@@ -804,12 +803,12 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="form-control">
-                    <label className="label font-semibold text-black">
+                    <label className="label font-semibold text-base-content">
                       Unit <span className="text-xs text-gray-400 font-normal">(Optional)</span>
                     </label>
                     <input
                       type="text"
-                      className="input input-bordered w-full bg-white text-black"
+                      className="input input-bordered w-full bg-base-100 text-base-content"
                       placeholder="e.g. Pcs, Pair, Pack"
                       value={formData.unit || ""}
                       onChange={(e) => handleInputChange("unit", e.target.value)}
@@ -817,13 +816,13 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="form-control">
-                    <label className="label font-semibold text-black">
+                    <label className="label font-semibold text-base-content">
                       Video URL <span className="text-xs text-gray-400 font-normal">(Optional)</span>
                     </label>
                     <div className="relative">
                       <input
                         type="url"
-                        className="input input-bordered w-full bg-white text-black pl-10"
+                        className="input input-bordered w-full bg-base-100 text-base-content pl-10"
                         placeholder="https://youtube.com/..."
                         value={formData.videoUrl || ""}
                         onChange={(e) => handleInputChange("videoUrl", e.target.value)}
@@ -833,9 +832,9 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="form-control md:col-span-2">
-                    <label className="label font-semibold text-black">Description *</label>
+                    <label className="label font-semibold text-base-content">Description *</label>
                     <textarea
-                      className="textarea textarea-bordered w-full h-24 bg-white text-black"
+                      className="textarea textarea-bordered w-full h-24 bg-base-100 text-base-content"
                       placeholder="Detailed product descriptions, material composition, features..."
                       value={formData.description}
                       onChange={(e) => handleInputChange("description", e.target.value)}
@@ -850,12 +849,12 @@ export default function AdminProductsPage() {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="form-control">
-                      <label className="label font-semibold text-black">Purchase Price (৳) *</label>
+                      <label className="label font-semibold text-base-content">Purchase Price (৳) *</label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className="input input-bordered w-full bg-white text-black"
+                        className="input input-bordered w-full bg-base-100 text-base-content"
                         value={formData.purchasePrice}
                         onChange={(e) => handleInputChange("purchasePrice", e.target.value)}
                         required
@@ -863,12 +862,12 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="form-control">
-                      <label className="label font-semibold text-black">Old Price / MSRP (৳) *</label>
+                      <label className="label font-semibold text-base-content">Old Price / MSRP (৳) *</label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className="input input-bordered w-full bg-white text-black"
+                        className="input input-bordered w-full bg-base-100 text-base-content"
                         value={formData.oldPrice}
                         onChange={(e) => handleInputChange("oldPrice", e.target.value)}
                         required
@@ -876,12 +875,12 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="form-control">
-                      <label className="label font-semibold text-black">New Sale Price (৳) *</label>
+                      <label className="label font-semibold text-base-content">New Sale Price (৳) *</label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className="input input-bordered w-full bg-white text-black"
+                        className="input input-bordered w-full bg-base-100 text-base-content"
                         value={formData.newPrice}
                         onChange={(e) => handleInputChange("newPrice", e.target.value)}
                         required
@@ -889,12 +888,12 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="form-control">
-                      <label className="label font-semibold text-black">Reseller Price (৳) *</label>
+                      <label className="label font-semibold text-base-content">Reseller Price (৳) *</label>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className="input input-bordered w-full bg-white text-black"
+                        className="input input-bordered w-full bg-base-100 text-base-content"
                         value={formData.resellerPrice}
                         onChange={(e) => handleInputChange("resellerPrice", e.target.value)}
                         required
@@ -906,9 +905,9 @@ export default function AdminProductsPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                     <div className="form-control">
-                      <label className="label font-semibold text-black">Status</label>
+                      <label className="label font-semibold text-base-content">Status</label>
                       <select
-                        className="select select-bordered w-full bg-white text-black"
+                        className="select select-bordered w-full bg-base-100 text-base-content"
                         value={formData.status}
                         onChange={(e) => handleInputChange("status", e.target.value)}
                       >
@@ -919,14 +918,14 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="form-control pt-6">
-                      <label className="label cursor-pointer justify-start gap-4 border p-3 rounded-lg bg-white">
+                      <label className="label cursor-pointer justify-start gap-4 border p-3 rounded-lg bg-base-100">
                         <input
                           type="checkbox"
                           className="checkbox checkbox-primary"
                           checked={formData.showAsNewArrival}
                           onChange={(e) => handleInputChange("showAsNewArrival", e.target.checked)}
                         />
-                        <span className="label-text font-semibold text-black">
+                        <span className="label-text font-semibold text-base-content">
                           Show as New Arrival Badge
                         </span>
                       </label>
@@ -940,7 +939,7 @@ export default function AdminProductsPage() {
                 <div className="space-y-6">
                   {/* Colors Attribute Selection */}
                   <div>
-                    <h3 className="text-md font-bold text-black mb-2 flex items-center gap-2">
+                    <h3 className="text-md font-bold text-base-content mb-2 flex items-center gap-2">
                       <Tag size={18} className="text-primary" /> Colors (Optional)
                     </h3>
                     <p className="text-xs text-gray-500 mb-3">
@@ -962,7 +961,7 @@ export default function AdminProductsPage() {
                               className={`btn btn-sm gap-2 border ${
                                 isSelected
                                   ? "btn-primary text-white"
-                                  : "btn-outline text-black bg-white"
+                                  : "btn-outline text-base-content bg-base-100"
                               }`}
                             >
                               <span
@@ -982,7 +981,7 @@ export default function AdminProductsPage() {
 
                   {/* Sizes Attribute Selection */}
                   <div>
-                    <h3 className="text-md font-bold text-black mb-2 flex items-center gap-2">
+                    <h3 className="text-md font-bold text-base-content mb-2 flex items-center gap-2">
                       <Layers size={18} className="text-primary" /> Sizes (Optional)
                     </h3>
                     <p className="text-xs text-gray-500 mb-3">
@@ -1004,7 +1003,7 @@ export default function AdminProductsPage() {
                               className={`btn btn-sm gap-2 border ${
                                 isSelected
                                   ? "btn-primary text-white"
-                                  : "btn-outline text-black bg-white"
+                                  : "btn-outline text-base-content bg-base-100"
                               }`}
                             >
                               {s.name}
@@ -1020,7 +1019,7 @@ export default function AdminProductsPage() {
 
                   {/* Age Variants Attribute Selection */}
                   <div>
-                    <h3 className="text-md font-bold text-black mb-2 flex items-center gap-2">
+                    <h3 className="text-md font-bold text-base-content mb-2 flex items-center gap-2">
                       <Package size={18} className="text-primary" /> Age Variants (Optional)
                     </h3>
                     <p className="text-xs text-gray-500 mb-3">
@@ -1042,7 +1041,7 @@ export default function AdminProductsPage() {
                               className={`btn btn-sm gap-2 border ${
                                 isSelected
                                   ? "btn-primary text-white"
-                                  : "btn-outline text-black bg-white"
+                                  : "btn-outline text-base-content bg-base-100"
                               }`}
                             >
                               {a.ageRange}
@@ -1063,7 +1062,7 @@ export default function AdminProductsPage() {
                     <input
                       type="url"
                       placeholder="Paste image URL (e.g. https://images.unsplash.com/...)"
-                      className="input input-bordered flex-1 bg-white text-black"
+                      className="input input-bordered flex-1 bg-base-100 text-base-content"
                       value={newImageUrl}
                       onChange={(e) => setNewImageUrl(e.target.value)}
                     />
@@ -1086,7 +1085,7 @@ export default function AdminProductsPage() {
                       {formData.images?.map((img, idx) => (
                         <div
                           key={idx}
-                          className={`relative group rounded-box border p-2 bg-white ${
+                          className={`relative group rounded-box border p-2 bg-base-100 ${
                             img.isPrimary ? "ring-2 ring-primary" : ""
                           }`}
                         >
@@ -1102,7 +1101,7 @@ export default function AdminProductsPage() {
                           </div>
 
                           <div className="mt-2 flex items-center justify-between">
-                            <label className="text-xs flex items-center gap-1 cursor-pointer font-semibold text-black">
+                            <label className="text-xs flex items-center gap-1 cursor-pointer font-semibold text-base-content">
                               <input
                                 type="radio"
                                 name="primaryImage"
@@ -1130,7 +1129,7 @@ export default function AdminProductsPage() {
               {/* TAB 5: INVENTORY SETUP */}
               {activeTab === "inventory" && !currentProduct && (
                 <div className="space-y-4">
-                  <div className="alert alert-info text-sm text-black bg-blue-50 border-blue-200">
+                  <div className="alert alert-info text-sm text-base-content bg-blue-50 border-blue-200">
                     <AlertCircle size={20} className="text-info" />
                     <span>
                       Inventory records will be automatically seeded for each selected Size (or a primary inventory record if no size is chosen). Supplier details are optional.
@@ -1139,10 +1138,10 @@ export default function AdminProductsPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="form-control">
-                      <label className="label font-semibold text-black">Supplier Name (Optional)</label>
+                      <label className="label font-semibold text-base-content">Supplier Name (Optional)</label>
                       <input
                         type="text"
-                        className="input input-bordered w-full bg-white text-black"
+                        className="input input-bordered w-full bg-base-100 text-base-content"
                         placeholder="e.g. Acme Textile Ltd."
                         value={formData.supplierName || ""}
                         onChange={(e) => handleInputChange("supplierName", e.target.value)}
@@ -1150,10 +1149,10 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="form-control">
-                      <label className="label font-semibold text-black">Supplier Mobile (Optional)</label>
+                      <label className="label font-semibold text-base-content">Supplier Mobile (Optional)</label>
                       <input
                         type="text"
-                        className="input input-bordered w-full bg-white text-black"
+                        className="input input-bordered w-full bg-base-100 text-base-content"
                         placeholder="e.g. +8801700000000"
                         value={formData.supplierMobile || ""}
                         onChange={(e) => handleInputChange("supplierMobile", e.target.value)}
@@ -1161,13 +1160,13 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="form-control">
-                      <label className="label font-semibold text-black">
+                      <label className="label font-semibold text-base-content">
                         Low Stock Alert Limit
                       </label>
                       <input
                         type="number"
                         min="0"
-                        className="input input-bordered w-full bg-white text-black"
+                        className="input input-bordered w-full bg-base-100 text-base-content"
                         value={formData.stockLimitAlert ?? 10}
                         onChange={(e) => handleInputChange("stockLimitAlert", e.target.value)}
                       />
@@ -1194,7 +1193,7 @@ export default function AdminProductsPage() {
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    className="btn btn-ghost text-black"
+                    className="btn btn-ghost text-base-content"
                     onClick={handleCloseForm}
                     disabled={isSubmitting}
                   >
@@ -1242,20 +1241,20 @@ export default function AdminProductsPage() {
       {/* PRODUCT DETAIL PREVIEW MODAL */}
       {isDetailOpen && currentProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-base-100 rounded-box shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative animate-in zoom-in-95 duration-150">
-            <div className="p-6 border-b border-base-300 flex justify-between items-center bg-white rounded-t-box">
-              <h2 className="text-xl font-bold text-black flex items-center gap-2">
+          <div className="bg-base-100 rounded-box shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative animate-scale-in duration-150">
+            <div className="p-6 border-b border-base-300 flex justify-between items-center bg-base-100 rounded-t-box">
+              <h2 className="text-xl font-bold text-base-content flex items-center gap-2">
                 <Eye size={20} className="text-primary" /> Product Details
               </h2>
               <button
                 onClick={() => setIsDetailOpen(false)}
-                className="btn btn-ghost btn-circle btn-sm text-black"
+                className="btn btn-ghost btn-circle btn-sm text-base-content"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-6 text-black">
+            <div className="p-6 overflow-y-auto space-y-6 text-base-content">
               {/* Product Header & Images */}
               <div className="flex flex-col sm:flex-row gap-4 items-start">
                 <div className="w-32 h-32 rounded-box bg-base-200 overflow-hidden flex-shrink-0 border">
@@ -1327,14 +1326,14 @@ export default function AdminProductsPage() {
 
               {/* Attributes Summary */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-black">Assigned Attributes:</h4>
+                <h4 className="font-semibold text-base-content">Assigned Attributes:</h4>
                 <div>
                   <span className="text-xs font-semibold text-gray-500 block mb-1">Colors:</span>
                   <div className="flex flex-wrap gap-2">
                     {currentProduct.colors?.map((c) => (
                       <span
                         key={c.id}
-                        className="badge badge-outline gap-1 text-black bg-white"
+                        className="badge badge-outline gap-1 text-base-content bg-base-100"
                       >
                         <span
                           className="w-3 h-3 rounded-full border"
@@ -1353,7 +1352,7 @@ export default function AdminProductsPage() {
                   <span className="text-xs font-semibold text-gray-500 block mb-1">Sizes:</span>
                   <div className="flex flex-wrap gap-2">
                     {currentProduct.sizes?.map((s) => (
-                      <span key={s.id} className="badge badge-outline text-black bg-white">
+                      <span key={s.id} className="badge badge-outline text-base-content bg-base-100">
                         {s.size.name}
                       </span>
                     ))}
@@ -1367,7 +1366,7 @@ export default function AdminProductsPage() {
                   <span className="text-xs font-semibold text-gray-500 block mb-1">Age Variants:</span>
                   <div className="flex flex-wrap gap-2">
                     {currentProduct.ages?.map((a) => (
-                      <span key={a.id} className="badge badge-outline text-black bg-white">
+                      <span key={a.id} className="badge badge-outline text-base-content bg-base-100">
                         {a.ageVariant.ageRange}
                       </span>
                     ))}
@@ -1385,16 +1384,16 @@ export default function AdminProductsPage() {
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteOpen && productToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="bg-base-100 rounded-box shadow-2xl p-6 w-full max-w-md animate-in zoom-in-95 duration-150">
-            <h3 className="text-lg font-bold text-black flex items-center gap-2">
+          <div className="bg-base-100 rounded-box shadow-2xl p-6 w-full max-w-md animate-scale-in duration-150">
+            <h3 className="text-lg font-bold text-base-content flex items-center gap-2">
               <Trash2 className="text-error" size={20} /> Delete Product
             </h3>
-            <p className="py-4 text-sm text-black">
+            <p className="py-4 text-sm text-base-content">
               Are you sure you want to delete <strong>&ldquo;{productToDelete.name}&rdquo;</strong>? This action will remove it from active lists.
             </p>
             <div className="flex justify-end gap-3">
               <button
-                className="btn btn-ghost text-black"
+                className="btn btn-ghost text-base-content"
                 onClick={() => setIsDeleteOpen(false)}
                 disabled={isSubmitting}
               >

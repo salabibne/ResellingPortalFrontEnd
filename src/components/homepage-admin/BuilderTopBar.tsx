@@ -55,50 +55,50 @@ export default function BuilderTopBar({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={onShowPreview}
-          className="btn btn-xs btn-outline gap-1 border-white/30 text-white hover:bg-white/10 sm:btn-sm"
+          className="btn btn-sm btn-outline rounded-xl gap-2 border-white/30 text-white hover:bg-white/10"
         >
-          <Eye size={13} /> Preview
+          <Eye size={16} /> Preview
         </button>
         <button
           type="button"
           onClick={onReset}
           disabled={busy}
-          className="btn btn-xs btn-ghost gap-1 text-slate-300 hover:text-white sm:btn-sm"
+          className="btn btn-sm btn-ghost rounded-xl gap-2 text-slate-300 hover:text-white"
           title="Restore the factory section layout as a draft"
         >
-          {resetting ? <span className="loading loading-spinner loading-xs" /> : <RotateCcw size={13} />}
+          {resetting ? <span className="loading loading-spinner loading-xs" /> : <RotateCcw size={16} />}
           Reset
         </button>
         <button
           type="button"
           onClick={onDiscard}
           disabled={busy}
-          className="btn btn-xs btn-ghost gap-1 text-slate-300 hover:text-white sm:btn-sm"
+          className="btn btn-sm btn-ghost rounded-xl gap-2 text-slate-300 hover:text-white"
           title="Delete the draft and reload the published version"
         >
-          {discarding ? <span className="loading loading-spinner loading-xs" /> : <Undo2 size={13} />}
+          {discarding ? <span className="loading loading-spinner loading-xs" /> : <Undo2 size={16} />}
           Discard
         </button>
         <button
           type="button"
           onClick={onSave}
           disabled={busy || dirtyCount === 0}
-          className="btn btn-xs btn-outline gap-1 border-white/30 text-white hover:bg-white/10 sm:btn-sm"
+          className="btn btn-sm btn-primary rounded-xl gap-2 text-white font-semibold"
         >
-          {saving ? <span className="loading loading-spinner loading-xs" /> : <Save size={13} />}
+          {saving ? <span className="loading loading-spinner loading-xs" /> : <Save size={16} />}
           Save draft
         </button>
         <button
           type="button"
           onClick={onPublish}
           disabled={busy}
-          className="btn btn-xs btn-primary gap-1 font-bold shadow-md shadow-primary/30 sm:btn-sm"
+          className="btn btn-sm btn-primary rounded-xl gap-2 text-white font-semibold"
         >
-          {publishing ? <span className="loading loading-spinner loading-xs" /> : <Send size={13} />}
+          {publishing ? <span className="loading loading-spinner loading-xs" /> : <Send size={16} />}
           Publish
         </button>
       </div>
