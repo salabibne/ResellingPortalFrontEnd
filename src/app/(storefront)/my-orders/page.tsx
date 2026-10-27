@@ -5,19 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ShoppingBag,
-  Clock,
-  CheckCircle2,
   RefreshCw,
-  Truck,
-  XCircle,
   Eye,
   ChevronLeft,
   ChevronRight,
   Filter,
   ArrowRight,
 } from "lucide-react";
-import { orderApi, Order, OrderProcessingStatus, PaymentStatus } from "@/services/order.api";
+import { orderApi, Order, OrderStatusFilter, PaymentStatus } from "@/services/order.api";
 import { useAuthStore } from "@/store/useAuthStore";
+import CourierStatusBadge, { COURIER_STATUS_FILTERS } from "@/components/courier/CourierStatusBadge";
 
 export default function MyOrdersPage() {
   const router = useRouter();
@@ -28,7 +25,7 @@ export default function MyOrdersPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [meta, setMeta] = useState({ total: 0, totalPages: 1 });
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("ALL");
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<OrderStatusFilter>("ALL");
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -44,7 +41,7 @@ export default function MyOrdersPage() {
         page,
         limit,
         undefined,
-        selectedStatusFilter !== "ALL" ? (selectedStatusFilter as OrderProcessingStatus) : undefined
+        selectedStatusFilter
       );
       setOrders(res.data || []);
       setMeta({
@@ -61,50 +58,6 @@ export default function MyOrdersPage() {
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
-
-  const renderProcessingBadge = (status: OrderProcessingStatus) => {
-    switch (status) {
-      case "PENDING":
-        return (
-          <span className="badge badge-warning text-base-content font-bold text-xs gap-1 py-2 px-3">
-            <Clock size={12} /> Pending
-          </span>
-        );
-      case "CONFIRMED":
-        return (
-          <span className="badge badge-info text-white font-bold text-xs gap-1 py-2 px-3">
-            <CheckCircle2 size={12} /> Confirmed
-          </span>
-        );
-      case "PROCESSING":
-        return (
-          <span className="badge badge-primary text-white font-bold text-xs gap-1 py-2 px-3">
-            <RefreshCw size={12} className="animate-spin" /> Processing
-          </span>
-        );
-      case "SHIPPED":
-        return (
-          <span className="badge badge-accent text-white font-bold text-xs gap-1 py-2 px-3">
-            <Truck size={12} /> Shipped
-          </span>
-        );
-      case "DELIVERED":
-        return (
-          <span className="badge badge-success text-white font-bold text-xs gap-1 py-2 px-3">
-            <CheckCircle2 size={12} /> Delivered
-          </span>
-        );
-      case "CANCELLED":
-      case "RETURNED":
-        return (
-          <span className="badge badge-error text-white font-bold text-xs gap-1 py-2 px-3">
-            <XCircle size={12} /> {status}
-          </span>
-        );
-      default:
-        return <span className="badge text-xs">{status}</span>;
-    }
-  };
 
   const renderPaymentBadge = (status: PaymentStatus) => {
     switch (status) {
@@ -135,14 +88,10 @@ export default function MyOrdersPage() {
     }
   };
 
-  const statusFilters = [
-    { label: "All Orders", value: "ALL" },
-    { label: "Pending", value: "PENDING" },
-    { label: "Processing", value: "PROCESSING" },
-    { label: "Shipped", value: "SHIPPED" },
-    { label: "Delivered", value: "DELIVERED" },
-    { label: "Cancelled", value: "CANCELLED" },
-  ];
+  const statusFilters = COURIER_STATUS_FILTERS.map((opt) => ({
+    label: opt.value === "ALL" ? "All Orders" : opt.label,
+    value: opt.value,
+  }));
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
@@ -208,7 +157,7 @@ export default function MyOrdersPage() {
               <h3 className="text-lg font-bold text-slate-800">No Orders Found</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto mb-6">
                 {selectedStatusFilter !== "ALL"
-                  ? `No orders with status "${selectedStatusFilter}" were found.`
+                  ? `No orders with status "${statusFilters.find((s) => s.value === selectedStatusFilter)?.label}" were found.`
                   : "You haven&apos;t placed any orders yet. Explore our shop catalog!"}
               </p>
               <Link href="/shop" className="btn btn-primary rounded-full px-6 btn-sm">
@@ -247,7 +196,7 @@ export default function MyOrdersPage() {
                       <td className="font-bold text-slate-700">
                         {ord.orderItems?.length || 0} {ord.orderItems?.length === 1 ? "item" : "items"}
                       </td>
-                      <td>{renderProcessingBadge(ord.processingStatus)}</td>
+                      <td><CourierStatusBadge status={ord.courierStatus} /></td>
                       <td>{renderPaymentBadge(ord.paymentStatus)}</td>
                       <td className="font-black text-base-content">
                         ৳ {Number(ord.total).toLocaleString()}

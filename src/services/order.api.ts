@@ -2,6 +2,7 @@ import api from "./axios";
 
 export type PaymentMethod = "CASH_ON_DELIVERY" | "BKASH" | "NAGAD" | "BANK_TRANSFER";
 export type PaymentStatus = "DUE" | "PAID" | "PARTIAL" | "CANCELLED";
+/** Internal status kept by the backend; never shown — the courier status is the order status. */
 export type OrderProcessingStatus =
   | "PENDING"
   | "CONFIRMED"
@@ -10,6 +11,26 @@ export type OrderProcessingStatus =
   | "DELIVERED"
   | "CANCELLED"
   | "RETURNED";
+
+/** Order status filter values: courier status groups (see CourierStatusBadge). */
+export type OrderStatusFilter =
+  | "ALL"
+  | "ORDER_PLACED"
+  | "PENDING"
+  | "IN_TRANSIT"
+  | "DELIVERED"
+  | "PARTIAL"
+  | "CANCELLED";
+
+export interface OrderStatusSummary {
+  total: number;
+  ORDER_PLACED: number;
+  PENDING: number;
+  IN_TRANSIT: number;
+  DELIVERED: number;
+  PARTIAL: number;
+  CANCELLED: number;
+}
 
 export interface CreateOrderDto {
   paymentMethod: PaymentMethod;
@@ -84,7 +105,7 @@ export interface Order {
   advanceCourierAmount?: number | null;
   paymentStatus: PaymentStatus;
   paymentMethod: PaymentMethod;
-  processingStatus: OrderProcessingStatus;
+  processingStatus?: OrderProcessingStatus;
   orderProcessedBy?: string | null;
   subtotal: number;
   courierCharge: number;
@@ -129,8 +150,11 @@ export interface CourierPolicy {
 
 export interface ResellerStats {
   totalOrders: number;
+  orderPlacedOrders: number;
   pendingOrders: number;
+  inTransitOrders: number;
   deliveredOrders: number;
+  cancelledOrders: number;
   totalResellerProfit: number;
   pendingResellerProfit?: number;
   totalResellerSales: number;
@@ -227,7 +251,8 @@ export interface CourierAuthStatus {
 
 export interface PublicTrackingResult {
   orderRef: string | null;
-  processingStatus: OrderProcessingStatus;
+  /** Courier status, or "order_placed" when not yet booked. */
+  status: string;
   paymentStatus: PaymentStatus;
   courierStatus: string | null;
   courierTrackingLink: string | null;
@@ -270,7 +295,7 @@ export const orderApi = {
     page = 1,
     limit = 20,
     search?: string,
-    processingStatus?: OrderProcessingStatus,
+    courierStatus?: OrderStatusFilter,
     paymentStatus?: PaymentStatus,
     isResellerOnly?: boolean,
     startDate?: string,
@@ -281,8 +306,8 @@ export const orderApi = {
     params.set("page", page.toString());
     params.set("limit", limit.toString());
     if (search) params.set("search", search);
-    if (processingStatus && processingStatus !== ("ALL" as any)) {
-      params.set("processingStatus", processingStatus);
+    if (courierStatus && courierStatus !== "ALL") {
+      params.set("courierStatus", courierStatus);
     }
     if (paymentStatus && paymentStatus !== ("ALL" as any)) {
       params.set("paymentStatus", paymentStatus);
@@ -400,7 +425,7 @@ export const orderApi = {
   },
   exportOrders: async (
     search?: string,
-    processingStatus?: OrderProcessingStatus,
+    courierStatus?: OrderStatusFilter,
     paymentStatus?: PaymentStatus,
     isResellerOnly?: boolean,
     startDate?: string,
@@ -409,8 +434,8 @@ export const orderApi = {
   ): Promise<Order[]> => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
-    if (processingStatus && processingStatus !== ("ALL" as any)) {
-      params.set("processingStatus", processingStatus);
+    if (courierStatus && courierStatus !== "ALL") {
+      params.set("courierStatus", courierStatus);
     }
     if (paymentStatus && paymentStatus !== ("ALL" as any)) {
       params.set("paymentStatus", paymentStatus);
@@ -424,11 +449,22 @@ export const orderApi = {
     const response = await api.get(`/orders/export?${params.toString()}`);
     return response.data;
   },
-  updateOrderStatus: async (
+  updatePaymentStatus: async (
     orderId: string,
-    data: { processingStatus?: OrderProcessingStatus; paymentStatus?: PaymentStatus }
+    data: { paymentStatus: PaymentStatus }
   ): Promise<Order> => {
     const response = await api.patch(`/orders/${orderId}/status`, data);
+    return response.data;
+  },
+  /** Cancel an order not yet booked with the courier. Stock is restored manually. */
+  cancelOrder: async (orderId: string): Promise<Order> => {
+    const response = await api.patch(`/orders/${orderId}/cancel`, {});
+    return response.data;
+  },
+  getStatusSummary: async (isResellerOnly?: boolean): Promise<OrderStatusSummary> => {
+    const response = await api.get(
+      `/orders/status-summary${isResellerOnly ? "?isResellerOnly=true" : ""}`
+    );
     return response.data;
   },
   sendToCourier: async (

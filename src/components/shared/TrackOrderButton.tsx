@@ -3,16 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink, PackageSearch, X } from "lucide-react";
 import { orderApi, type PublicTrackingResult } from "@/services/order.api";
-
-const STATUS_STYLES: Record<string, string> = {
-  PENDING: "badge-warning",
-  CONFIRMED: "badge-info",
-  PROCESSING: "badge-info",
-  SHIPPED: "badge-primary",
-  DELIVERED: "badge-success",
-  CANCELLED: "badge-error",
-  RETURNED: "badge-neutral",
-};
+import CourierStatusBadge from "@/components/courier/CourierStatusBadge";
 
 export default function TrackOrderButton() {
   const [open, setOpen] = useState(false);
@@ -125,19 +116,8 @@ export default function TrackOrderButton() {
                 <span className="font-mono text-[10px] font-bold">
                   {result.orderRef || "Order"}
                 </span>
-                <span
-                  className={`badge badge-xs ${
-                    STATUS_STYLES[result.processingStatus] || "badge-neutral"
-                  }`}
-                >
-                  {result.processingStatus}
-                </span>
+                <CourierStatusBadge status={result.courierStatus} />
               </div>
-              {result.courierStatus && (
-                <p className="text-[10px] text-base-content/60">
-                  Courier: <strong>{result.courierStatus}</strong>
-                </p>
-              )}
               <p className="text-[10px] text-base-content/50">
                 Updated {new Date(result.updatedAt).toLocaleString()}
               </p>

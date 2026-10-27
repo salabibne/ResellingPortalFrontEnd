@@ -3,14 +3,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   ShoppingBag,
-  Clock,
   CheckCircle2,
   Truck,
-  XCircle,
   Eye,
   Search,
   MapPin,
-  X,
   FileSpreadsheet,
   RefreshCw,
   Copy,
@@ -20,10 +17,13 @@ import {
 import {
   orderApi,
   Order,
-  OrderProcessingStatus,
+  OrderStatusFilter,
   CourierTrackResult,
 } from "@/services/order.api";
-import CourierStatusBadge from "@/components/courier/CourierStatusBadge";
+import CourierStatusBadge, {
+  COURIER_STATUS_FILTERS,
+  isProfitEarned,
+} from "@/components/courier/CourierStatusBadge";
 import PanelPage from "@/components/panel/PanelPage";
 import PanelPageHeader from "@/components/panel/PanelPageHeader";
 import PanelTabs from "@/components/panel/PanelTabs";
@@ -31,7 +31,6 @@ import PanelTable from "@/components/panel/PanelTable";
 import PanelEmpty from "@/components/panel/PanelEmpty";
 import PanelSkeleton from "@/components/panel/PanelSkeleton";
 import PanelModal from "@/components/panel/PanelModal";
-import StatusBadge from "@/components/panel/StatusBadge";
 import { exportOrdersToCSV } from "@/utils/csvExporter";
 
 export default function ResellerOrdersPage() {
@@ -42,7 +41,8 @@ export default function ResellerOrdersPage() {
   const [meta, setMeta] = useState({ total: 0, totalPages: 1 });
 
   const [search, setSearch] = useState<string>("");
-  const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
+  // Order status = courier status group
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatusFilter>("ALL");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
@@ -105,9 +105,7 @@ export default function ResellerOrdersPage() {
       setExporting(true);
       const data = await orderApi.exportOrders(
         search || undefined,
-        selectedStatus !== "ALL"
-          ? (selectedStatus as OrderProcessingStatus)
-          : undefined,
+        selectedStatus,
         undefined,
         true, // isResellerOnly
         startDate || undefined,
@@ -130,9 +128,7 @@ export default function ResellerOrdersPage() {
         page,
         limit,
         search || undefined,
-        selectedStatus !== "ALL"
-          ? (selectedStatus as OrderProcessingStatus)
-          : undefined,
+        selectedStatus,
         undefined,
         true, // isResellerOnly
         startDate || undefined,
@@ -177,106 +173,6 @@ export default function ResellerOrdersPage() {
     setEndDate("");
     setCustomerPhone("");
     setPage(1);
-  };
-
-  const renderCourierBadge = (status?: string | null) => {
-    if (!status) return null;
-    const s = status.toLowerCase();
-    switch (s) {
-      case "delivered":
-        return (
-          <span className="badge badge-success text-white text-[10px] font-bold py-1.5 px-2 gap-1">
-            <Check size={10} /> Delivered
-          </span>
-        );
-      case "in_review":
-        return (
-          <span className="badge badge-warning text-base-content text-[10px] font-bold py-1.5 px-2 gap-1">
-            <Clock size={10} /> In Review
-          </span>
-        );
-      case "pending":
-      case "in_transit":
-        return (
-          <span className="badge badge-info text-white text-[10px] font-bold py-1.5 px-2 gap-1">
-            <Truck size={10} /> In Transit
-          </span>
-        );
-      case "cancelled":
-        return (
-          <span className="badge badge-error text-white text-[10px] font-bold py-1.5 px-2 gap-1">
-            <X size={10} /> Courier Cancelled
-          </span>
-        );
-      case "hold":
-        return (
-          <span className="badge badge-warning text-white text-[10px] font-bold py-1.5 px-2 gap-1">
-            <AlertTriangle size={10} /> On Hold
-          </span>
-        );
-      case "partial_delivered":
-        return (
-          <span className="badge badge-warning text-base-content font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
-            <CheckCircle2 size={10} /> Partial Delivered
-          </span>
-        );
-      case "partial_delivered_approval_pending":
-        return (
-          <span className="badge badge-accent text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Clock size={10} /> Part. Deliv. Pending Appr.
-          </span>
-        );
-      case "delivered_approval_pending":
-        return (
-          <span className="badge badge-accent text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <CheckCircle2 size={10} /> Deliv. Pending Appr.
-          </span>
-        );
-      case "cancelled_approval_pending":
-        return (
-          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Clock size={10} /> Canc. Pending Appr.
-          </span>
-        );
-      case "cancelled_return_received":
-        return (
-          <span className="badge badge-error text-white font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-red-300">
-            <XCircle size={10} /> Returned & Restocked
-          </span>
-        );
-      case "partial_delivered_return_received":
-        return (
-          <span className="badge badge-warning text-base-content font-extrabold text-[10px] uppercase py-1.5 px-2 gap-1 border border-amber-400">
-            <CheckCircle2 size={10} /> Part. Return Received
-          </span>
-        );
-      case "cancelled_return_processing":
-      case "cancelled_return_rider_assigned":
-        return (
-          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Truck size={10} /> Return In Transit
-          </span>
-        );
-      case "partial_delivered_return_proccessing":
-      case "partial_delivered_return_rider_assigned":
-        return (
-          <span className="badge badge-warning text-base-content font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <Truck size={10} /> Part. Return In Transit
-          </span>
-        );
-      case "exceptional":
-        return (
-          <span className="badge badge-error text-white font-bold text-[10px] uppercase py-1.5 px-2 gap-1">
-            <AlertTriangle size={10} /> Exceptional
-          </span>
-        );
-      default:
-        return (
-          <span className="badge badge-ghost text-[10px] font-semibold py-1.5 px-2">
-            {status}
-          </span>
-        );
-    }
   };
 
   return (
@@ -376,18 +272,10 @@ export default function ResellerOrdersPage() {
           ariaLabel="Filter orders by status"
           value={selectedStatus}
           onChange={(id) => {
-            setSelectedStatus(id);
+            setSelectedStatus(id as OrderStatusFilter);
             setPage(1);
           }}
-          tabs={["ALL", "PENDING", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map(
-            (status) => ({
-              id: status,
-              label:
-                status === "ALL"
-                  ? "All"
-                  : status.charAt(0) + status.slice(1).toLowerCase(),
-            })
-          )}
+          tabs={COURIER_STATUS_FILTERS.map((opt) => ({ id: opt.value, label: opt.label }))}
         />
       </div>
 
@@ -410,7 +298,7 @@ export default function ResellerOrdersPage() {
                 <tr>
                   <th>Order Ref</th>
                   <th>Customer Info</th>
-                  <th>Steadfast Courier</th>
+                  <th>Tracking</th>
                   <th>Location</th>
                   <th>Selling Price</th>
                   <th>Reseller Profit</th>
@@ -441,8 +329,7 @@ export default function ResellerOrdersPage() {
                       ? Number(order.resellerProfit)
                       : calculatedItemProfit;
 
-                  const isEarned =
-                    order.processingStatus === "DELIVERED" && order.paymentStatus === "PAID";
+                  const isEarned = isProfitEarned(order);
 
                   return (
                     <tr key={order.id} className="hover:bg-base-200/40 transition-colors">
@@ -464,7 +351,6 @@ export default function ResellerOrdersPage() {
                               <Truck size={12} className="text-primary" />
                               <span>{order.courierTrackingCode}</span>
                             </div>
-                            <div>{renderCourierBadge(order.courierStatus)}</div>
                             {order.courierReturnStatus && (
                               <span className="badge badge-warning text-base-content text-[9px] font-bold uppercase py-1 px-1.5">
                                 Return: {order.courierReturnStatus}
@@ -473,7 +359,7 @@ export default function ResellerOrdersPage() {
                           </div>
                         ) : (
                           <span className="text-[11px] text-base-content/40 italic">
-                            Processing
+                            Not dispatched
                           </span>
                         )}
                       </td>
@@ -512,7 +398,7 @@ export default function ResellerOrdersPage() {
                           </span>
                         )}
                       </td>
-                      <td><StatusBadge status={order.processingStatus} /></td>
+                      <td><CourierStatusBadge status={order.courierStatus} /></td>
                       <td>
                         <button
                           className="btn btn-ghost btn-xs gap-1 text-primary"
@@ -550,7 +436,7 @@ export default function ResellerOrdersPage() {
                         {order.customerPhone || order.customer?.phone || "N/A"}
                       </p>
                     </div>
-                    <StatusBadge status={order.processingStatus} />
+                    <CourierStatusBadge status={order.courierStatus} />
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-base-content/60">Selling Price</span>
@@ -844,7 +730,7 @@ export default function ResellerOrdersPage() {
             {/* Profit Summary Block */}
             <div className="p-3.5 bg-base-200/60 rounded-xl flex items-center justify-between text-xs font-bold border border-base-300">
               <span className="text-base-content/70">Calculated Reseller Profit:</span>
-              {selectedOrder.processingStatus === "DELIVERED" && selectedOrder.paymentStatus === "PAID" ? (
+              {isProfitEarned(selectedOrder) ? (
                 <span className="text-emerald-600 font-extrabold text-sm">
                   +৳{Number(selectedOrder.resellerProfit || 0).toLocaleString()} (Earned)
                 </span>

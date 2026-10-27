@@ -2,8 +2,11 @@
 
 import PanelPageHeader from "@/components/panel/PanelPageHeader";
 import PanelSkeleton from "@/components/panel/PanelSkeleton";
-import StatusBadge from "@/components/panel/StatusBadge";
-import CourierStatusBadge from "@/components/courier/CourierStatusBadge";
+import CourierStatusBadge, {
+  COURIER_STATUS_FILTERS,
+  ORDER_PLACED_LABEL,
+  courierGroupOf,
+} from "@/components/courier/CourierStatusBadge";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
@@ -42,7 +45,8 @@ import {
 import {
   orderApi,
   Order,
-  OrderProcessingStatus,
+  OrderStatusFilter,
+  OrderStatusSummary,
   PaymentStatus,
 } from "@/services/order.api";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -63,7 +67,8 @@ export default function OrdersPage() {
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedProcessingStatus, setSelectedProcessingStatus] = useState<string>("ALL");
+  // Order status = courier status group
+  const [selectedCourierStatus, setSelectedCourierStatus] = useState<OrderStatusFilter>("ALL");
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState<string>("ALL");
   const [selectedOrderType, setSelectedOrderType] = useState<string>("ALL");
   const [startDate, setStartDate] = useState<string>("");
@@ -100,9 +105,7 @@ export default function OrdersPage() {
       setExporting(true);
       const data = await orderApi.exportOrders(
         searchQuery || undefined,
-        selectedProcessingStatus !== "ALL"
-          ? (selectedProcessingStatus as OrderProcessingStatus)
-          : undefined,
+        selectedCourierStatus,
         selectedPaymentStatus !== "ALL"
           ? (selectedPaymentStatus as PaymentStatus)
           : undefined,
@@ -138,9 +141,6 @@ export default function OrdersPage() {
       setSyncingAllCourier(false);
     }
   };
-
-  // Courier Status Filter
-  const [selectedCourierStatus, setSelectedCourierStatus] = useState<string>("ALL");
 
   // Steadfast Merchant Balance State
   const [steadfastBalance, setSteadfastBalance] = useState<number | null>(null);
@@ -244,10 +244,19 @@ export default function OrdersPage() {
 
   // Selected Order Drawer State
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [pendingProcessingStatus, setPendingProcessingStatus] = useState<OrderProcessingStatus>("PENDING");
   const [pendingPaymentStatus, setPendingPaymentStatus] = useState<PaymentStatus>("DUE");
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
+  const [isCancellingOrder, setIsCancellingOrder] = useState<boolean>(false);
   const [updateSuccessMsg, setUpdateSuccessMsg] = useState<string | null>(null);
+  const [statusSummary, setStatusSummary] = useState<OrderStatusSummary | null>(null);
+
+  const fetchStatusSummary = useCallback(async () => {
+    try {
+      setStatusSummary(await orderApi.getStatusSummary(selectedOrderType === "RESELLER"));
+    } catch (err) {
+      console.error("Failed to load order status summary:", err);
+    }
+  }, [selectedOrderType]);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -256,9 +265,7 @@ export default function OrdersPage() {
         page,
         limit,
         searchQuery || undefined,
-        selectedProcessingStatus !== "ALL"
-          ? (selectedProcessingStatus as OrderProcessingStatus)
-          : undefined,
+        selectedCourierStatus,
         selectedPaymentStatus !== "ALL"
           ? (selectedPaymentStatus as PaymentStatus)
           : undefined,
@@ -277,7 +284,8 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, searchQuery, selectedProcessingStatus, selectedPaymentStatus, selectedOrderType, startDate, endDate, customerPhoneFilter]);
+    fetchStatusSummary();
+  }, [page, limit, searchQuery, selectedCourierStatus, selectedPaymentStatus, selectedOrderType, startDate, endDate, customerPhoneFilter, fetchStatusSummary]);
 
   useEffect(() => {
     fetchOrders();
@@ -307,46 +315,12 @@ export default function OrdersPage() {
     };
   }, [fetchOrders]);
 
-  // Filter orders by Courier Status
-  const displayedOrders = useMemo(() => {
-    if (selectedCourierStatus === "ALL") return orders;
-    return orders.filter((o) => {
-      const cs = (o.courierStatus || "").toLowerCase();
-      if (selectedCourierStatus === "NOT_SENT") {
-        return !o.courierTrackingCode && !o.courierConsignmentId;
-      }
-      if (selectedCourierStatus === "IN_TRANSIT") {
-        return [
-          "pending",
-          "in_review",
-          "in_transit",
-          "delivered_approval_pending",
-          "partial_delivered_approval_pending",
-        ].includes(cs);
-      }
-      if (selectedCourierStatus === "DELIVERED") {
-        return cs === "delivered";
-      }
-      if (selectedCourierStatus === "PARTIAL_DELIVERED") {
-        return cs === "partial_delivered" || cs === "partial_delivered_return_received";
-      }
-      if (selectedCourierStatus === "CANCELLED") {
-        return cs === "cancelled" || cs.includes("cancelled");
-      }
-      if (selectedCourierStatus === "HOLD") {
-        return cs === "hold";
-      }
-      if (selectedCourierStatus === "RETURNED") {
-        return cs.includes("return");
-      }
-      return cs === selectedCourierStatus.toLowerCase();
-    });
-  }, [orders, selectedCourierStatus]);
+  // The status filter is applied by the backend, so the list is shown as-is.
+  const displayedOrders = orders;
 
   // Sync state when drawer opens
   useEffect(() => {
     if (selectedOrder) {
-      setPendingProcessingStatus(selectedOrder.processingStatus);
       setPendingPaymentStatus(selectedOrder.paymentStatus);
       setUpdateSuccessMsg(null);
       setCourierActionMsg(null);
@@ -461,9 +435,8 @@ export default function OrdersPage() {
   // Compute KPI Header Metrics
   const kpiMetrics = useMemo(() => {
     const totalOrdersCount = meta.total || orders.length;
-    const pendingOrdersCount = orders.filter(
-      (o) => o.processingStatus === "PENDING"
-    ).length;
+    // Orders that reached admin but are not yet booked with the courier
+    const orderPlacedCount = statusSummary?.ORDER_PLACED ?? 0;
 
     const totalRevenue = orders.reduce((sum, o) => {
       return o.paymentStatus === "PAID" ? sum + Number(o.total) : sum;
@@ -475,37 +448,54 @@ export default function OrdersPage() {
 
     return {
       totalOrdersCount,
-      pendingOrdersCount,
+      orderPlacedCount,
       totalRevenue,
       outstandingDue,
     };
-  }, [orders, meta.total]);
+  }, [orders, meta.total, statusSummary]);
 
-  // Save Status Handler
-  const handleSaveStatusUpdate = async () => {
+  // Save Payment Status Handler (order status itself comes from the courier)
+  const handleSavePaymentStatus = async () => {
     if (!selectedOrder) return;
     try {
       setIsUpdatingStatus(true);
-      const updated = await orderApi.updateOrderStatus(selectedOrder.id, {
-        processingStatus: pendingProcessingStatus,
+      const updated = await orderApi.updatePaymentStatus(selectedOrder.id, {
         paymentStatus: pendingPaymentStatus,
       });
-      setSelectedOrder(updated);
-      setUpdateSuccessMsg("Order status & inventory successfully synchronized!");
+      setSelectedOrder({ ...selectedOrder, paymentStatus: updated.paymentStatus });
+      setUpdateSuccessMsg("Payment status updated.");
       fetchOrders();
     } catch (err: any) {
-      console.error("Failed to update order status:", err);
-      alert(err?.response?.data?.message || "Failed to update order status");
+      console.error("Failed to update payment status:", err);
+      alert(err?.response?.data?.message || "Failed to update payment status");
     } finally {
       setIsUpdatingStatus(false);
     }
   };
 
-  const isRestockSelection =
-    pendingProcessingStatus === "CANCELLED" || pendingProcessingStatus === "RETURNED";
-
-  const renderProcessingBadge = (status: OrderProcessingStatus) => {
-    return <StatusBadge status={status} />;
+  // Cancel an order that has not been booked with the courier yet
+  const handleCancelOrder = async () => {
+    if (!selectedOrder) return;
+    const confirmed = window.confirm(
+      "Cancel this order?\n\nStock is NOT restored automatically — restock the items manually from the Inventory page."
+    );
+    if (!confirmed) return;
+    try {
+      setIsCancellingOrder(true);
+      const updated = await orderApi.cancelOrder(selectedOrder.id);
+      setSelectedOrder({
+        ...selectedOrder,
+        courierStatus: updated.courierStatus,
+        paymentStatus: updated.paymentStatus,
+      });
+      setUpdateSuccessMsg("Order cancelled. Remember to restock the items from Inventory.");
+      fetchOrders();
+    } catch (err: any) {
+      console.error("Failed to cancel order:", err);
+      alert(err?.response?.data?.message || "Failed to cancel order");
+    } finally {
+      setIsCancellingOrder(false);
+    }
   };
 
   const renderPaymentBadge = (status: PaymentStatus) => {
@@ -547,7 +537,7 @@ export default function OrdersPage() {
     <div className="space-y-6">
       <PanelPageHeader
         title="Order & Fulfillment Management"
-        subtitle="Manage customer & reseller orders, track payments, update delivery status, and trigger stock restocks."
+        subtitle="Manage customer & reseller orders, track payments, and follow live courier status."
         icon={ShoppingBag}
       />
 
@@ -613,14 +603,14 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        {/* Pending Orders */}
+        {/* Order Placed: reached admin, not yet booked with the courier */}
         <div className="bg-base-100 p-5 rounded-3xl border border-slate-200/80 shadow-sm flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Pending Orders
+              {ORDER_PLACED_LABEL}
             </div>
             <div className="text-2xl font-black text-amber-600 mt-1">
-              {kpiMetrics.pendingOrdersCount}
+              {kpiMetrics.orderPlacedCount}
             </div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
@@ -742,11 +732,10 @@ export default function OrdersPage() {
 
           {/* Toolbar Actions */}
           <div className="flex items-center gap-2 ml-auto">
-            {(searchQuery || selectedProcessingStatus !== "ALL" || selectedPaymentStatus !== "ALL" || selectedOrderType !== "ALL" || selectedCourierStatus !== "ALL" || startDate || endDate || customerPhoneFilter) && (
+            {(searchQuery || selectedPaymentStatus !== "ALL" || selectedOrderType !== "ALL" || selectedCourierStatus !== "ALL" || startDate || endDate || customerPhoneFilter) && (
               <button
                 onClick={() => {
                   setSearchQuery("");
-                  setSelectedProcessingStatus("ALL");
                   setSelectedCourierStatus("ALL");
                   setSelectedPaymentStatus("ALL");
                   setSelectedOrderType("ALL");
@@ -793,47 +782,23 @@ export default function OrdersPage() {
             </select>
           </div>
 
-          {/* Processing Status Filter */}
+          {/* Order Status Filter (courier status) */}
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 min-w-0 whitespace-nowrap">
-            <Filter size={14} className="shrink-0" /> Processing:
-            <select
-              value={selectedProcessingStatus}
-              onChange={(e) => {
-                setSelectedProcessingStatus(e.target.value);
-                setPage(1);
-              }}
-              className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0"
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="PENDING">PENDING</option>
-              <option value="CONFIRMED">CONFIRMED</option>
-              <option value="PROCESSING">PROCESSING</option>
-              <option value="SHIPPED">SHIPPED</option>
-              <option value="DELIVERED">DELIVERED</option>
-              <option value="CANCELLED">CANCELLED</option>
-              <option value="RETURNED">RETURNED</option>
-            </select>
-          </div>
-
-          {/* Courier Status Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 min-w-0 whitespace-nowrap">
-            <Truck size={14} className="text-info shrink-0" /> Courier:
+            <Filter size={14} className="shrink-0" /> Status:
             <select
               value={selectedCourierStatus}
               onChange={(e) => {
-                setSelectedCourierStatus(e.target.value);
+                setSelectedCourierStatus(e.target.value as OrderStatusFilter);
                 setPage(1);
               }}
               className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0"
             >
-              <option value="ALL">All Courier Statuses</option>
-              <option value="NOT_SENT">Not Placed with Courier</option>
-              <option value="IN_TRANSIT">In Transit / Active</option>
-              <option value="DELIVERED">Delivered</option>
-              <option value="PARTIAL_DELIVERED">Partially Delivered</option>
-              <option value="CANCELLED">Cancelled</option>
-              <option value="HOLD">On Hold</option>
-              <option value="RETURNED">Returned (Return Received)</option>
+              {COURIER_STATUS_FILTERS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.value === "ALL" ? "All Statuses" : opt.label}
+                  {statusSummary && opt.value !== "ALL" ? ` (${statusSummary[opt.value]})` : ""}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -912,7 +877,7 @@ export default function OrdersPage() {
                   </th>
                   <th className="whitespace-nowrap">Order Ref / Type</th>
                   <th className="whitespace-nowrap">Customer Info</th>
-                  <th className="whitespace-nowrap">Steadfast Courier</th>
+                  <th className="whitespace-nowrap">Tracking</th>
                   <th className="whitespace-nowrap">Order Date</th>
                   <th className="whitespace-nowrap">Status</th>
                   <th className="whitespace-nowrap">Total Bill</th>
@@ -991,7 +956,6 @@ export default function OrdersPage() {
                               <span className="underline decoration-dotted">{ord.courierTrackingCode}</span>
                               <ExternalLink size={10} className="opacity-40 group-hover:opacity-100" />
                             </button>
-                            <div>{renderCourierBadge(ord.courierStatus)}</div>
                           </div>
                         ) : (
                           <span className="text-[11px] text-slate-400 font-medium italic whitespace-nowrap">
@@ -1008,7 +972,7 @@ export default function OrdersPage() {
 
                       <td className="align-middle py-3 whitespace-nowrap">
                         <div className="flex flex-col items-start gap-1">
-                          {renderProcessingBadge(ord.processingStatus)}
+                          {renderCourierBadge(ord.courierStatus)}
                           {renderPaymentBadge(ord.paymentStatus)}
                         </div>
                       </td>
@@ -1200,9 +1164,7 @@ export default function OrdersPage() {
                   <h4 className="text-xs font-black text-indigo-950 uppercase tracking-wider flex items-center gap-1.5">
                     <Truck size={15} className="text-primary" /> Steadfast Courier Service
                   </h4>
-                  {selectedOrder.courierStatus && (
-                    <div>{renderCourierBadge(selectedOrder.courierStatus)}</div>
-                  )}
+                  <div>{renderCourierBadge(selectedOrder.courierStatus)}</div>
                 </div>
 
                 {courierActionMsg && (
@@ -1326,6 +1288,11 @@ export default function OrdersPage() {
                       </button>
                     </div>
                   </div>
+                ) : courierGroupOf(selectedOrder.courierStatus) === "CANCELLED" ? (
+                  /* Cancelled before it was placed with the courier */
+                  <p className="text-xs text-slate-500 font-medium">
+                    This order was cancelled before it was placed with Steadfast.
+                  </p>
                 ) : (
                   /* Not yet placed with Courier */
                   <div className="space-y-3">
@@ -1416,66 +1383,61 @@ export default function OrdersPage() {
                 )}
               </div>
 
-              {/* Interactive Status Management */}
+              {/* Payment & Cancellation — the order status itself comes from the courier */}
               <div className="bg-indigo-50/70 p-5 rounded-2xl border border-indigo-100 space-y-4">
                 <h4 className="text-xs font-extrabold text-indigo-950 uppercase tracking-wider flex items-center gap-1.5">
-                  <Package size={14} className="text-indigo-600" /> Status Management
+                  <Package size={14} className="text-indigo-600" /> Payment & Cancellation
                 </h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">Processing Status</label>
-                    <select
-                      value={pendingProcessingStatus}
-                      onChange={(e) => setPendingProcessingStatus(e.target.value as OrderProcessingStatus)}
-                      className="select select-sm select-bordered w-full bg-base-100 text-base-content font-bold rounded-xl"
-                    >
-                      <option value="PENDING">PENDING</option>
-                      <option value="CONFIRMED">CONFIRMED</option>
-                      <option value="PROCESSING">PROCESSING</option>
-                      <option value="SHIPPED">SHIPPED</option>
-                      <option value="DELIVERED">DELIVERED</option>
-                      <option value="CANCELLED">CANCELLED</option>
-                      <option value="RETURNED">RETURNED</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-700">Payment Status</label>
-                    <select
-                      value={pendingPaymentStatus}
-                      onChange={(e) => setPendingPaymentStatus(e.target.value as PaymentStatus)}
-                      className="select select-sm select-bordered w-full bg-base-100 text-base-content font-bold rounded-xl"
-                    >
-                      <option value="DUE">DUE</option>
-                      <option value="PAID">PAID</option>
-                      <option value="PARTIAL">PARTIAL</option>
-                      <option value="CANCELLED">CANCELLED</option>
-                    </select>
-                  </div>
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700">Payment Status</label>
+                  <select
+                    value={pendingPaymentStatus}
+                    onChange={(e) => setPendingPaymentStatus(e.target.value as PaymentStatus)}
+                    className="select select-sm select-bordered w-full bg-base-100 text-base-content font-bold rounded-xl"
+                  >
+                    <option value="DUE">DUE</option>
+                    <option value="PAID">PAID</option>
+                    <option value="PARTIAL">PARTIAL</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                  </select>
                 </div>
 
-                {isRestockSelection && (
-                  <div className="alert alert-warning text-base-content text-xs font-bold rounded-xl p-3 flex items-start gap-2.5 border border-amber-300">
-                    <ShieldAlert size={18} className="shrink-0 text-amber-700 mt-0.5" />
-                    <div>
-                      <span className="font-extrabold uppercase tracking-wide text-[11px] text-amber-900 block">Automatic Inventory Sync Warning</span>
-                      Updating to {pendingProcessingStatus} will restore item quantities back to warehouse inventory.
-                    </div>
-                  </div>
-                )}
-
                 <button
-                  onClick={handleSaveStatusUpdate}
-                  disabled={isUpdatingStatus}
-                  className="btn btn-primary btn-sm w-full text-white font-bold rounded-xl gap-2 mt-2"
+                  onClick={handleSavePaymentStatus}
+                  disabled={isUpdatingStatus || pendingPaymentStatus === selectedOrder.paymentStatus}
+                  className="btn btn-primary btn-sm w-full text-white font-bold rounded-xl gap-2"
                 >
                   {isUpdatingStatus ? (
                     <><span className="loading loading-spinner loading-xs"></span> Saving...</>
                   ) : (
-                    <><Save size={16} /> Save Status & Sync Inventory</>
+                    <><Save size={16} /> Save Payment Status</>
                   )}
                 </button>
+
+                {!selectedOrder.courierTrackingCode &&
+                  !selectedOrder.courierConsignmentId &&
+                  courierGroupOf(selectedOrder.courierStatus) !== "CANCELLED" && (
+                    <div className="pt-2 border-t border-indigo-100 space-y-2">
+                      <div className="flex items-start gap-2 text-[11px] text-slate-600 font-medium">
+                        <ShieldAlert size={14} className="shrink-0 text-amber-600 mt-0.5" />
+                        <span>
+                          Cancelling does not restore stock. Restock the items manually from the Inventory page.
+                        </span>
+                      </div>
+                      <button
+                        onClick={handleCancelOrder}
+                        disabled={isCancellingOrder}
+                        className="btn btn-outline btn-error btn-sm w-full font-bold rounded-xl gap-2"
+                      >
+                        {isCancellingOrder ? (
+                          <><span className="loading loading-spinner loading-xs"></span> Cancelling...</>
+                        ) : (
+                          <><XCircle size={16} /> Cancel Order</>
+                        )}
+                      </button>
+                    </div>
+                  )}
               </div>
 
               {/* Order Items Table */}

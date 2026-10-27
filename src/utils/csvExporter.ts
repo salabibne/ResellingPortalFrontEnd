@@ -1,4 +1,5 @@
 import { Order } from "@/services/order.api";
+import { courierStatusLabel } from "@/components/courier/CourierStatusBadge";
 import { Product } from "@/services/product.api";
 import {
   InventoryTransaction,
@@ -69,10 +70,9 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
     "Reseller Email",
     "Reseller Page Name",
     "Order Date",
-    "Processing Status",
+    "Order Status",
     "Payment Status",
     "Courier Provider",
-    "Courier Status",
     "Tracking Code",
     "Consignment ID",
     "Courier Delivery Type",
@@ -111,12 +111,12 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
 
     // Dates & Status
     const orderDate = formatDateTimeAMPM(ord.createdAt);
-    const processingStatus = ord.processingStatus || "";
+    // The courier status is the order status ("Order Placed" until booked).
+    const orderStatus = courierStatusLabel(ord.courierStatus);
     const paymentStatus = ord.paymentStatus || "";
 
     // Courier Details
     const courierProvider = ord.courierProvider || (ord.courierTrackingCode ? "STEADFAST" : "");
-    const courierStatus = ord.courierStatus ? ord.courierStatus.toUpperCase() : (ord.courierTrackingCode || ord.courierConsignmentId ? "NOT_SYNCED" : "NOT_SENT");
     const trackingCode = ord.courierTrackingCode || "";
     const consignmentId = ord.courierConsignmentId || "";
     const deliveryType = ord.courierDeliveryType === 1 ? "Point/Hub Pickup" : "Home Delivery";
@@ -180,10 +180,9 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
       escapeCSVField(resellerEmail),
       escapeCSVField(resellerPageName),
       escapeCSVField(orderDate),
-      escapeCSVField(processingStatus),
+      escapeCSVField(orderStatus),
       escapeCSVField(paymentStatus),
       escapeCSVField(courierProvider),
-      escapeCSVField(courierStatus),
       escapeCSVField(trackingCode),
       escapeCSVField(consignmentId),
       escapeCSVField(deliveryType),

@@ -7,6 +7,9 @@ import {
   TrendingUp,
   Clock,
   CheckCircle2,
+  Truck,
+  XCircle,
+  ClipboardList,
   Package,
   ShoppingCart,
   ArrowRight,
@@ -18,6 +21,7 @@ import PanelPage from "@/components/panel/PanelPage";
 import PanelPageHeader from "@/components/panel/PanelPageHeader";
 import PanelCard from "@/components/panel/PanelCard";
 import { orderApi, ResellerStats } from "@/services/order.api";
+import { ORDER_PLACED_LABEL } from "@/components/courier/CourierStatusBadge";
 
 export default function ResellerDashboardPage() {
   const [stats, setStats] = useState<ResellerStats | null>(null);
@@ -154,6 +158,32 @@ export default function ResellerDashboardPage() {
         </PanelCard>
       </div>
 
+      {/* Order status breakdown — the courier status is the order status */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        {[
+          { label: ORDER_PLACED_LABEL, value: stats?.orderPlacedOrders, icon: ClipboardList, tone: "text-slate-600 bg-slate-100" },
+          { label: "Pending", value: stats?.pendingOrders, icon: Clock, tone: "text-amber-600 bg-amber-50" },
+          { label: "In Transit", value: stats?.inTransitOrders, icon: Truck, tone: "text-info bg-info/10" },
+          { label: "Cancelled", value: stats?.cancelledOrders, icon: XCircle, tone: "text-error bg-error/10" },
+        ].map(({ label, value, icon: Icon, tone }) => (
+          <PanelCard key={label} className="p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-bold text-base-content/60 uppercase tracking-wider">
+                  {label}
+                </p>
+                <h3 className="text-2xl font-black text-base-content mt-1">
+                  {loading ? "..." : value || 0}
+                </h3>
+              </div>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold shrink-0 ${tone}`}>
+                <Icon size={24} />
+              </div>
+            </div>
+          </PanelCard>
+        ))}
+      </div>
+
       {/* Quick Action Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <PanelCard className="flex flex-col gap-4 hover:shadow-md transition-shadow">
@@ -198,7 +228,7 @@ export default function ResellerDashboardPage() {
             <h2>My Reseller Orders</h2>
           </div>
           <p className="text-sm text-base-content/70 flex-1">
-            Track all orders placed on behalf of your customers, view processing status (Pending, Confirmed, Shipped, Delivered), and profit.
+            Track all orders placed on behalf of your customers, follow live courier status (Order Placed, Pending, In Transit, Delivered), and profit.
           </p>
           <div>
             <Link

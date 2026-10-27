@@ -515,9 +515,10 @@ export default function CourierShipmentsPage() {
             >
               <option value="ALL">All Courier Statuses</option>
               <option value="NOT_SENT">Not Placed with Courier</option>
+              <option value="PENDING">Pending / In Review</option>
               <option value="IN_TRANSIT">In Transit / Active</option>
               <option value="DELIVERED">Delivered</option>
-              <option value="PARTIAL_DELIVERED">Partially Delivered</option>
+              <option value="PARTIAL">Partially Delivered</option>
               <option value="CANCELLED">Cancelled</option>
               <option value="HOLD">On Hold</option>
               <option value="RETURNED">Returned</option>

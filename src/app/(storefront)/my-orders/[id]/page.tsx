@@ -6,8 +6,6 @@ import Link from "next/link";
 import {
   ShoppingBag,
   ArrowLeft,
-  CheckCircle2,
-  Clock,
   Truck,
   XCircle,
   PackageCheck,
@@ -23,8 +21,14 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { orderApi, Order, OrderProcessingStatus, PaymentStatus } from "@/services/order.api";
+import { orderApi, Order, PaymentStatus } from "@/services/order.api";
 import { useAuthStore } from "@/store/useAuthStore";
+import CourierStatusBadge, {
+  CourierStatusGroup,
+  ORDER_PLACED_LABEL,
+  courierGroupOf,
+  courierStatusLabel,
+} from "@/components/courier/CourierStatusBadge";
 
 export default function CustomerOrderDetailPage() {
   const params = useParams();
@@ -93,10 +97,13 @@ export default function CustomerOrderDetailPage() {
     }
   }, [order?.courierTrackingCode]);
 
+  // The courier status is the order status
+  const statusGroup = courierGroupOf(order?.courierStatus);
+
   // Auto-refresh courier tracking status if active
   useEffect(() => {
     if (!order?.courierTrackingCode) return;
-    if (order.processingStatus === "DELIVERED" || order.processingStatus === "CANCELLED") return;
+    if (statusGroup === "DELIVERED" || statusGroup === "PARTIAL" || statusGroup === "CANCELLED") return;
 
     const interval = setInterval(() => {
       if (document.visibilityState === "visible") {
@@ -106,23 +113,19 @@ export default function CustomerOrderDetailPage() {
     }, 45000);
 
     return () => clearInterval(interval);
-  }, [order?.courierTrackingCode, order?.processingStatus]);
+  }, [order?.courierTrackingCode, statusGroup]);
 
-  const steps: OrderProcessingStatus[] = [
-    "PENDING",
-    "CONFIRMED",
-    "PROCESSING",
-    "SHIPPED",
-    "DELIVERED",
+  const steps: { group: CourierStatusGroup; label: string }[] = [
+    { group: "ORDER_PLACED", label: ORDER_PLACED_LABEL },
+    { group: "PENDING", label: "Pending" },
+    { group: "IN_TRANSIT", label: "In Transit" },
+    { group: "DELIVERED", label: "Delivered" },
   ];
 
-  const getStepIndex = (status: OrderProcessingStatus) => {
-    return steps.indexOf(status);
-  };
-
-  const currentStepIndex = order ? getStepIndex(order.processingStatus) : -1;
-  const isCancelledOrReturned =
-    order?.processingStatus === "CANCELLED" || order?.processingStatus === "RETURNED";
+  const currentStepIndex = order
+    ? steps.findIndex((s) => s.group === (statusGroup === "PARTIAL" ? "DELIVERED" : statusGroup))
+    : -1;
+  const isCancelledOrReturned = statusGroup === "CANCELLED";
 
   const renderPaymentBadge = (status: PaymentStatus) => {
     switch (status) {
@@ -134,52 +137,6 @@ export default function CustomerOrderDetailPage() {
         return <span className="badge badge-info text-white font-bold">PARTIAL</span>;
       default:
         return <span className="badge badge-error text-white font-bold">{status}</span>;
-    }
-  };
-
-  const renderCourierBadge = (status?: string | null) => {
-    if (!status) return null;
-    const s = status.toLowerCase();
-    switch (s) {
-      case "delivered":
-        return (
-          <span className="badge badge-success text-white font-bold text-xs py-2 px-3 gap-1">
-            <Check size={12} /> Delivered
-          </span>
-        );
-      case "in_review":
-        return (
-          <span className="badge badge-warning text-base-content font-bold text-xs py-2 px-3 gap-1">
-            <Clock size={12} /> In Review
-          </span>
-        );
-      case "pending":
-      case "in_transit":
-        return (
-          <span className="badge badge-info text-white font-bold text-xs py-2 px-3 gap-1">
-            <Truck size={12} /> In Transit
-          </span>
-        );
-      case "cancelled":
-        return (
-          <span className="badge badge-error text-white font-bold text-xs py-2 px-3 gap-1">
-            <XCircle size={12} /> Courier Cancelled
-          </span>
-        );
-      case "partial_delivered":
-        return (
-          <span className="badge badge-warning text-base-content font-extrabold text-xs py-2 px-3 gap-1 border border-amber-400">
-            <CheckCircle2 size={12} /> Partially Delivered
-          </span>
-        );
-      case "partial_delivered_approval_pending":
-        return (
-          <span className="badge badge-accent text-white font-bold text-xs py-2 px-3 gap-1">
-            <Clock size={12} /> Part. Deliv. Pending Appr.
-          </span>
-        );
-      default:
-        return <span className="badge badge-neutral text-white font-bold text-xs py-2 px-3">{status}</span>;
     }
   };
 
@@ -246,9 +203,7 @@ export default function CustomerOrderDetailPage() {
 
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   {renderPaymentBadge(order.paymentStatus)}
-                  <span className="badge badge-md sm:badge-lg bg-slate-900 text-white font-extrabold px-3 sm:px-4 py-2 sm:py-3">
-                    {order.processingStatus}
-                  </span>
+                  <CourierStatusBadge status={order.courierStatus} className="text-xs" />
                 </div>
               </div>
 
@@ -257,9 +212,9 @@ export default function CustomerOrderDetailPage() {
                 <div className="alert alert-error text-white font-bold rounded-2xl flex items-center gap-3">
                   <XCircle size={24} />
                   <div>
-                    <h4 className="font-extrabold">Order {order.processingStatus}</h4>
+                    <h4 className="font-extrabold">Order {courierStatusLabel(order.courierStatus)}</h4>
                     <p className="text-xs opacity-90 font-normal">
-                      This order has been {order.processingStatus.toLowerCase()}. Product inventory has been automatically synchronized.
+                      This order has been cancelled.
                     </p>
                   </div>
                 </div>
@@ -269,13 +224,13 @@ export default function CustomerOrderDetailPage() {
                     Fulfillment Progress Tracker
                   </h4>
                   <div className="overflow-x-auto no-scrollbar pb-2">
-                    <div className="flex items-center justify-between min-w-[340px] sm:min-w-0 sm:grid sm:grid-cols-5 gap-2 relative">
-                      {steps.map((stepName, idx) => {
+                    <div className="flex items-center justify-between min-w-[340px] sm:min-w-0 sm:grid sm:grid-cols-4 gap-2 relative">
+                      {steps.map(({ group, label }, idx) => {
                         const isCompleted = idx <= currentStepIndex;
                         const isCurrent = idx === currentStepIndex;
 
                         return (
-                          <div key={stepName} className="flex flex-col items-center text-center flex-1">
+                          <div key={group} className="flex flex-col items-center text-center flex-1">
                             <div
                               className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-[10px] sm:text-xs transition-all ${
                                 isCompleted
@@ -294,7 +249,7 @@ export default function CustomerOrderDetailPage() {
                                   : "text-slate-400"
                               }`}
                             >
-                              {stepName}
+                              {label}
                             </span>
                           </div>
                         );
@@ -377,7 +332,7 @@ export default function CustomerOrderDetailPage() {
                           Steadfast Courier
                         </span>
                       </div>
-                      {renderCourierBadge(order.courierStatus)}
+                      <CourierStatusBadge status={order.courierStatus} />
                     </div>
 
                     <div className="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 space-y-2">
