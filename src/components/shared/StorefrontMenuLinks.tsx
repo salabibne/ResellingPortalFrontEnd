@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useCategoryStore } from "@/store/useCategoryStore";
 
@@ -16,6 +16,7 @@ const accentLinkClass =
 export default function StorefrontMenuLinks({ onNavigate }: { onNavigate: () => void }) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const setSelectedCategory = useCategoryStore((state) => state.setSelectedCategory);
   const setSelectedSubcategory = useCategoryStore((state) => state.setSelectedSubcategory);
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,6 +77,26 @@ export default function StorefrontMenuLinks({ onNavigate }: { onNavigate: () => 
           </>
         )}
       </div>
+
+      {/* Any signed-in role (customer, uddokta, staff) can log out from here. */}
+      {user && (
+        <div className="flex items-center gap-2 rounded-xl border border-base-200 p-2">
+          <span className="min-w-0 flex-1 truncate px-1 text-xs text-base-content/60">
+            Logged in as{" "}
+            <span className="font-semibold text-base-content">{user.name || user.email}</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              onNavigate();
+            }}
+            className="btn btn-sm btn-ghost shrink-0 gap-1.5 rounded-xl text-error hover:bg-error/10"
+          >
+            <LogOut size={14} /> Logout
+          </button>
+        </div>
+      )}
     </div>
   );
 }
