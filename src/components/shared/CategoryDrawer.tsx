@@ -1,11 +1,18 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronRight, X } from "lucide-react";
 
 export interface CategoryDrawerItem {
   id: string;
   name: string;
+}
+
+export interface CategoryDrawerProduct {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  price: number;
 }
 
 interface CategoryDrawerProps {
@@ -15,11 +22,16 @@ interface CategoryDrawerProps {
   activeId?: string | null;
   onSelect: (id: string) => void;
   loading?: boolean;
+  /** When passed, tapping a category expands its products instead of selecting it. */
+  productsByCategory?: Record<string, CategoryDrawerProduct[]>;
+  productsLoading?: boolean;
+  onSelectProduct?: (id: string) => void;
 }
 
 /**
- * Minimal left drawer that lists category names only. Shared by the
- * storefront and the uddokta catalog; callers own the data and navigation.
+ * Minimal left drawer that lists categories. Shared by the storefront and the
+ * uddokta catalog; callers own the data and navigation. With
+ * `productsByCategory` each category becomes an accordion of its products.
  */
 export default function CategoryDrawer({
   open,
@@ -28,10 +40,21 @@ export default function CategoryDrawer({
   activeId,
   onSelect,
   loading = false,
+  productsByCategory,
+  productsLoading = false,
+  onSelectProduct,
 }: CategoryDrawerProps) {
   // Callers often pass an inline onClose; a ref keeps the effect below stable.
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const expandable = productsByCategory !== undefined;
+
+  // Each time the drawer opens, start with the active category expanded.
+  useEffect(() => {
+    if (open) setExpandedId(activeId ?? null);
+  }, [open, activeId]);
 
   // Escape closes the drawer and body scroll is locked while it is open.
   useEffect(() => {
@@ -49,6 +72,64 @@ export default function CategoryDrawer({
   }, [open]);
 
   if (!open) return null;
+
+  const renderProducts = (category: CategoryDrawerItem) => {
+    const products = productsByCategory?.[category.id] ?? [];
+    return (
+      <div id={`category-products-${category.id}`} className="mt-1 mb-2 ml-3 border-l border-base-200 pl-2">
+        {productsLoading && products.length === 0 ? (
+          <ul className="space-y-1" aria-hidden="true">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <li key={index} className="flex items-center gap-3 px-2 py-2">
+                <span className="skeleton h-12 w-12 shrink-0 rounded-lg" />
+                <span className="flex-1 space-y-2">
+                  <span className="skeleton block h-3 w-3/4 rounded" />
+                  <span className="skeleton block h-3 w-1/3 rounded" />
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : products.length === 0 ? (
+          <p className="px-2 py-3 text-xs text-base-content/60">No products in this category</p>
+        ) : (
+          <ul className="space-y-0.5">
+            {products.map((product) => (
+              <li key={product.id}>
+                <button
+                  type="button"
+                  onClick={() => onSelectProduct?.(product.id)}
+                  className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-base-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                >
+                  <img
+                    src={product.imageUrl || "/placeholder.png"}
+                    alt=""
+                    loading="lazy"
+                    className="h-12 w-12 shrink-0 rounded-lg bg-base-200 object-cover"
+                  />
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm font-medium text-base-content line-clamp-2">
+                      {product.name}
+                    </span>
+                    <span className="block text-xs font-bold text-primary">
+                      ৳{product.price.toLocaleString()}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <button
+          type="button"
+          onClick={() => onSelect(category.id)}
+          className="mt-1 flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-xs font-semibold text-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        >
+          <span className="flex-1 min-w-0 truncate">View all {category.name}</span>
+          <ChevronRight size={14} className="shrink-0" />
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-[70] print:hidden">
@@ -92,22 +173,35 @@ export default function CategoryDrawer({
             <ul className="space-y-1">
               {categories.map((category) => {
                 const active = category.id === activeId;
+                const expanded = expandable && category.id === expandedId;
                 return (
                   <li key={category.id}>
                     <button
                       type="button"
-                      onClick={() => onSelect(category.id)}
+                      onClick={() =>
+                        expandable
+                          ? setExpandedId(expanded ? null : category.id)
+                          : onSelect(category.id)
+                      }
                       aria-current={active ? "true" : undefined}
+                      aria-expanded={expandable ? expanded : undefined}
+                      aria-controls={expanded ? `category-products-${category.id}` : undefined}
                       title={category.name}
                       className={`flex items-center gap-3 h-12 px-4 w-full rounded-xl text-sm font-medium text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
-                        active
+                        active || expanded
                           ? "bg-primary/10 text-primary"
                           : "text-base-content/80 hover:bg-base-200"
                       }`}
                     >
                       <span className="flex-1 min-w-0 truncate">{category.name}</span>
-                      <ChevronRight size={16} className="shrink-0 opacity-60" />
+                      <ChevronRight
+                        size={16}
+                        className={`shrink-0 opacity-60 transition-transform motion-reduce:transition-none ${
+                          expanded ? "rotate-90" : ""
+                        }`}
+                      />
                     </button>
+                    {expanded && renderProducts(category)}
                   </li>
                 );
               })}
