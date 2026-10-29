@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { ChevronRight, X } from "lucide-react";
 
 export interface CategoryDrawerItem {
@@ -26,6 +26,10 @@ interface CategoryDrawerProps {
   productsByCategory?: Record<string, CategoryDrawerProduct[]>;
   productsLoading?: boolean;
   onSelectProduct?: (id: string) => void;
+  /** Drawer heading; defaults to "Categories". */
+  title?: string;
+  /** Extra content (search, links) shown above the category list. */
+  header?: ReactNode;
 }
 
 /**
@@ -43,6 +47,8 @@ export default function CategoryDrawer({
   productsByCategory,
   productsLoading = false,
   onSelectProduct,
+  title = "Categories",
+  header,
 }: CategoryDrawerProps) {
   // Callers often pass an inline onClose; a ref keeps the effect below stable.
   const onCloseRef = useRef(onClose);
@@ -143,22 +149,30 @@ export default function CategoryDrawer({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Categories"
+        aria-label={title}
         className="absolute inset-y-0 left-0 flex w-[85vw] max-w-xs flex-col bg-base-100 shadow-2xl animate-slide-in-left motion-reduce:animate-none"
       >
         <div className="flex items-center justify-between gap-2 border-b border-base-200 px-4 py-3">
-          <h2 className="text-base font-bold text-base-content">Categories</h2>
+          <h2 className="text-base font-bold text-base-content">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             className="btn btn-ghost btn-sm btn-square rounded-xl"
-            aria-label="Close categories"
+            aria-label={`Close ${title.toLowerCase()}`}
           >
             <X size={16} />
           </button>
         </div>
 
         <nav className="flex-1 min-h-0 overflow-y-auto p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
+          {header && (
+            <>
+              {header}
+              <h3 className="px-4 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wider text-base-content/60">
+                Categories
+              </h3>
+            </>
+          )}
           {loading && categories.length === 0 ? (
             <ul className="space-y-1" aria-hidden="true">
               {Array.from({ length: 6 }).map((_, index) => (

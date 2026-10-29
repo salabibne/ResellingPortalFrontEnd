@@ -2,7 +2,7 @@
 
 import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ShoppingBag,
   ShoppingCart,
@@ -26,10 +26,10 @@ import CartDrawer from "./CartDrawer";
 
 function NavbarContent() {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const mobileMenuOpen = useMobileMenuStore((state) => state.open);
-  const setMobileMenuOpen = useMobileMenuStore((state) => state.setOpen);
+  // The ☰ button opens the shared drawer (StorefrontCategoryDrawer) in menu mode.
+  const menuOpen = useMobileMenuStore((state) => state.menuOpen);
+  const setMenuOpen = useMobileMenuStore((state) => state.setMenuOpen);
   const [searchQuery, setSearchQuery] = useState("");
 
   const { categories, fetchCategories, setSelectedCategory, setSelectedSubcategory } =
@@ -46,29 +46,6 @@ function NavbarContent() {
     fetchCart();
   }, [fetchCategories, fetchCart]);
 
-  // Close the drawer whenever the route changes.
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname, setMobileMenuOpen]);
-
-  // Lock background scroll and support Escape while the drawer is open.
-  useEffect(() => {
-    if (!mobileMenuOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMobileMenuOpen(false);
-    };
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [mobileMenuOpen, setMobileMenuOpen]);
-
   const cartItemCount = cart?.cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   const handleCategoryClick = (categoryId: string, subcategoryId?: string) => {
@@ -81,14 +58,12 @@ function NavbarContent() {
       queryParams.set("subcategoryId", subcategoryId);
     }
     router.push(`/shop?${queryParams.toString()}`);
-    setMobileMenuOpen(false);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
-      setMobileMenuOpen(false);
     }
   };
 
@@ -140,11 +115,12 @@ function NavbarContent() {
                 <button
                   type="button"
                   className="btn btn-ghost btn-square btn-sm shrink-0 text-white hover:bg-white/10 lg:hidden"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-                  aria-expanded={mobileMenuOpen}
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  aria-label={menuOpen ? "Close menu" : "Open menu"}
+                  aria-haspopup="dialog"
+                  aria-expanded={menuOpen}
                 >
-                  {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                  {menuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
 
                 <Link href="/" className="group flex min-w-0 items-center gap-2">
@@ -361,154 +337,6 @@ function NavbarContent() {
           </div>
         </div>
       </div>
-
-      {/* Mobile drawer: a true fixed overlay, never a flow sibling of the nav */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[70] lg:hidden">
-          <button
-            type="button"
-            className="absolute inset-0 h-full w-full bg-black/60"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close menu"
-          />
-
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Main menu"
-            className="absolute inset-y-0 left-0 flex w-[85vw] max-w-sm flex-col overflow-y-auto bg-[#001777] shadow-2xl"
-          >
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-              <span className="text-sm font-extrabold text-white">Menu</span>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="btn btn-ghost btn-sm btn-circle text-white hover:bg-white/10"
-                aria-label="Close menu"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="space-y-4 px-4 py-4">
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="input input-sm w-full rounded-xl bg-white/15 text-white placeholder-white/70 focus:bg-base-100 focus:text-gray-900 pl-9 pr-4 text-xs"
-                  aria-label="Search products"
-                />
-                <Search
-                  size={14}
-                  className="absolute left-3 top-2.5 text-white/70 pointer-events-none"
-                />
-              </form>
-
-              <div className="grid grid-cols-2 gap-2 border-b border-white/10 pb-3">
-                <Link
-                  href="/"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="btn btn-xs bg-white/10 text-white border-none hover:bg-white/20 rounded-lg justify-start"
-                >
-                  Home
-                </Link>
-                <Link
-                  href="/shop"
-                  onClick={() => {
-                    setSelectedCategory(null);
-                    setSelectedSubcategory(null);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="btn btn-xs bg-white/10 text-white border-none hover:bg-white/20 rounded-lg justify-start"
-                >
-                  All Products
-                </Link>
-                <Link
-                  href="/about"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="btn btn-xs bg-white/10 text-white border-none hover:bg-white/20 rounded-lg justify-start"
-                >
-                  About Us
-                </Link>
-                <Link
-                  href="/reseller"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="btn btn-xs bg-secondary text-primary border-none hover:bg-secondary/90 rounded-lg justify-start font-bold"
-                >
-                  Uddokta Hub
-                </Link>
-              </div>
-
-              {!user && (
-                <div className="grid grid-cols-2 gap-2 border-b border-white/10 pb-3 sm:hidden">
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="btn btn-xs bg-white/10 text-white border-none hover:bg-white/20 rounded-lg justify-start"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="btn btn-xs bg-secondary text-primary border-none hover:bg-secondary/90 rounded-lg justify-start font-bold"
-                  >
-                    Register
-                  </Link>
-                </div>
-              )}
-
-              <div className="space-y-1">
-                <div className="text-[11px] font-bold text-white/60 uppercase tracking-wider px-1 pb-1">
-                  Product Categories
-                </div>
-                {categories.map((category) => {
-                  const isActiveCat = activeCategoryId === category.id;
-                  return (
-                    <div key={category.id} className="space-y-1">
-                      <button
-                        type="button"
-                        onClick={() => handleCategoryClick(category.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-between transition-colors ${
-                          isActiveCat ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/10"
-                        }`}
-                      >
-                        <span>{category.name}</span>
-                        {category.subcategories && category.subcategories.length > 0 && (
-                          <span className="text-[10px] opacity-70 bg-white/15 px-1.5 py-0.5 rounded">
-                            {category.subcategories.length}
-                          </span>
-                        )}
-                      </button>
-
-                      {category.subcategories && category.subcategories.length > 0 && (
-                        <div className="pl-3 space-y-1 border-l-2 border-white/20 ml-2">
-                          {category.subcategories.map((sub) => (
-                            <button
-                              key={sub.id}
-                              type="button"
-                              onClick={() => handleCategoryClick(category.id, sub.id)}
-                              className={`w-full text-left px-3 py-1.5 rounded-md text-[11px] font-medium transition-colors ${
-                                activeSubcategoryId === sub.id
-                                  ? "bg-white/30 text-white font-bold"
-                                  : "text-white/70 hover:text-white hover:bg-white/5"
-                              }`}
-                            >
-                              {sub.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Slide-over Cart Drawer */}
       <CartDrawer />

@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import CategoryDrawer, { CategoryDrawerProduct } from "@/components/shared/CategoryDrawer";
+import StorefrontMenuLinks from "@/components/shared/StorefrontMenuLinks";
 import { productApi, Product } from "@/services/product.api";
 import { useCategoryStore } from "@/store/useCategoryStore";
 import { useMobileMenuStore } from "@/store/useMobileMenuStore";
@@ -13,8 +14,11 @@ function StorefrontCategoryDrawerContent() {
   const searchParams = useSearchParams();
   const { categories, loading, fetchCategories, setSelectedCategory, setSelectedSubcategory } =
     useCategoryStore();
-  const open = useMobileMenuStore((state) => state.categoriesOpen);
-  const setOpen = useMobileMenuStore((state) => state.setCategoriesOpen);
+  const menuOpen = useMobileMenuStore((state) => state.menuOpen);
+  const categoriesOpen = useMobileMenuStore((state) => state.categoriesOpen);
+  const setMenuOpen = useMobileMenuStore((state) => state.setMenuOpen);
+  const setCategoriesOpen = useMobileMenuStore((state) => state.setCategoriesOpen);
+  const open = menuOpen || categoriesOpen;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(false);
@@ -59,18 +63,21 @@ function StorefrontCategoryDrawerContent() {
     return grouped;
   }, [products]);
 
-  const close = useCallback(() => setOpen(false), [setOpen]);
+  const close = useCallback(() => {
+    setMenuOpen(false);
+    setCategoriesOpen(false);
+  }, [setMenuOpen, setCategoriesOpen]);
 
   const handleSelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory(null);
     router.push(`/shop?categoryId=${encodeURIComponent(categoryId)}`);
-    setOpen(false);
+    close();
   };
 
   const handleSelectProduct = (productId: string) => {
     router.push(`/shop/${productId}`);
-    setOpen(false);
+    close();
   };
 
   return (
@@ -84,11 +91,16 @@ function StorefrontCategoryDrawerContent() {
       productsByCategory={productsByCategory}
       productsLoading={productsLoading}
       onSelectProduct={handleSelectProduct}
+      title={menuOpen ? "Menu" : "Categories"}
+      header={menuOpen ? <StorefrontMenuLinks onNavigate={close} /> : undefined}
     />
   );
 }
 
-/** The single storefront category drawer, opened from the bottom nav and /shop. */
+/**
+ * The single storefront left drawer: the Navbar ☰ menu (with search and links)
+ * and the categories-only drawer from the bottom nav and /shop.
+ */
 export default function StorefrontCategoryDrawer() {
   return (
     <Suspense fallback={null}>

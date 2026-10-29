@@ -1,23 +1,23 @@
 import { create } from "zustand";
 
 /**
- * Open state of the storefront's drawers. Shared so every trigger (Navbar
- * hamburger, bottom navigation, shop page) opens the same drawer instance.
- * - `open`: the full ☰ menu (search, links, categories).
- * - `categoriesOpen`: the categories-only drawer.
+ * Open state of the storefront's left drawer (StorefrontCategoryDrawer).
+ * Shared so every trigger opens the same drawer instance.
+ * - `menuOpen`: the Navbar ☰ menu — search, links, then categories.
+ * - `categoriesOpen`: bottom nav / shop page — categories only.
+ * Opening one closes the other.
  */
 interface MobileMenuState {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  toggle: () => void;
+  menuOpen: boolean;
+  setMenuOpen: (open: boolean) => void;
   categoriesOpen: boolean;
   setCategoriesOpen: (open: boolean) => void;
 }
 
 export const useMobileMenuStore = create<MobileMenuState>((set) => ({
-  open: false,
-  setOpen: (open) => set({ open }),
-  toggle: () => set((state) => ({ open: !state.open })),
+  menuOpen: false,
+  setMenuOpen: (menuOpen) => set(menuOpen ? { menuOpen, categoriesOpen: false } : { menuOpen }),
   categoriesOpen: false,
-  setCategoriesOpen: (categoriesOpen) => set({ categoriesOpen }),
+  setCategoriesOpen: (categoriesOpen) =>
+    set(categoriesOpen ? { categoriesOpen, menuOpen: false } : { categoriesOpen }),
 }));
