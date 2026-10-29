@@ -142,7 +142,7 @@ export default function AdminTicketsPage() {
     <PanelPage>
       <PanelPageHeader
         title="Support Tickets Management"
-        subtitle="Monitor and resolve incoming reseller inquiries. Search by Ticket ID, customer name, or keyword, and update resolution notes."
+        subtitle="Monitor and resolve incoming uddokta inquiries. Search by Ticket ID, customer name, or keyword, and update resolution notes."
         icon={LifeBuoy}
         actions={
           <button
@@ -271,7 +271,7 @@ export default function AdminTicketsPage() {
               <thead>
                 <tr>
                   <th>Ticket ID</th>
-                  <th>Reseller</th>
+                  <th>Uddokta</th>
                   <th>Reason</th>
                   <th>Message Preview</th>
                   <th>Status</th>
@@ -423,7 +423,7 @@ export default function AdminTicketsPage() {
               {/* Reseller Info Box */}
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Reseller Details
+                  Uddokta Details
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-800">
                   <div>
@@ -459,7 +459,7 @@ export default function AdminTicketsPage() {
 
               {/* Reseller's Message */}
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Reseller Message:</label>
+                <label className="font-bold text-slate-700">Uddokta Message:</label>
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-slate-800 leading-relaxed whitespace-pre-line">
                   {selectedTicket.message}
                 </div>
@@ -493,13 +493,13 @@ export default function AdminTicketsPage() {
                 </label>
                 <textarea
                   rows={4}
-                  placeholder="Enter resolution details, tracking notes, or message for the reseller..."
+                  placeholder="Enter resolution details, tracking notes, or message for the uddokta..."
                   className="textarea textarea-bordered w-full text-xs text-base-content"
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                 />
                 <span className="label-text-alt text-slate-400 mt-1">
-                  These notes will be visible to the reseller when viewing their ticket details.
+                  These notes will be visible to the uddokta when viewing their ticket details.
                 </span>
               </div>
             </form>

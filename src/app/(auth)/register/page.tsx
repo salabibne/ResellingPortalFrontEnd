@@ -61,7 +61,7 @@ function RegisterForm() {
       // deliberately does not return tokens for them.
       if (res.requiresApproval || !res.accessToken) {
         setSuccessMessage(
-          "Your reseller account is awaiting approval. You will be able to log in once an administrator approves it.",
+          "Your uddokta account is awaiting approval. You will be able to log in once an administrator approves it.",
         );
         setIsSuccess(true);
 

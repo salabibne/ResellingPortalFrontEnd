@@ -509,7 +509,7 @@ export default function AdminProductPagesPage() {
                     onChange={(e) =>
                       setConfig((prev) => ({ ...prev, metaDescription: e.target.value }))
                     }
-                    placeholder="Top quality Panjabi at reseller prices..."
+                    placeholder="Top quality Panjabi at uddokta prices..."
                     className="textarea textarea-bordered w-full text-sm mt-1 h-16 bg-base-100 text-base-content"
                   />
                 </div>

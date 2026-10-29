@@ -178,8 +178,8 @@ export default function ResellerOrdersPage() {
   return (
     <PanelPage>
       <PanelPageHeader
-        title="My Reseller Orders"
-        subtitle="Track fulfillment status, end-customer information, and reseller profit for all orders placed."
+        title="My Uddokta Orders"
+        subtitle="Track fulfillment status, end-customer information, and uddokta profit for all orders placed."
         icon={ShoppingBag}
         actions={
           <button
@@ -286,7 +286,7 @@ export default function ResellerOrdersPage() {
         <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm">
           <PanelEmpty
             icon={ShoppingBag}
-            title="No reseller orders found"
+            title="No uddokta orders found"
             text="Placed orders on behalf of your customers will appear here."
           />
         </div>
@@ -301,7 +301,7 @@ export default function ResellerOrdersPage() {
                   <th>Tracking</th>
                   <th>Location</th>
                   <th>Selling Price</th>
-                  <th>Reseller Profit</th>
+                  <th>Uddokta Profit</th>
                   <th>Advance Courier</th>
                   <th>Status</th>
                   <th>Action</th>
@@ -729,7 +729,7 @@ export default function ResellerOrdersPage() {
 
             {/* Profit Summary Block */}
             <div className="p-3.5 bg-base-200/60 rounded-xl flex items-center justify-between text-xs font-bold border border-base-300">
-              <span className="text-base-content/70">Calculated Reseller Profit:</span>
+              <span className="text-base-content/70">Calculated Uddokta Profit:</span>
               {isProfitEarned(selectedOrder) ? (
                 <span className="text-emerald-600 font-extrabold text-sm">
                   +৳{Number(selectedOrder.resellerProfit || 0).toLocaleString()} (Earned)
@@ -744,7 +744,7 @@ export default function ResellerOrdersPage() {
             {/* Optional Notes */}
             {selectedOrder.notes && (
               <div className="p-3 bg-base-200/60 rounded-xl text-xs space-y-1">
-                <span className="font-bold text-base-content/70 block">Optional Reseller Notes:</span>
+                <span className="font-bold text-base-content/70 block">Optional Uddokta Notes:</span>
                 <p className="text-base-content">{selectedOrder.notes}</p>
               </div>
             )}

@@ -155,7 +155,7 @@ export default function BulkAddToCartModal({ product, isOpen, onClose }: BulkAdd
                   Sale Price: <span className="font-bold text-primary">৳ {Number(product.newPrice).toLocaleString()}</span>
                   {product.resellerPrice && (
                     <span className="ml-2 text-secondary font-semibold">
-                      (Reseller: ৳ {Number(product.resellerPrice).toLocaleString()})
+                      (Uddokta: ৳ {Number(product.resellerPrice).toLocaleString()})
                     </span>
                   )}
                 </div>

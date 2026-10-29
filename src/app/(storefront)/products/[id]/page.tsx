@@ -272,7 +272,7 @@ export default function ProductDetailPage() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex flex-col justify-end p-6 md:p-12 text-white">
               <span className="text-primary font-bold text-xs uppercase tracking-widest bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full w-max mb-3">
-                Reseller Exclusive Special
+                Uddokta Exclusive Special
               </span>
               <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
                 {pageConfig.customTitle || product.name}
@@ -694,7 +694,7 @@ export default function ProductDetailPage() {
                 What Verified Buyers Say
               </h2>
               <p className="text-sm text-base-content/70">
-                Resellers and retail customers share their experience with our products.
+                Uddoktas and retail customers share their experience with our products.
               </p>
             </div>
 
@@ -709,7 +709,7 @@ export default function ProductDetailPage() {
                 {
                   name: "Rezaul Karim",
                   rating: 5,
-                  comment: "The markup I get as a reseller is amazing, and the quality keeps my customers coming back. High quality finishing and stitching.",
+                  comment: "The markup I get as an uddokta is amazing, and the quality keeps my customers coming back. High quality finishing and stitching.",
                   date: "1 week ago"
                 },
                 {
@@ -772,7 +772,7 @@ export default function ProductDetailPage() {
                   a: "Absolutely. We ship with trustworthy logistics partners that deliver with Cash on Delivery options available in Dhaka and all outer districts."
                 },
                 {
-                  q: "How can I join as a reseller?",
+                  q: "How can I join as an uddokta?",
                   a: "Create an account on our platform and register under user settings or contact support to get special wholesale pricing configs."
                 }
               ].map((faq, idx) => (

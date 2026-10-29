@@ -57,7 +57,7 @@ export default function AdminCourierPage() {
       });
 
       setPolicy(updated);
-      setSuccessMsg("Courier charge policy text updated successfully! This change reflects on both Reseller & Normal User checkout.");
+      setSuccessMsg("Courier charge policy text updated successfully! This change reflects on both Uddokta & Normal User checkout.");
     } catch (err: any) {
       console.error("Failed to update courier policy:", err);
       setErrorMsg(err?.response?.data?.message || "Failed to update courier charge policy text.");
@@ -78,7 +78,7 @@ export default function AdminCourierPage() {
     <div className="max-w-6xl mx-auto space-y-6 pb-20">
       <PanelPageHeader
         title="Courier Charge Text Policy Management"
-        subtitle="Configure courier charge policy text & default fees. Updates reflect instantly across both Reseller Checkout and Normal Customer Checkout."
+        subtitle="Configure courier charge policy text & default fees. Updates reflect instantly across both Uddokta Checkout and Normal Customer Checkout."
         icon={Truck}
         actions={
           <button
@@ -130,7 +130,7 @@ export default function AdminCourierPage() {
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                Courier Charge Info Text (Displayed to Resellers & Normal Users)
+                Courier Charge Info Text (Displayed to Uddoktas & Normal Users)
               </label>
               <textarea
                 rows={5}
@@ -141,7 +141,7 @@ export default function AdminCourierPage() {
                 onChange={(e) => setChargeText(e.target.value)}
               />
               <span className="text-[11px] text-slate-400 mt-1 block">
-                This exact text format is rendered on checkout pages for resellers and normal users.
+                This exact text format is rendered on checkout pages for uddoktas and normal users.
               </span>
             </div>
 
@@ -183,9 +183,9 @@ export default function AdminCourierPage() {
           <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-sm space-y-3">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-xs font-extrabold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-                <Users size={14} /> Reseller Checkout Preview (/reseller/cart)
+                <Users size={14} /> Uddokta Checkout Preview (/reseller/cart)
               </h3>
-              <span className="badge badge-primary text-[10px]">RESELLER VIEW</span>
+              <span className="badge badge-primary text-[10px]">UDDOKTA VIEW</span>
             </div>
 
             <div className="p-4 bg-slate-800/80 rounded-2xl border border-slate-700 space-y-2">

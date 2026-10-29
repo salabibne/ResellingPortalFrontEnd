@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps) {
     }
     return {
       title: `${doc.title} | Aarham Apparel`,
-      description: `${doc.title} version ${doc.version} for Aarham Apparel reselling portal.`,
+      description: `${doc.title} version ${doc.version} for Aarham Apparel Uddokta portal.`,
     };
   } catch (err) {
     return { title: "Legal Policy - Aarham Apparel" };

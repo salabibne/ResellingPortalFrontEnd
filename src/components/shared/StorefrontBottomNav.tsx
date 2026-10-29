@@ -24,8 +24,8 @@ export default function StorefrontBottomNav() {
   const cart = useCartStore((state) => state.cart);
   const toggleCart = useCartStore((state) => state.toggleCart);
   const contactInfo = useCMSStore((state) => state.contactInfo);
-  const menuOpen = useMobileMenuStore((state) => state.open);
-  const setMenuOpen = useMobileMenuStore((state) => state.setOpen);
+  const categoriesOpen = useMobileMenuStore((state) => state.categoriesOpen);
+  const setCategoriesOpen = useMobileMenuStore((state) => state.setCategoriesOpen);
 
   // Auth is restored from localStorage, so wait for mount to avoid a
   // server/client mismatch on the account slot.
@@ -43,8 +43,8 @@ export default function StorefrontBottomNav() {
         {
           label: "Category",
           icon: LayoutGrid,
-          onClick: () => setMenuOpen(!menuOpen),
-          expanded: menuOpen,
+          onClick: () => setCategoriesOpen(!categoriesOpen),
+          expanded: categoriesOpen,
         },
         {
           label: "Message",

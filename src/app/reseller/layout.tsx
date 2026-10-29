@@ -120,7 +120,7 @@ export default function ResellerLayout({
           </div>
           <div className="min-w-0">
             <p className="font-bold text-base leading-tight text-base-content truncate">
-              Reseller Portal
+              Uddokta Portal
             </p>
             <p className="text-[11px] text-base-content/60 font-medium truncate">
               Aarham Apparel
@@ -135,10 +135,10 @@ export default function ResellerLayout({
           </div>
           <div className="overflow-hidden flex-1">
             <p className="text-xs font-bold truncate text-base-content">
-              {user?.name || "Reseller"}
+              {user?.name || "Uddokta"}
             </p>
             <p className="text-[10px] text-success font-semibold flex items-center gap-1">
-              <UserCheck size={12} /> Verified Reseller
+              <UserCheck size={12} /> Verified Uddokta
             </p>
           </div>
         </div>

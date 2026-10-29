@@ -493,7 +493,7 @@ export default function AdminProductsPage() {
               <tr className="bg-base-200">
                 <th className="text-base-content">Product</th>
                 <th className="text-base-content">Category / Brand</th>
-                <th className="text-base-content">Prices (New / Old / Reseller)</th>
+                <th className="text-base-content">Prices (New / Old / Uddokta)</th>
                 <th className="text-base-content text-center">Attributes & Variants</th>
                 <th className="text-base-content text-center">Status</th>
                 <th className="text-right text-base-content">Actions</th>
@@ -577,7 +577,7 @@ export default function AdminProductsPage() {
                           ৳{Number(product.oldPrice).toLocaleString()}
                         </div>
                         <div className="text-xs text-blue-600">
-                          Reseller: ৳{Number(product.resellerPrice).toLocaleString()}
+                          Uddokta: ৳{Number(product.resellerPrice).toLocaleString()}
                         </div>
                       </td>
 
@@ -888,7 +888,7 @@ export default function AdminProductsPage() {
                     </div>
 
                     <div className="form-control">
-                      <label className="label font-semibold text-base-content">Reseller Price (৳) *</label>
+                      <label className="label font-semibold text-base-content">Uddokta Price (৳) *</label>
                       <input
                         type="number"
                         step="0.01"
@@ -1317,7 +1317,7 @@ export default function AdminProductsPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500">Reseller Price</div>
+                  <div className="text-xs text-gray-500">Uddokta Price</div>
                   <div className="text-lg font-bold text-blue-600">
                     ৳{Number(currentProduct.resellerPrice).toLocaleString()}
                   </div>

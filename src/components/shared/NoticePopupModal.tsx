@@ -115,7 +115,7 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
           <div className="relative">
             <img
               src={notice.imageUrl!}
-              alt={notice.title || "Reseller announcement"}
+              alt={notice.title || "Uddokta announcement"}
               className="w-[30vw] md:w-[40vw] max-w-full h-auto rounded-2xl shadow-2xl"
               onError={() => setImageFailed(true)}
             />
@@ -197,7 +197,7 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
             </span>
             {audience === "RESELLER" && (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <Sparkles size={11} /> Reseller Announcement
+                <Sparkles size={11} /> Uddokta Announcement
               </span>
             )}
           </div>

@@ -45,8 +45,8 @@ export default function ResellerDashboardPage() {
   return (
     <PanelPage>
       <PanelPageHeader
-        title="Reseller Dashboard"
-        subtitle="Welcome back to the Reseller Hub."
+        title="Uddokta Dashboard"
+        subtitle="Welcome back to the Uddokta Hub."
         icon={LayoutDashboard}
       />
 
@@ -54,13 +54,13 @@ export default function ResellerDashboardPage() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-secondary p-6 sm:p-8 text-primary-content border border-primary/20">
         <div className="relative z-10 max-w-2xl space-y-3">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md">
-            <Sparkles size={14} /> Reseller Commerce Portal
+            <Sparkles size={14} /> Uddokta Commerce Portal
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Welcome to Reseller Hub
+            Welcome to Uddokta Hub
           </h2>
           <p className="text-sm opacity-90 leading-relaxed">
-            Browse our wholesale catalog at reseller prices, place orders on behalf of your end-customers, set your custom sell price, and track order fulfillment smoothly.
+            Browse our wholesale catalog at uddokta prices, place orders on behalf of your end-customers, set your custom sell price, and track order fulfillment smoothly.
           </p>
           <div className="pt-2 flex flex-wrap gap-3">
             <Link
@@ -210,7 +210,7 @@ export default function ResellerDashboardPage() {
             <h2>Product Catalog</h2>
           </div>
           <p className="text-sm text-base-content/70 flex-1">
-            Explore active products with wholesale reseller prices. Select sizes, colors, and quantities to add to your cart.
+            Explore active products with wholesale uddokta prices. Select sizes, colors, and quantities to add to your cart.
           </p>
           <div>
             <Link
@@ -225,7 +225,7 @@ export default function ResellerDashboardPage() {
         <PanelCard className="flex flex-col gap-4 hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3 text-primary font-bold text-lg">
             <ShoppingBag size={24} />
-            <h2>My Reseller Orders</h2>
+            <h2>My Uddokta Orders</h2>
           </div>
           <p className="text-sm text-base-content/70 flex-1">
             Track all orders placed on behalf of your customers, follow live courier status (Order Placed, Pending, In Transit, Delivered), and profit.

@@ -169,7 +169,7 @@ export default function AdminWithdrawalsPage() {
         adminNotes: rejectForm.adminNotes.trim(),
       });
 
-      showToast(`Payout request rejected. Reseller balance restored.`, "success");
+      showToast(`Payout request rejected. Uddokta balance restored.`, "success");
       setRejectModalWithdrawal(null);
       await loadData();
     } catch (err: any) {
@@ -212,8 +212,8 @@ export default function AdminWithdrawalsPage() {
       )}
 
       <PanelPageHeader
-        title="Reseller Profit Withdrawals"
-        subtitle="Review profit withdrawal requests from resellers, disburse payments, and attach verifiable proof documents and Transaction IDs (TrxID)."
+        title="Uddokta Profit Withdrawals"
+        subtitle="Review profit withdrawal requests from uddoktas, disburse payments, and attach verifiable proof documents and Transaction IDs (TrxID)."
         icon={Wallet}
         actions={
           <button
@@ -314,7 +314,7 @@ export default function AdminWithdrawalsPage() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40" />
             <input
               type="text"
-              placeholder="Search by reseller name, phone, email, or TrxID..."
+              placeholder="Search by uddokta name, phone, email, or TrxID..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -394,7 +394,7 @@ export default function AdminWithdrawalsPage() {
             <thead>
               <tr>
                 <th>Request ID & Date</th>
-                <th>Reseller Details</th>
+                <th>Uddokta Details</th>
                 <th>Amount</th>
                 <th>Payout Channel & Details</th>
                 <th>Status</th>
@@ -421,7 +421,7 @@ export default function AdminWithdrawalsPage() {
                     {/* Reseller Info */}
                     <td>
                       <div className="font-bold text-base-content text-sm">
-                        {w.reseller?.name || "Unknown Reseller"}
+                        {w.reseller?.name || "Unknown Uddokta"}
                       </div>
                       <div className="text-xs text-base-content/70 flex items-center gap-1 font-mono">
                         <Phone size={11} /> {w.reseller?.phone}
@@ -451,7 +451,7 @@ export default function AdminWithdrawalsPage() {
                       </div>
                       {w.resellerNotes && (
                         <div className="text-[10px] text-base-content/60 italic mt-0.5">
-                          Reseller Note: &ldquo;{w.resellerNotes}&rdquo;
+                          Uddokta Note: &ldquo;{w.resellerNotes}&rdquo;
                         </div>
                       )}
                     </td>
@@ -584,7 +584,7 @@ export default function AdminWithdrawalsPage() {
             {/* Recipient Account Details Summary Card */}
             <div className="bg-base-200/50 p-4 rounded-xl space-y-2 border border-base-300/60">
               <div className="flex justify-between items-center">
-                <span className="text-xs text-base-content/60 font-semibold">Reseller</span>
+                <span className="text-xs text-base-content/60 font-semibold">Uddokta</span>
                 <strong className="text-sm text-base-content">
                   {processModalWithdrawal.reseller?.name} ({processModalWithdrawal.reseller?.phone})
                 </strong>
@@ -722,13 +722,13 @@ export default function AdminWithdrawalsPage() {
           <div className="space-y-4">
             <p className="text-xs text-base-content/70">
               Rejecting this request will restore the requested amount (
-              <strong>৳{Number(rejectModalWithdrawal.amount).toFixed(2)}</strong>) back to the reseller&apos;s available withdrawable balance.
+              <strong>৳{Number(rejectModalWithdrawal.amount).toFixed(2)}</strong>) back to the uddokta&apos;s available withdrawable balance.
             </p>
 
             <form id="reject-payout-form" onSubmit={handleSubmitReject} className="space-y-4">
               <div className="form-control">
                 <label className="label font-bold text-xs uppercase tracking-wider text-base-content">
-                  Rejection Reason (Visible to Reseller) *
+                  Rejection Reason (Visible to Uddokta) *
                 </label>
                 <textarea
                   rows={3}

@@ -12,9 +12,9 @@ export default function Footer() {
 
   return (
     <footer className="bg-base-200 text-base-content mt-auto border-t border-base-300 pb-28 lg:pb-0">
-      <div className="footer p-6 sm:p-10 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-        <aside className="max-w-xs">
-          <Link href="/" className="flex items-center gap-2 text-2xl font-bold mb-3 text-base-content">
+      <div className="footer p-6 sm:p-10 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 justify-items-center text-center">
+        <aside className="max-w-xs mx-auto place-items-center">
+          <Link href="/" className="flex items-center justify-center gap-2 text-2xl font-bold mb-3 text-base-content">
             <BrandLogo className="h-10 sm:h-12 w-auto max-w-[60%] object-contain" alt="Aarham Apparel">
               <ShoppingBag className="text-primary" size={28} />
               Aarham Apparel
@@ -28,7 +28,7 @@ export default function Footer() {
 
           {/* Social Media Links from CMS */}
           {socials.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap justify-center gap-2 mt-2">
               {socials.map((s, idx) => (
                 <div
                   key={s.id || idx}
@@ -43,10 +43,10 @@ export default function Footer() {
         </aside>
 
         {/* Dynamic Contact Info from CMS */}
-        <nav>
+        <nav className="place-items-center">
           <h6 className="footer-title text-base-content">Contact Us</h6>
           {contact ? (
-            <div className="flex flex-col gap-2.5 text-sm text-base-content/80">
+            <div className="flex flex-col items-center gap-2.5 text-sm text-base-content/80">
               {contact.phone && (
                 <a href={`tel:${contact.phone}`} className="flex items-center gap-2 hover:text-primary">
                   <Phone size={16} className="text-primary shrink-0" />
@@ -60,7 +60,7 @@ export default function Footer() {
                 </a>
               )}
               {contact.address && (
-                <div className="flex items-start gap-2 max-w-xs">
+                <div className="flex items-start justify-center gap-2 max-w-xs text-center">
                   <MapPin size={16} className="text-primary shrink-0 mt-1" />
                   <span>{contact.address}</span>
                 </div>
@@ -92,7 +92,7 @@ export default function Footer() {
           )}
         </nav>
 
-        <nav>
+        <nav className="place-items-center">
           <h6 className="footer-title text-base-content">Company</h6>
           <Link href="/about" className="link link-hover">About Us</Link>
           <Link href="/shop" className="link link-hover">Shop Collection</Link>
@@ -126,7 +126,7 @@ function FooterLegalNav() {
   }, []);
 
   return (
-    <nav>
+    <nav className="place-items-center">
       <h6 className="footer-title text-base-content">Legal & Compliance</h6>
       {docs.length > 0 ? (
         docs.map((doc) => (

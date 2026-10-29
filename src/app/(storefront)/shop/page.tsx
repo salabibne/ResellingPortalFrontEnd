@@ -10,10 +10,12 @@ import {
   Check,
   ChevronDown,
   Layers,
+  LayoutGrid,
 } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { productApi, Product } from "@/services/product.api";
 import { useCategoryStore } from "@/store/useCategoryStore";
+import { useMobileMenuStore } from "@/store/useMobileMenuStore";
 
 type SortOption = "newest" | "price-asc" | "price-desc" | "name-asc";
 
@@ -26,6 +28,7 @@ function ShopPageContent() {
   const searchQueryParam = searchParams.get("search") || "";
 
   const { categories, fetchCategories } = useCategoryStore();
+  const setCategoriesOpen = useMobileMenuStore((state) => state.setCategoriesOpen);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +51,12 @@ function ShopPageContent() {
   useEffect(() => {
     setSelectedSubcategoryId(subcategoryIdParam);
   }, [subcategoryIdParam]);
+
+  // Category-first catalog: with no category or search picked, start from the
+  // category drawer. Closing it leaves all products visible.
+  useEffect(() => {
+    if (!categoryIdParam && !searchQueryParam) setCategoriesOpen(true);
+  }, [categoryIdParam, searchQueryParam, setCategoriesOpen]);
 
   // Fetch all products
   useEffect(() => {
@@ -236,6 +245,16 @@ function ShopPageContent() {
                 ? `Explore our high quality ${activeCategory.name} collection tailored for modern comfort and style.`
                 : "Browse our entire apparel line up. Filter by subcategory, price, colors, and sizes."}
             </p>
+            <div className="pt-2 flex justify-center md:justify-start">
+              <button
+                type="button"
+                onClick={() => setCategoriesOpen(true)}
+                className="btn btn-sm btn-outline rounded-xl gap-2 border-white/40 text-white hover:bg-white/10 hover:border-white hover:text-white"
+              >
+                <LayoutGrid size={16} />
+                {activeCategory ? activeCategory.name : "Categories"}
+              </button>
+            </div>
           </div>
           <div className="bg-white/10 backdrop-blur-md px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl border border-white/20 text-center shrink-0">
             <span className="block text-xl sm:text-2xl font-bold text-white">

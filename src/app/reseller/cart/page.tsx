@@ -81,7 +81,7 @@ export default function ResellerCartPage() {
 
     if (invalidPriceItems.length > 0) {
       setErrorMsg(
-        `Custom selling price for item(s) cannot be less than the Admin wholesale reseller price.`
+        `Custom selling price for item(s) cannot be less than the Admin wholesale uddokta price.`
       );
       return;
     }
@@ -134,7 +134,7 @@ export default function ResellerCartPage() {
       console.error("Reseller checkout error:", err);
       setErrorMsg(
         err?.response?.data?.message ||
-          "Failed to place reseller order. Please verify your details."
+          "Failed to place uddokta order. Please verify your details."
       );
     } finally {
       setSubmitting(false);
@@ -161,7 +161,7 @@ export default function ResellerCartPage() {
   return (
     <PanelPage width="narrow">
       <PanelPageHeader
-        title="Reseller Order Checkout"
+        title="Uddokta Order Checkout"
         subtitle="Enter customer details & set your custom selling price for each item."
         icon={ShoppingBag}
         backHref="/reseller/products"
@@ -225,7 +225,7 @@ export default function ResellerCartPage() {
                             </span>
                           )}
                           <span className="text-primary font-bold">
-                            Reseller Base Price: ৳{item.resellerPrice}
+                            Uddokta Base Price: ৳{item.resellerPrice}
                           </span>
                           {item.purchasePrice !== undefined && (
                             <span className="text-slate-500 font-medium">
@@ -309,7 +309,7 @@ export default function ResellerCartPage() {
                         </div>
                         {isPriceBelowReseller ? (
                           <span className="text-[10px] text-error font-bold flex items-center gap-1">
-                            <AlertTriangle size={12} /> Selling price cannot be less than reseller base price (৳{item.resellerPrice})
+                            <AlertTriangle size={12} /> Selling price cannot be less than uddokta base price (৳{item.resellerPrice})
                           </span>
                         ) : (
                           <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
@@ -439,7 +439,7 @@ export default function ResellerCartPage() {
               </div>
               <p className="text-xs text-base-content/80 leading-relaxed font-medium">
                 {courierPolicy?.chargeText ||
-                  "Inside Dhaka City: ৳70 | Sub-Urban Dhaka: ৳100 | Outside Dhaka: ৳130. Advance courier fee is collected by reseller if applicable."}
+                  "Inside Dhaka City: ৳70 | Sub-Urban Dhaka: ৳100 | Outside Dhaka: ৳130. Advance courier fee is collected by uddokta if applicable."}
               </p>
             </div>
 
@@ -524,7 +524,7 @@ export default function ResellerCartPage() {
             {/* Reseller Order Store Billing Preview */}
             <div className="p-4 bg-base-200/80 rounded-xl space-y-2 text-xs">
               <div className="flex justify-between font-medium text-base-content/80">
-                <span>Reseller Subtotal:</span>
+                <span>Uddokta Subtotal:</span>
                 <span className="font-extrabold text-base-content">
                   ৳
                   {items
@@ -549,7 +549,7 @@ export default function ResellerCartPage() {
                 </span>
               </div>
               <div className="flex justify-between font-bold text-emerald-600 border-t border-dashed border-base-300 pt-1">
-                <span>Estimated Reseller Profit:</span>
+                <span>Estimated Uddokta Profit:</span>
                 <span>
                   +৳
                   {items
@@ -595,7 +595,7 @@ export default function ResellerCartPage() {
                   Placing Order...
                 </>
               ) : (
-                "Place Reseller Order"
+                "Place Uddokta Order"
               )}
             </button>
           </div>

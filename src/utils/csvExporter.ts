@@ -65,10 +65,10 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
     "Customer District",
     "Customer Thana",
     "Shipping Address",
-    "Reseller Name",
-    "Reseller Phone",
-    "Reseller Email",
-    "Reseller Page Name",
+    "Uddokta Name",
+    "Uddokta Phone",
+    "Uddokta Email",
+    "Uddokta Page Name",
     "Order Date",
     "Order Status",
     "Payment Status",
@@ -87,13 +87,13 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
     "Advance Courier Paid",
     "Discount",
     "Total Bill",
-    "Reseller Profit Margin",
+    "Uddokta Profit Margin",
   ];
 
   const rows = orders.map((ord) => {
     const isReseller = ord.isResellerOrder || ord.customer?.role === "RESELLER";
     const orderRef = ord.orderRef || `#${ord.id.substring(0, 8).toUpperCase()}`;
-    const orderType = isReseller ? "Reseller Order" : "Direct Customer";
+    const orderType = isReseller ? "Uddokta Order" : "Direct Customer";
 
     // End Customer Info
     const customerName = ord.customerName || ord.customer?.name || "";
@@ -223,7 +223,7 @@ export function exportInventoryStockToCSV(
     "Stock Alert Threshold",
     "Reorder Deficit (Units)",
     "Purchase Cost (৳)",
-    "Wholesale / Reseller Price (৳)",
+    "Wholesale / Uddokta Price (৳)",
     "Retail Selling Price (৳)",
     "Profit Margin per Unit (৳)",
     "Profit Margin %",

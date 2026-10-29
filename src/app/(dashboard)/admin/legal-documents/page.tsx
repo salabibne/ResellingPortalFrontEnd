@@ -122,7 +122,7 @@ export default function AdminLegalDocumentsPage() {
     <div className="p-6 max-w-7xl mx-auto space-y-6 bg-base-100 text-base-content">
       <PanelPageHeader
         title="Legal Documents Manager"
-        subtitle="Create, version control, and publish legal agreements (Terms & Conditions, Privacy Policy, Return & Refund Policy, Reseller Agreement)."
+        subtitle="Create, version control, and publish legal agreements (Terms & Conditions, Privacy Policy, Return & Refund Policy, Uddokta Agreement)."
         icon={FileText}
         actions={
           <button

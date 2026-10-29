@@ -487,7 +487,7 @@ export default function ProductDetailPage() {
                     onClick={() => setIsBulkModalOpen(true)}
                     className="btn btn-outline btn-sm sm:btn-md border-primary/40 text-primary hover:bg-primary hover:text-white rounded-xl sm:rounded-2xl gap-2 font-bold w-full text-xs sm:text-sm"
                   >
-                    <Sparkles size={16} /> Wholesale / Reseller Multi-Size Matrix
+                    <Sparkles size={16} /> Wholesale / Uddokta Multi-Size Matrix
                   </button>
                 )}
               </div>

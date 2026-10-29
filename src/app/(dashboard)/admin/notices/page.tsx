@@ -170,13 +170,13 @@ export default function AdminNoticesPage() {
       case "ALL":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700 border border-purple-200">
-            <Layers size={12} /> Both (Public & Reseller)
+            <Layers size={12} /> Both (Public & Uddokta)
           </span>
         );
       case "RESELLER":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
-            <Users size={12} /> Reseller Panel Only
+            <Users size={12} /> Uddokta Panel Only
           </span>
         );
       case "PUBLIC":
@@ -192,7 +192,7 @@ export default function AdminNoticesPage() {
     <PanelPage>
       <PanelPageHeader
         title="Pop-up Notices"
-        subtitle="Configure announcement pop-up modals for visitors and resellers. Decide who sees each notice based on business needs."
+        subtitle="Configure announcement pop-up modals for visitors and uddoktas. Decide who sees each notice based on business needs."
         icon={Bell}
         actions={
           <button
@@ -218,7 +218,7 @@ export default function AdminNoticesPage() {
           </p>
         </div>
         <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
-          <p className="text-xs text-purple-600 font-semibold uppercase">Reseller Targeted</p>
+          <p className="text-xs text-purple-600 font-semibold uppercase">Uddokta Targeted</p>
           <p className="text-2xl font-black text-purple-600 mt-1">
             {notices.filter((n) => n.targetAudience === "RESELLER" || n.targetAudience === "ALL").length}
           </p>
@@ -240,7 +240,7 @@ export default function AdminNoticesPage() {
           { id: "ALL_FILTER", label: "All Notices" },
           { id: "ACTIVE_ONLY", label: "Active Only" },
           { id: "PUBLIC", label: "Normal Store" },
-          { id: "RESELLER", label: "Reseller Panel" },
+          { id: "RESELLER", label: "Uddokta Panel" },
         ]}
       />
 
@@ -252,7 +252,7 @@ export default function AdminNoticesPage() {
           <PanelEmpty
             icon={Bell}
             title="No pop-up notices found"
-            text="Click the button below to create your first announcement pop-up for your visitors or resellers."
+            text="Click the button below to create your first announcement pop-up for your visitors or uddoktas."
             action={
               <button
                 type="button"
@@ -462,12 +462,12 @@ export default function AdminNoticesPage() {
                   value={targetAudience}
                   onChange={(e) => setTargetAudience(e.target.value as NoticeAudience)}
                 >
-                  <option value="ALL">Both Reseller Panel & Normal Customer Website</option>
+                  <option value="ALL">Both Uddokta Panel & Normal Customer Website</option>
                   <option value="PUBLIC">Normal Customer Website Only</option>
-                  <option value="RESELLER">Reseller Panel Only</option>
+                  <option value="RESELLER">Uddokta Panel Only</option>
                 </select>
                 <span className="label-text-alt text-slate-400 mt-1">
-                  Admin decides whether normal visitors, resellers, or both will see this modal.
+                  Admin decides whether normal visitors, uddoktas, or both will see this modal.
                 </span>
               </div>
 

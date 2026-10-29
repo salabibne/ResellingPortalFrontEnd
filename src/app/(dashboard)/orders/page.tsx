@@ -537,7 +537,7 @@ export default function OrdersPage() {
     <div className="space-y-6">
       <PanelPageHeader
         title="Order & Fulfillment Management"
-        subtitle="Manage customer & reseller orders, track payments, and follow live courier status."
+        subtitle="Manage customer & uddokta orders, track payments, and follow live courier status."
         icon={ShoppingBag}
       />
 
@@ -782,7 +782,7 @@ export default function OrdersPage() {
               className="select select-xs select-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0"
             >
               <option value="ALL">All Order Types</option>
-              <option value="RESELLER">Reseller Orders</option>
+              <option value="RESELLER">Uddokta Orders</option>
               <option value="CUSTOMER">Direct Customer</option>
             </select>
           </div>
@@ -927,7 +927,7 @@ export default function OrdersPage() {
                         <div className="font-mono font-bold text-indigo-600 text-xs mb-1">{displayRef}</div>
                         {isReseller ? (
                           <span className="badge badge-primary text-white font-extrabold text-[11px] uppercase whitespace-nowrap h-auto py-1 px-2">
-                            Reseller
+                            Uddokta
                           </span>
                         ) : (
                           <span className="badge badge-ghost text-slate-600 font-semibold text-[11px] uppercase whitespace-nowrap h-auto py-1 px-2">
@@ -944,7 +944,7 @@ export default function OrdersPage() {
                         </div>
                         {isReseller && ord.reseller && (
                           <div className="text-[10px] text-primary font-semibold mt-0.5 leading-tight">
-                            Via Reseller: {ord.reseller.name} ({ord.reseller.phone})
+                            Via Uddokta: {ord.reseller.name} ({ord.reseller.phone})
                           </div>
                         )}
                       </td>
@@ -1042,7 +1042,7 @@ export default function OrdersPage() {
                 <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider">
                   <ShoppingBag size={16} /> Fulfillment Drawer
                   {selectedOrder.isResellerOrder && (
-                    <span className="badge badge-primary text-white text-[10px] ml-2">RESELLER ORDER</span>
+                    <span className="badge badge-primary text-white text-[10px] ml-2">UDDOKTA ORDER</span>
                   )}
                 </div>
                 <h3 className="text-xl font-extrabold tracking-tight mt-0.5">
@@ -1069,12 +1069,12 @@ export default function OrdersPage() {
               {selectedOrder.isResellerOrder && (
                 <div className="bg-primary/5 p-4 rounded-2xl border border-primary/20 space-y-2">
                   <h4 className="text-xs font-extrabold text-primary uppercase tracking-wider flex items-center gap-1.5">
-                    <User size={14} /> Reseller Profile
+                    <User size={14} /> Uddokta Profile
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-slate-500 font-medium">Name:</span>{" "}
-                      <strong className="text-base-content">{selectedOrder.reseller?.name || selectedOrder.customer?.name || "Reseller"}</strong>
+                      <strong className="text-base-content">{selectedOrder.reseller?.name || selectedOrder.customer?.name || "Uddokta"}</strong>
                     </div>
                     <div>
                       <span className="text-slate-500 font-medium">Phone:</span>{" "}
@@ -1154,7 +1154,7 @@ export default function OrdersPage() {
                 {selectedOrder.notes && (
                   <div className="pt-2 border-t border-slate-200 text-xs">
                     <span className="font-bold text-slate-500 flex items-center gap-1">
-                      <FileText size={12} /> Optional Reseller Notes:
+                      <FileText size={12} /> Optional Uddokta Notes:
                     </span>
                     <p className="text-slate-700 font-medium mt-1 bg-base-100 p-2 rounded-lg border border-slate-200">
                       {selectedOrder.notes}
@@ -1498,7 +1498,7 @@ export default function OrdersPage() {
                 {selectedOrder.isResellerOrder ? (
                   <>
                     <div className="text-slate-600">
-                      Reseller Subtotal:{" "}
+                      Uddokta Subtotal:{" "}
                       <span className="font-bold text-base-content">
                         ৳ {Number(selectedOrder.resellerSellPrice || selectedOrder.total).toLocaleString()}
                       </span>
@@ -1508,7 +1508,7 @@ export default function OrdersPage() {
                       <span className="font-bold text-base-content">
                         {selectedOrder.isAdvanceCourierPaid ? (
                           <span className="text-emerald-600">
-                            ৳ 0 (Advance courier fee was collected directly by reseller)
+                            ৳ 0 (Advance courier fee was collected directly by uddokta)
                           </span>
                         ) : (
                           `+৳ ${Number(selectedOrder.courierCharge).toLocaleString()}`
@@ -1517,13 +1517,13 @@ export default function OrdersPage() {
                     </div>
                     <div className="text-emerald-600 font-bold bg-emerald-50 p-2.5 rounded-xl border border-emerald-100 text-right space-y-0.5">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-bold">Reseller Profit Margin:</span>
+                        <span className="font-bold">Uddokta Profit Margin:</span>
                         <span className="font-black text-sm text-emerald-700">
                           +৳ {Number(selectedOrder.resellerProfit || 0).toLocaleString()}
                         </span>
                       </div>
                       <div className="text-[10px] text-slate-500 font-normal">
-                        * Note: Reseller profit is earned by reseller.
+                        * Note: Uddokta profit is earned by uddokta.
                       </div>
                     </div>
                     <div className="text-sm font-black text-base-content pt-2 border-t border-slate-200 flex justify-between items-center">
@@ -1605,11 +1605,11 @@ export default function OrdersPage() {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Courier Charge Text (Displayed to Resellers)
+                  Courier Charge Text (Displayed to Uddoktas)
                 </label>
                 <textarea
                   rows={4}
-                  placeholder="e.g. Inside Dhaka City: ৳70 | Sub-Urban Dhaka: ৳100 | Outside Dhaka: ৳130. Advance courier fee is collected by reseller if applicable."
+                  placeholder="e.g. Inside Dhaka City: ৳70 | Sub-Urban Dhaka: ৳100 | Outside Dhaka: ৳130. Advance courier fee is collected by uddokta if applicable."
                   className="textarea textarea-bordered w-full rounded-xl text-base-content text-xs"
                   value={courierPolicyText}
                   onChange={(e) => setCourierPolicyText(e.target.value)}

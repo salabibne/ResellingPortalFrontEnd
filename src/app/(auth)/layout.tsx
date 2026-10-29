@@ -1,6 +1,7 @@
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import StorefrontBottomNav from "@/components/shared/StorefrontBottomNav";
+import StorefrontCategoryDrawer from "@/components/shared/StorefrontCategoryDrawer";
 
 export default function AuthLayout({
   children,
@@ -11,6 +12,7 @@ export default function AuthLayout({
       <main className="flex-1 flex flex-col min-w-0">{children}</main>
       <Footer />
       <StorefrontBottomNav />
+      <StorefrontCategoryDrawer />
     </div>
   );
 }

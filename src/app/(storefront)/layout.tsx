@@ -2,6 +2,7 @@ import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import FloatingActions from "@/components/shared/FloatingActions";
 import StorefrontBottomNav from "@/components/shared/StorefrontBottomNav";
+import StorefrontCategoryDrawer from "@/components/shared/StorefrontCategoryDrawer";
 
 /**
  * Single storefront chrome for every public route. Route groups keep URLs
@@ -17,6 +18,7 @@ export default function StorefrontLayout({
       <Footer />
       <FloatingActions />
       <StorefrontBottomNav />
+      <StorefrontCategoryDrawer />
     </div>
   );
 }

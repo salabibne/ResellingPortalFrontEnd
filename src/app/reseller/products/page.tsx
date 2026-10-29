@@ -8,11 +8,13 @@ import {
   Check,
   Package,
   ArrowRight,
+  LayoutGrid,
 } from "lucide-react";
 import PanelPage from "@/components/panel/PanelPage";
 import PanelPageHeader from "@/components/panel/PanelPageHeader";
 import PanelEmpty from "@/components/panel/PanelEmpty";
 import PanelSkeleton from "@/components/panel/PanelSkeleton";
+import CategoryDrawer from "@/components/shared/CategoryDrawer";
 import { productApi, Product } from "@/services/product.api";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
 
@@ -21,6 +23,8 @@ export default function ResellerProductsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = useState<boolean>(false);
+  const [categoryDrawerShown, setCategoryDrawerShown] = useState<boolean>(false);
 
   // Selected variant state per product (productId -> { sizeId, colorId, qty })
   const [productSelections, setProductSelections] = useState<
@@ -82,6 +86,13 @@ export default function ResellerProductsPage() {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Category-first catalog: open the category drawer once products load.
+  useEffect(() => {
+    if (loading || categoryDrawerShown) return;
+    setCategoryDrawerShown(true);
+    if (selectedCategory === "ALL" && products.length > 0) setCategoryDrawerOpen(true);
+  }, [loading, categoryDrawerShown, selectedCategory, products.length]);
+
   // Extract unique categories
   const categories = Array.from(
     new Set(
@@ -131,8 +142,8 @@ export default function ResellerProductsPage() {
   return (
     <PanelPage className="pb-24">
       <PanelPageHeader
-        title="Reseller Products"
-        subtitle="Compare retail prices with wholesale reseller costs and add items to your cart."
+        title="Uddokta Products"
+        subtitle="Compare retail prices with wholesale uddokta costs and add items to your cart."
         icon={Package}
         actions={
           <Link
@@ -161,20 +172,31 @@ export default function ResellerProductsPage() {
           />
         </div>
 
-        <select
-          aria-label="Filter by category"
-          className="select select-bordered select-sm rounded-xl w-full sm:w-auto"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+        <button
+          type="button"
+          onClick={() => setCategoryDrawerOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={categoryDrawerOpen}
+          className="btn btn-outline btn-sm rounded-xl gap-2 w-full sm:w-auto max-w-full"
         >
-          <option value="ALL">All Categories</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+          <LayoutGrid size={16} className="shrink-0" />
+          <span className="truncate">
+            {selectedCategory === "ALL" ? "All Categories" : selectedCategory}
+          </span>
+        </button>
       </div>
+
+      <CategoryDrawer
+        open={categoryDrawerOpen}
+        onClose={() => setCategoryDrawerOpen(false)}
+        categories={categories.map((name) => ({ id: name, name }))}
+        activeId={selectedCategory === "ALL" ? null : selectedCategory}
+        onSelect={(name) => {
+          setSelectedCategory(name);
+          setCategoryDrawerOpen(false);
+        }}
+        loading={loading}
+      />
 
       {/* Product Grid */}
       {loading ? (
@@ -221,7 +243,7 @@ export default function ResellerProductsPage() {
                     />
                     {discountPct > 0 && (
                       <span className="absolute top-2 left-2 bg-error text-white text-[10px] font-extrabold px-2 py-1 rounded-md shadow-sm">
-                        Reseller Discount {discountPct}% OFF
+                        Uddokta Discount {discountPct}% OFF
                       </span>
                     )}
                     <span className="absolute bottom-2 right-2 bg-base-100/90 backdrop-blur-md text-base-content text-[11px] font-semibold px-2.5 py-1 rounded-md border border-base-200">
@@ -252,7 +274,7 @@ export default function ResellerProductsPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-primary">
-                          Reseller Wholesale Rate:
+                          Uddokta Wholesale Rate:
                         </span>
                         <span className="text-lg font-black text-primary">
                           ৳{resellerPrice.toLocaleString()}

@@ -314,7 +314,7 @@ function NavbarContent() {
                             href="/reseller"
                             className="hover:bg-primary/10 text-primary font-bold py-2"
                           >
-                            <ShoppingBag size={14} /> Reseller Portal
+                            <ShoppingBag size={14} /> Uddokta Portal
                           </Link>
                         </li>
                       )}
@@ -437,7 +437,7 @@ function NavbarContent() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="btn btn-xs bg-secondary text-primary border-none hover:bg-secondary/90 rounded-lg justify-start font-bold"
                 >
-                  Reseller Hub
+                  Uddokta Hub
                 </Link>
               </div>
 

@@ -122,6 +122,7 @@ Import them from the barrel: `import { PanelPage, PanelPageHeader, … } from "@
 - A new group should copy the existing pattern (for example "Products & Attributes"): chevron on the right, auto-opens when it holds the active route, the user can collapse it, animated open and close.
 - Nav row: `h-10 px-3 rounded-xl text-sm font-medium`, icon `size={18}` in a fixed `w-5` slot, label truncates with a `title` tooltip, badge `ml-auto` inside the same row.
 - **Phones get a bottom bar.** Below `lg`, every audience shows `MobileBottomNav`: storefront = Categories, Message (WhatsApp), Home, Cart, Login/Account; reseller = Menu, Catalog, Home, Cart, Orders; admin = Menu, Orders, Home, Products, Inventory. Everything else stays in the drawer. Pick slots for the most frequent tasks, keep labels to one short word, and keep the bar's z-index (`z-30`) below drawers and modals.
+- **Catalogs are category-first.** `/shop` and `/reseller/products` open `CategoryDrawer` (`components/shared/CategoryDrawer.tsx`, names only) when no category is picked; picking one shows its products and a Categories button reopens it. The storefront has a single instance (`StorefrontCategoryDrawer`, opened via `useMobileMenuStore().setCategoriesOpen`) shared by `/shop` and the bottom-nav Category slot; the ☰ menu keeps its full contents.
 - Don't let daisyUI `.menu` focus or active styles leak (they leave the previous item lit after client-side navigation).
 
 ### 3.6 Feedback, loading and motion

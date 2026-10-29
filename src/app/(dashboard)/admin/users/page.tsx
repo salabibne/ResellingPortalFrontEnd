@@ -183,7 +183,7 @@ export default function UserManagementPage() {
       case "INVENTOR":
         return <span className="badge badge-neutral bg-orange-950 border-none text-orange-200 text-xs">INVENTOR</span>;
       case "RESELLER":
-        return <span className="badge badge-neutral bg-emerald-950 border-none text-emerald-200 text-xs">RESELLER</span>;
+        return <span className="badge badge-neutral bg-emerald-950 border-none text-emerald-200 text-xs">UDDOKTA</span>;
       default:
         return <span className="badge badge-ghost text-base-content font-semibold text-xs border-slate-400">USER</span>;
     }
@@ -247,7 +247,7 @@ export default function UserManagementPage() {
                 <option value="">All Roles</option>
                 {ROLES.map((r) => (
                   <option key={r} value={r}>
-                    {r.replace("_", " ")}
+                    {r === "RESELLER" ? "UDDOKTA" : r.replace("_", " ")}
                   </option>
                 ))}
               </select>
@@ -602,7 +602,7 @@ export default function UserManagementPage() {
               >
                 {ROLES.map((role) => (
                   <option key={role} value={role}>
-                    {role.replace("_", " ")}
+                    {role === "RESELLER" ? "UDDOKTA" : role.replace("_", " ")}
                   </option>
                 ))}
               </select>

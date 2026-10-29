@@ -608,7 +608,7 @@ export default function CourierShipmentsPage() {
               <thead>
                 <tr>
                   <th className="py-4 pl-6">Order</th>
-                  <th>Reseller</th>
+                  <th>Uddokta</th>
                   <th>Customer</th>
                   <th>Delivery Address</th>
                   <th>Steadfast Shipment</th>
@@ -644,7 +644,7 @@ export default function CourierShipmentsPage() {
                         {order.isResellerOrder
                           ? order.reseller?.name ||
                             order.customer?.name ||
-                            "Reseller"
+                            "Uddokta"
                           : "Direct"}
                       </td>
 
