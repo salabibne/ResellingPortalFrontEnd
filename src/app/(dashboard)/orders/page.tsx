@@ -691,33 +691,38 @@ export default function OrdersPage() {
             <Search size={16} className="absolute left-3 top-2.5 text-slate-400 pointer-events-none" />
           </div>
 
-          {/* Date Range Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 whitespace-nowrap">
-            <Calendar size={14} className="text-primary" /> From:
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => {
-                setStartDate(e.target.value);
-                setPage(1);
-              }}
-              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl"
-            />
-            <span>To:</span>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => {
-                setEndDate(e.target.value);
-                setPage(1);
-              }}
-              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl"
-            />
+          {/* Date Range Filter: one row per date on phones, one line from md up */}
+          <div className="flex flex-col gap-3 w-full md:flex-row md:items-center md:gap-1.5 md:w-auto text-xs font-bold text-slate-600 whitespace-nowrap">
+            <div className="flex items-center gap-1.5">
+              <Calendar size={14} className="text-primary shrink-0" /> From:
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setPage(1);
+                }}
+                className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0 md:flex-none"
+              />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Calendar size={14} className="text-primary shrink-0 md:hidden" />
+              <span>To:</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setPage(1);
+                }}
+                className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0 md:flex-none"
+              />
+            </div>
           </div>
 
           {/* Customer Mobile Filter */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 whitespace-nowrap">
-            <Phone size={14} className="text-primary" /> Mobile:
+          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 whitespace-nowrap w-full md:w-auto">
+            <Phone size={14} className="text-primary shrink-0" /> Mobile:
             <input
               type="text"
               placeholder="Customer Phone..."
@@ -726,7 +731,7 @@ export default function OrdersPage() {
                 setCustomerPhoneFilter(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl w-36"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl flex-1 min-w-0 md:flex-none md:w-36"
             />
           </div>
 
