@@ -40,6 +40,31 @@ export function formatWhatsAppUrl(rawInput?: string | null): string {
   return `https://wa.me/${cleanUsername}`;
 }
 
+const WHATSAPP_PATH =
+  "M17.507 14.307l-.009.075c-.239.004-.76.012-1.353-.298-.445-.23-1.049-.553-1.89-1.01-.22-.12-.41-.18-.58-.02-.24.23-.93.99-1.14 1.18-.21.19-.36.21-.6.09-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.58-1.4-.8-1.92-.21-.51-.43-.44-.59-.45-.15-.01-.32-.01-.49-.01-.17 0-.45.06-.69.32-.24.26-.91.89-.91 2.17 0 1.28.93 2.52 1.06 2.7.13.18 1.83 2.8 4.43 3.92.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.54-.63 1.76-1.24.22-.61.22-1.13.15-1.24-.07-.11-.23-.17-.47-.28zM12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm0 18.16c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31c-.82-1.31-1.26-2.83-1.26-4.39 0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 012.41 5.83c0 4.54-3.7 8.24-8.25 8.24z";
+
+/** WhatsApp glyph. Uses `currentColor`, so colour it with a text class. */
+export function WhatsAppIcon({
+  size = 20,
+  className = "",
+}: {
+  size?: number | string;
+  className?: string;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      className={`fill-current ${className}`}
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path d={WHATSAPP_PATH} />
+    </svg>
+  );
+}
+
 export default function WhatsAppButton() {
   const [mounted, setMounted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -87,13 +112,7 @@ export default function WhatsAppButton() {
         <span className="absolute -inset-0.5 rounded-full bg-[#25D366] opacity-30 animate-pulse motion-reduce:animate-none group-hover:opacity-0 transition-opacity"></span>
 
         {/* WhatsApp Official Vector Icon */}
-        <svg
-          className="w-7 h-7 sm:w-8 sm:h-8 fill-current relative z-10 transition-transform duration-300 group-hover:scale-105"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M17.507 14.307l-.009.075c-.239.004-.76.012-1.353-.298-.445-.23-1.049-.553-1.89-1.01-.22-.12-.41-.18-.58-.02-.24.23-.93.99-1.14 1.18-.21.19-.36.21-.6.09-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.58-1.4-.8-1.92-.21-.51-.43-.44-.59-.45-.15-.01-.32-.01-.49-.01-.17 0-.45.06-.69.32-.24.26-.91.89-.91 2.17 0 1.28.93 2.52 1.06 2.7.13.18 1.83 2.8 4.43 3.92.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.54-.63 1.76-1.24.22-.61.22-1.13.15-1.24-.07-.11-.23-.17-.47-.28zM12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm0 18.16c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31c-.82-1.31-1.26-2.83-1.26-4.39 0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 012.41 5.83c0 4.54-3.7 8.24-8.25 8.24z" />
-        </svg>
+        <WhatsAppIcon className="w-7 h-7 sm:w-8 sm:h-8 relative z-10 transition-transform duration-300 group-hover:scale-105" />
 
         {/* Small Active Badge Dot */}
         <span className="absolute top-0 right-0 -mt-0.5 -mr-0.5 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full"></span>

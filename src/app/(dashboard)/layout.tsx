@@ -7,10 +7,13 @@ import {
   Package,
   FileText,
   LogOut,
+  ShoppingBag,
+  Boxes,
 } from "lucide-react";
 import PanelShell from "@/components/panel/PanelShell";
 import PanelButton from "@/components/panel/PanelButton";
 import type { PanelNavEntry } from "@/components/panel/PanelSidebar";
+import type { PanelBottomNav } from "@/components/panel/PanelShell";
 import { useAuthStore } from "@/store/useAuthStore";
 
 const NAV_ITEMS: PanelNavEntry[] = [
@@ -52,6 +55,16 @@ const NAV_ITEMS: PanelNavEntry[] = [
     ],
   },
 ];
+
+const BOTTOM_NAV: PanelBottomNav = {
+  homeHref: "/dashboard",
+  items: [
+    "menu",
+    { href: "/orders", label: "Orders", icon: ShoppingBag },
+    { href: "/dashboard/products", label: "Products", icon: Package },
+    { href: "/inventory", label: "Inventory", icon: Boxes },
+  ],
+};
 
 export default function DashboardLayout({
   children,
@@ -102,6 +115,7 @@ export default function DashboardLayout({
         </h2>
       }
       items={NAV_ITEMS}
+      bottomNav={BOTTOM_NAV}
       footer={
         <PanelButton
           variant="danger-outline"

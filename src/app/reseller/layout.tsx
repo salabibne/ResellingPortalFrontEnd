@@ -144,6 +144,15 @@ export default function ResellerLayout({
         </div>
       }
       items={navItems}
+      bottomNav={{
+        homeHref: "/reseller",
+        items: [
+          "menu",
+          { href: "/reseller/products", label: "Catalog", icon: Package },
+          { href: "/reseller/cart", label: "Cart", icon: ShoppingCart, badge: totalCartCount },
+          { href: "/reseller/orders", label: "Orders", icon: ShoppingBag },
+        ],
+      }}
       footer={
         <div className="space-y-2">
           {canAccessAdmin && (

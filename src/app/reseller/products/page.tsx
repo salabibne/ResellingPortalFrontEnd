@@ -400,7 +400,7 @@ export default function ResellerProductsPage() {
 
       {/* Floating Bottom Drawer Link if Items in Cart */}
       {totalCartCount > 0 && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-base-100 border border-primary/30 shadow-2xl rounded-2xl p-4 flex items-center justify-between gap-6 max-w-lg w-[92vw]">
+        <div className="fixed bottom-28 lg:bottom-4 left-1/2 -translate-x-1/2 z-40 bg-base-100 border border-primary/30 shadow-2xl rounded-2xl p-4 flex items-center justify-between gap-6 max-w-lg w-[92vw]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold">
               {totalCartCount}

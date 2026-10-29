@@ -20,6 +20,7 @@ import { useCategoryStore } from "@/store/useCategoryStore";
 import { useCartStore } from "@/store/useCartStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useCMSStore } from "@/store/useCMSStore";
+import { useMobileMenuStore } from "@/store/useMobileMenuStore";
 import BrandLogo from "@/components/shared/BrandLogo";
 import CartDrawer from "./CartDrawer";
 
@@ -27,7 +28,8 @@ function NavbarContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuOpen = useMobileMenuStore((state) => state.open);
+  const setMobileMenuOpen = useMobileMenuStore((state) => state.setOpen);
   const [searchQuery, setSearchQuery] = useState("");
 
   const { categories, fetchCategories, setSelectedCategory, setSelectedSubcategory } =
@@ -47,7 +49,7 @@ function NavbarContent() {
   // Close the drawer whenever the route changes.
   useEffect(() => {
     setMobileMenuOpen(false);
-  }, [pathname]);
+  }, [pathname, setMobileMenuOpen]);
 
   // Lock background scroll and support Escape while the drawer is open.
   useEffect(() => {
@@ -65,7 +67,7 @@ function NavbarContent() {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [mobileMenuOpen]);
+  }, [mobileMenuOpen, setMobileMenuOpen]);
 
   const cartItemCount = cart?.cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
@@ -138,7 +140,7 @@ function NavbarContent() {
                 <button
                   type="button"
                   className="btn btn-ghost btn-square btn-sm shrink-0 text-white hover:bg-white/10 lg:hidden"
-                  onClick={() => setMobileMenuOpen((open) => !open)}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                   aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
                   aria-expanded={mobileMenuOpen}
                 >

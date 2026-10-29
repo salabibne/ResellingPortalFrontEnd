@@ -87,6 +87,7 @@ Import them from the barrel: `import { PanelPage, PanelPageHeader, … } from "@
 | Component | Use it for | Key rules |
 |---|---|---|
 | `PanelShell` / `PanelSidebar` | Both panel layouts | Owns the mobile drawer (slide + backdrop fade), Escape, body-scroll lock, close on route change. |
+| `MobileBottomNav` | Phone-only floating bottom bar (below `lg`) | Four slots plus a raised centre Home button. Panels pass `bottomNav` to `PanelShell` (`"menu"` = a slot that opens the sidebar drawer); the storefront and auth layouts use `StorefrontBottomNav`. Anything fixed to the bottom of the screen must sit above it on phones (`bottom-28 lg:bottom-4`). |
 | `useActiveNav(hrefs)` | Sidebar highlighting | Longest-prefix match, so **exactly one** item is lit. Never use `pathname === href` or `pathname.includes()` for nav state. |
 | `PanelPage` | Every panel page's outer wrapper | `width="default"` (`max-w-7xl`), `"narrow"` (`max-w-3xl`, for forms, cart, track), `"full"` (big tables). |
 | `PanelPageHeader` | The one `<h1>` per page | `title`, `subtitle?`, `icon?` (shown in a `bg-primary/10` chip), `actions?`, `backHref?`. Actions wrap under the title on mobile. |
@@ -120,6 +121,7 @@ Import them from the barrel: `import { PanelPage, PanelPageHeader, … } from "@
 - Admin sections live in the **left sidebar as collapsible groups under Dashboard**. Don't add horizontal nav bars for admin sections.
 - A new group should copy the existing pattern (for example "Products & Attributes"): chevron on the right, auto-opens when it holds the active route, the user can collapse it, animated open and close.
 - Nav row: `h-10 px-3 rounded-xl text-sm font-medium`, icon `size={18}` in a fixed `w-5` slot, label truncates with a `title` tooltip, badge `ml-auto` inside the same row.
+- **Phones get a bottom bar.** Below `lg`, every audience shows `MobileBottomNav`: storefront = Categories, Message (WhatsApp), Home, Cart, Login/Account; reseller = Menu, Catalog, Home, Cart, Orders; admin = Menu, Orders, Home, Products, Inventory. Everything else stays in the drawer. Pick slots for the most frequent tasks, keep labels to one short word, and keep the bar's z-index (`z-30`) below drawers and modals.
 - Don't let daisyUI `.menu` focus or active styles leak (they leave the previous item lit after client-side navigation).
 
 ### 3.6 Feedback, loading and motion

@@ -23,8 +23,11 @@ export { default as PanelSkeleton } from "./PanelSkeleton";
 export { default as StatusBadge } from "./StatusBadge";
 export { default as PanelSidebar } from "./PanelSidebar";
 export { default as PanelShell } from "./PanelShell";
+export { default as MobileBottomNav } from "./MobileBottomNav";
 export { useActiveNav } from "./useActiveNav";
 
 export type { PanelTab } from "./PanelTabs";
 export type { PanelButtonVariant } from "./PanelButton";
+export type { BottomNavItem } from "./MobileBottomNav";
+export type { PanelBottomNav, PanelBottomNavSlot } from "./PanelShell";
 export type { PanelTheme, PanelNavItem, PanelNavGroup, PanelNavEntry } from "./PanelSidebar";

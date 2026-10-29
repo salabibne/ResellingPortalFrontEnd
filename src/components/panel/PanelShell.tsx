@@ -2,11 +2,21 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { Menu } from "lucide-react";
 import Header from "@/components/shared/Header";
 import PanelSidebar, {
   type PanelNavEntry,
   type PanelTheme,
 } from "./PanelSidebar";
+import MobileBottomNav, { type BottomNavItem } from "./MobileBottomNav";
+
+/** `"menu"` renders a slot that opens the sidebar drawer. */
+export type PanelBottomNavSlot = BottomNavItem | "menu";
+
+export interface PanelBottomNav {
+  homeHref: string;
+  items: PanelBottomNavSlot[];
+}
 
 interface PanelShellProps {
   theme: PanelTheme;
@@ -15,6 +25,7 @@ interface PanelShellProps {
   items: PanelNavEntry[];
   footer?: ReactNode;
   extra?: ReactNode;
+  bottomNav?: PanelBottomNav;
   children: ReactNode;
 }
 
@@ -25,6 +36,7 @@ export default function PanelShell({
   items,
   footer,
   extra,
+  bottomNav,
   children,
 }: PanelShellProps) {
   const [open, setOpen] = useState(false);
@@ -75,11 +87,28 @@ export default function PanelShell({
         />
         <main
           key={pathname}
-          className="flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-4 md:p-6 animate-fade-in"
+          className={`flex-1 overflow-x-hidden overflow-y-auto p-3 sm:p-4 md:p-6 animate-fade-in ${
+            bottomNav ? "pb-28 sm:pb-28 md:pb-28 lg:pb-6" : ""
+          }`}
         >
           {children}
         </main>
       </div>
+      {bottomNav && (
+        <MobileBottomNav
+          homeHref={bottomNav.homeHref}
+          items={bottomNav.items.map((slot) =>
+            slot === "menu"
+              ? {
+                  label: "Menu",
+                  icon: Menu,
+                  onClick: () => setOpen(true),
+                  expanded: open,
+                }
+              : slot
+          )}
+        />
+      )}
       {extra}
     </div>
   );

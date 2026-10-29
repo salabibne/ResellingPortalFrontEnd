@@ -33,7 +33,7 @@ export default function CartDrawer() {
     <>
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="toast toast-end toast-bottom z-[999]">
+        <div className="toast toast-end toast-bottom z-[999] mb-24 lg:mb-0">
           <div className="alert alert-info shadow-lg text-white flex gap-2 items-center">
             <CheckCircle2 size={18} />
             <span className="text-sm font-medium">{toastMessage}</span>
