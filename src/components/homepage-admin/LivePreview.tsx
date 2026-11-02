@@ -27,12 +27,23 @@ export default function LivePreview({
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Scrolls only the preview box: scrollIntoView would also scroll the admin
+  // page and push the builder toolbar out of view.
   useEffect(() => {
-    if (!selectedId || !containerRef.current) return;
-    const node = containerRef.current.querySelector<HTMLElement>(
+    const container = containerRef.current;
+    if (!selectedId || !container) return;
+    const node = container.querySelector<HTMLElement>(
       `[data-homepage-section="${selectedId}"]`,
     );
-    node?.scrollIntoView({ block: "center", behavior: "smooth" });
+    if (!node) return;
+    const offset =
+      node.getBoundingClientRect().top -
+      container.getBoundingClientRect().top +
+      container.scrollTop;
+    container.scrollTo({
+      top: Math.max(0, offset - (container.clientHeight - node.offsetHeight) / 2),
+      behavior: "smooth",
+    });
   }, [selectedId]);
 
   return (

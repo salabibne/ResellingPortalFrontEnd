@@ -4,10 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   CheckCircle2,
+  ChevronLeft,
   Eye,
-  Layers,
-  SlidersHorizontal,
+  Palette,
+  PencilLine,
+  Type,
 } from "lucide-react";
+import { PanelTabs } from "@/components/panel";
 import homepageApi from "@/services/homepage.api";
 import type {
   HomepageConfig,
@@ -72,13 +75,11 @@ function errorMessage(err: any, fallback: string): string {
   return typeof message === "string" && message ? message : fallback;
 }
 
-type Tab = "sections" | "editor" | "preview";
-
-const TABS: { id: Tab; label: string; icon: typeof Layers }[] = [
-  { id: "sections", label: "Sections", icon: Layers },
-  { id: "editor", label: "Editor", icon: SlidersHorizontal },
-  { id: "preview", label: "Preview", icon: Eye },
-];
+/** Phone-only switch between the side panel and the preview. */
+type MobileView = "panel" | "preview";
+/** What the side panel shows, like a site customizer: the list, or one section. */
+type PanelView = "list" | "section";
+type EditorTab = "content" | "design";
 
 export default function BuilderShell() {
   const [page, setPage] = useState<HomepageConfig["page"] | null>(null);
@@ -99,12 +100,22 @@ export default function BuilderShell() {
   const [resetting, setResetting] = useState(false);
   const [hasUnpublished, setHasUnpublished] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [tab, setTab] = useState<Tab>("sections");
+  const [mobileView, setMobileView] = useState<MobileView>("panel");
+  const [panelView, setPanelView] = useState<PanelView>("list");
+  const [editorTab, setEditorTab] = useState<EditorTab>("content");
 
   const selectedSection = useMemo(
     () => sections.find((section) => section.id === selectedId) || null,
     [sections, selectedId],
   );
+
+  /** Opens a section in the side panel, on its Content tab. */
+  const openSection = useCallback((id: string) => {
+    setSelectedId(id);
+    setPanelView("section");
+    setEditorTab("content");
+    setMobileView("panel");
+  }, []);
 
   const showToast = useCallback((text: string, type: "success" | "error" = "success") => {
     setToast({ type, text });
@@ -222,11 +233,10 @@ export default function BuilderShell() {
       const row = await homepageApi.createSection({ type, variant });
       const section = normalizeRow(row);
       setSections((current) => sortSections([...current, section]));
-      setSelectedId(section.id);
+      openSection(section.id);
       setNewIds((current) => [...current, section.id]);
       setHasUnpublished(true);
       setLibraryOpen(false);
-      setTab("editor");
       showToast("Section added to the draft.");
     } catch (err: any) {
       showToast(errorMessage(err, "Could not add the section."), "error");
@@ -285,7 +295,10 @@ export default function BuilderShell() {
       setSections((current) => sortSections(current.filter((entry) => entry.id !== section.id)));
       setDirtyIds((current) => current.filter((id) => id !== section.id));
       setNewIds((current) => current.filter((id) => id !== section.id));
-      if (selectedId === section.id) setSelectedId(null);
+      if (selectedId === section.id) {
+        setSelectedId(null);
+        setPanelView("list");
+      }
       setHasUnpublished(true);
       showToast("Section removed.");
     } catch (err: any) {
@@ -387,6 +400,7 @@ export default function BuilderShell() {
       setSections(list);
       setResources(data.resources || EMPTY_RESOURCES);
       setSelectedId(list[0]?.id ?? null);
+      setPanelView("list");
       setDirtyIds([]);
       setNewIds([]);
       setHasUnpublished(true);
@@ -404,8 +418,10 @@ export default function BuilderShell() {
     resources,
   };
 
+  const editingSection = panelView === "section" ? selectedSection : null;
+
   return (
-    <div className="mx-auto max-w-[1600px] space-y-4 pb-20">
+    <div className="mx-auto max-w-[1600px] space-y-3">
       {toast && (
         <div className="fixed right-4 top-4 z-[80] max-w-xs">
           <div
@@ -434,41 +450,105 @@ export default function BuilderShell() {
         onPublish={() => void handlePublish()}
         onDiscard={() => void handleDiscard()}
         onReset={() => void handleReset()}
-        onShowPreview={() => setTab("preview")}
       />
 
-      <div className="flex gap-1 rounded-xl border border-base-200 bg-base-100 p-1 xl:hidden">
-        {TABS.map((entry) => {
+      <div className="flex gap-1 rounded-xl border border-base-200 bg-base-100 p-1 lg:hidden">
+        {(
+          [
+            { id: "panel", label: editingSection ? "Edit section" : "Sections", icon: PencilLine },
+            { id: "preview", label: "Preview", icon: Eye },
+          ] as const
+        ).map((entry) => {
           const Icon = entry.icon;
           return (
             <button
               key={entry.id}
               type="button"
-              onClick={() => setTab(entry.id)}
-              className={`btn btn-sm flex-1 gap-1 rounded-lg ${
-                tab === entry.id ? "btn-primary" : "btn-ghost"
+              onClick={() => setMobileView(entry.id)}
+              aria-pressed={mobileView === entry.id}
+              className={`btn btn-sm flex-1 flex-nowrap gap-1 whitespace-nowrap rounded-lg ${
+                mobileView === entry.id ? "btn-primary text-white" : "btn-ghost"
               }`}
             >
-              <Icon size={13} /> {entry.label}
+              <Icon size={13} className="shrink-0" /> {entry.label}
             </button>
           );
         })}
       </div>
 
-      <div className="flex flex-col gap-3 xl:flex-row">
+      <div className="flex flex-col gap-3 lg:h-[calc(100vh-11.5rem)] lg:min-h-[560px] lg:flex-row">
+        {/* Side panel: the section list, or the selected section's controls. */}
         <aside
-          className={`${tab === "sections" ? "block" : "hidden"} xl:block xl:w-72 xl:shrink-0`}
+          className={`${
+            mobileView === "panel" ? "flex" : "hidden"
+          } min-h-0 flex-col lg:flex lg:w-[360px] lg:shrink-0 xl:w-[400px]`}
         >
-          <div className="xl:sticky xl:top-4 xl:h-[calc(100vh-9rem)]">
+          {editingSection ? (
+            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-base-200 bg-base-100">
+              <div className="flex items-start gap-2 border-b border-base-200 p-2.5">
+                <button
+                  type="button"
+                  onClick={() => setPanelView("list")}
+                  className="btn btn-ghost btn-sm btn-square shrink-0 rounded-xl"
+                  aria-label="Back to sections"
+                  title="Back to sections"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-base-content/50">
+                    Editing section #{editingSection.sortOrder}
+                  </p>
+                  <h2 className="truncate text-sm font-extrabold">
+                    {editingSection.title || "Untitled section"}
+                  </h2>
+                  <p className="truncate text-[10px] uppercase tracking-wider text-base-content/50">
+                    {editingSection.type} · {editingSection.variant}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-b border-base-200 px-2.5 py-2">
+                <PanelTabs
+                  ariaLabel="Section settings"
+                  value={editorTab}
+                  onChange={(id) => setEditorTab(id as EditorTab)}
+                  tabs={[
+                    { id: "content", label: "Content", icon: Type },
+                    { id: "design", label: "Design", icon: Palette },
+                  ]}
+                />
+              </div>
+
+              <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-2.5">
+                {editorTab === "content" ? (
+                  <SectionEditor
+                    section={editingSection}
+                    resources={resources}
+                    onChange={(patch) => updateSectionLocal(editingSection.id, patch)}
+                    onSettings={(patch) => updateSettings(editingSection.id, patch)}
+                  />
+                ) : (
+                  <VariantSelector
+                    section={editingSection}
+                    onChange={(variant) => updateSectionLocal(editingSection.id, { variant })}
+                  />
+                )}
+
+                <p className="rounded-xl bg-base-200/60 p-2.5 text-[10px] leading-relaxed text-base-content/60">
+                  Edits show in the preview straight away and are kept until you press{" "}
+                  <strong>Save draft</strong>. Publishing copies the saved draft to the live
+                  homepage.
+                </p>
+              </div>
+            </div>
+          ) : (
             <SectionList
               sections={sections}
               selectedId={selectedId}
               newIds={newIds}
               pendingId={pendingId}
-              onSelect={(id) => {
-                setSelectedId(id);
-                setTab("editor");
-              }}
+              onSelect={openSection}
               onToggle={handleToggle}
               onDuplicate={handleDuplicate}
               onDelete={handleDelete}
@@ -476,74 +556,25 @@ export default function BuilderShell() {
               onReorder={handleReorder}
               onAdd={() => setLibraryOpen(true)}
             />
-          </div>
+          )}
         </aside>
 
-        <div className={`${tab === "preview" ? "block" : "hidden"} min-w-0 flex-1 xl:block`}>
-          <div className="h-[70vh] xl:sticky xl:top-4 xl:h-[calc(100vh-9rem)]">
-            <LivePreview
-              config={previewConfig}
-              selectedId={selectedId}
-              newIds={newIds}
-              onSelect={(id) => {
-                setSelectedId(id);
-                setTab("editor");
-              }}
-              loading={loading}
-              error={loadError}
-              onRetry={() => void load()}
-            />
-          </div>
-        </div>
-
-        <aside
-          className={`${tab === "editor" ? "block" : "hidden"} xl:block xl:w-[380px] xl:shrink-0`}
+        {/* Canvas: the live preview takes all remaining width. */}
+        <div
+          className={`${
+            mobileView === "preview" ? "block" : "hidden"
+          } h-[75vh] min-w-0 flex-1 lg:block lg:h-auto`}
         >
-          <div className="max-h-[calc(100vh-9rem)] overflow-y-auto xl:sticky xl:top-4">
-            {selectedSection ? (
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-2 rounded-2xl border border-base-200 bg-base-100 p-3">
-                  <div className="min-w-0">
-                    <h3 className="truncate text-sm font-extrabold">
-                      {selectedSection.title || "Untitled section"}
-                    </h3>
-                    <p className="text-[10px] uppercase tracking-wider text-base-content/50">
-                      {selectedSection.type} · {selectedSection.variant}
-                    </p>
-                  </div>
-                  <span className="badge badge-xs badge-outline shrink-0">
-                    #{selectedSection.sortOrder}
-                  </span>
-                </div>
-
-                <VariantSelector
-                  section={selectedSection}
-                  onChange={(variant) => updateSectionLocal(selectedSection.id, { variant })}
-                />
-
-                <SectionEditor
-                  section={selectedSection}
-                  resources={resources}
-                  onChange={(patch) => updateSectionLocal(selectedSection.id, patch)}
-                  onSettings={(patch) => updateSettings(selectedSection.id, patch)}
-                />
-
-                <p className="rounded-xl bg-base-200/60 p-2.5 text-[10px] leading-relaxed text-base-content/60">
-                  Edits are kept in this browser session until you press{" "}
-                  <strong>Save draft</strong>. Publishing copies the saved draft over the live
-                  homepage.
-                </p>
-              </div>
-            ) : (
-              <div className="flex h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-base-300 bg-base-100 p-6 text-center">
-                <SlidersHorizontal size={20} className="mb-1 text-base-content/30" />
-                <p className="text-xs font-semibold text-base-content/60">
-                  Select a section to edit its content and design.
-                </p>
-              </div>
-            )}
-          </div>
-        </aside>
+          <LivePreview
+            config={previewConfig}
+            selectedId={selectedId}
+            newIds={newIds}
+            onSelect={openSection}
+            loading={loading}
+            error={loadError}
+            onRetry={() => void load()}
+          />
+        </div>
       </div>
 
       <SectionLibrary

@@ -43,6 +43,8 @@ const NAV_ITEMS: PanelNavEntry[] = [
       { href: "/orders", label: "Orders & Sales" },
       { href: "/reseller", label: "Uddokta Portal" },
       { href: "/cms", label: "Base CMS Management" },
+      { href: "/admin/homepage", label: "Homepage Builder" },
+      { href: "/admin/custom-pages", label: "Custom Pages" },
       { href: "/admin/users", label: "User Management" },
       { href: "/admin/withdrawals", label: "Uddokta Withdrawals" },
       { href: "/admin/courier/shipments", label: "Courier Management" },

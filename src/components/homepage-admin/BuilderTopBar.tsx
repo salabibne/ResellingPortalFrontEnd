@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Eye, RotateCcw, Save, Send, Undo2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, LayoutTemplate, RotateCcw, Save, Send, Undo2 } from "lucide-react";
 
 interface BuilderTopBarProps {
   dirtyCount: number;
@@ -13,9 +13,9 @@ interface BuilderTopBarProps {
   onPublish: () => void;
   onDiscard: () => void;
   onReset: () => void;
-  onShowPreview: () => void;
 }
 
+/** Slim editor toolbar, like a site editor's header: title and status left, actions right. */
 export default function BuilderTopBar({
   dirtyCount,
   hasUnpublishedChanges,
@@ -27,78 +27,86 @@ export default function BuilderTopBar({
   onPublish,
   onDiscard,
   onReset,
-  onShowPreview,
 }: BuilderTopBarProps) {
   const busy = saving || publishing || discarding || resetting;
 
   return (
-    <div className="flex flex-col gap-3 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-4 text-white shadow-xl sm:p-6 lg:flex-row lg:items-center lg:justify-between">
-      <div className="min-w-0">
-        <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-indigo-400">
-          Homepage builder
-        </p>
-        <h1 className="text-xl font-extrabold tracking-tight sm:text-2xl">
-          Manage sections, designs and content
-        </h1>
-        <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
-          <span>Draft workspace — the live site only changes when you publish.</span>
-          {dirtyCount > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 px-2 py-0.5 font-bold text-amber-200">
-              <AlertTriangle size={11} /> {dirtyCount} unsaved
-            </span>
-          )}
-          {dirtyCount === 0 && hasUnpublishedChanges && (
-            <span className="rounded-full bg-indigo-400/20 px-2 py-0.5 font-bold text-indigo-200">
-              Draft differs from live
-            </span>
-          )}
+    <div className="flex flex-col gap-2 rounded-2xl border border-base-200 bg-base-100 px-3 py-2.5 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-4">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <LayoutTemplate size={18} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-base font-extrabold leading-tight">Homepage Builder</h1>
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-base-content/60">
+            {dirtyCount > 0 ? (
+              <span className="inline-flex items-center gap-1 font-bold text-amber-600">
+                <AlertTriangle size={11} className="shrink-0" /> {dirtyCount} unsaved
+              </span>
+            ) : hasUnpublishedChanges ? (
+              <span className="font-bold text-primary">Draft saved · not published</span>
+            ) : (
+              <span className="inline-flex items-center gap-1 font-bold text-emerald-600">
+                <CheckCircle2 size={11} className="shrink-0" /> Live is up to date
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={onShowPreview}
-          className="btn btn-sm btn-outline rounded-xl gap-2 border-white/30 text-white hover:bg-white/10"
-        >
-          <Eye size={16} /> Preview
-        </button>
+      <div className="flex flex-wrap items-center gap-1.5 sm:justify-end">
         <button
           type="button"
           onClick={onReset}
           disabled={busy}
-          className="btn btn-sm btn-ghost rounded-xl gap-2 text-slate-300 hover:text-white"
+          className="btn btn-sm btn-ghost rounded-xl gap-1.5 flex-nowrap whitespace-nowrap"
           title="Restore the factory section layout as a draft"
         >
-          {resetting ? <span className="loading loading-spinner loading-xs" /> : <RotateCcw size={16} />}
+          {resetting ? (
+            <span className="loading loading-spinner loading-xs" />
+          ) : (
+            <RotateCcw size={15} className="shrink-0" />
+          )}
           Reset
         </button>
         <button
           type="button"
           onClick={onDiscard}
           disabled={busy}
-          className="btn btn-sm btn-ghost rounded-xl gap-2 text-slate-300 hover:text-white"
+          className="btn btn-sm btn-ghost rounded-xl gap-1.5 flex-nowrap whitespace-nowrap"
           title="Delete the draft and reload the published version"
         >
-          {discarding ? <span className="loading loading-spinner loading-xs" /> : <Undo2 size={16} />}
+          {discarding ? (
+            <span className="loading loading-spinner loading-xs" />
+          ) : (
+            <Undo2 size={15} className="shrink-0" />
+          )}
           Discard
         </button>
         <button
           type="button"
           onClick={onSave}
           disabled={busy || dirtyCount === 0}
-          className="btn btn-sm btn-primary rounded-xl gap-2 text-white font-semibold"
+          className="btn btn-sm btn-outline btn-primary rounded-xl gap-1.5 flex-nowrap whitespace-nowrap font-semibold"
         >
-          {saving ? <span className="loading loading-spinner loading-xs" /> : <Save size={16} />}
+          {saving ? (
+            <span className="loading loading-spinner loading-xs" />
+          ) : (
+            <Save size={15} className="shrink-0" />
+          )}
           Save draft
         </button>
         <button
           type="button"
           onClick={onPublish}
           disabled={busy}
-          className="btn btn-sm btn-primary rounded-xl gap-2 text-white font-semibold"
+          className="btn btn-sm btn-primary rounded-xl gap-1.5 flex-nowrap whitespace-nowrap text-white font-semibold"
         >
-          {publishing ? <span className="loading loading-spinner loading-xs" /> : <Send size={16} />}
+          {publishing ? (
+            <span className="loading loading-spinner loading-xs" />
+          ) : (
+            <Send size={15} className="shrink-0" />
+          )}
           Publish
         </button>
       </div>

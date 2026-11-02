@@ -144,86 +144,6 @@ function NavbarContent() {
                 </Link>
               </div>
 
-              {/* Middle: desktop category nav */}
-              <nav className="hidden lg:flex items-center space-x-1 font-medium text-sm">
-                <Link
-                  href="/shop"
-                  onClick={() => {
-                    setSelectedCategory(null);
-                    setSelectedSubcategory(null);
-                  }}
-                  className={`px-3.5 py-2 rounded-lg transition-colors hover:bg-white/10 ${
-                    !activeCategoryId ? "bg-white/15 font-semibold text-white" : "text-white/90"
-                  }`}
-                >
-                  All Products
-                </Link>
-
-                {categories.map((category) => {
-                  const hasSub = category.subcategories && category.subcategories.length > 0;
-                  const isActiveCat = activeCategoryId === category.id;
-
-                  if (!hasSub) {
-                    return (
-                      <button
-                        key={category.id}
-                        type="button"
-                        onClick={() => handleCategoryClick(category.id)}
-                        className={`px-3.5 py-2 rounded-lg transition-colors hover:bg-white/10 ${
-                          isActiveCat ? "bg-white/20 font-bold text-white" : "text-white/90"
-                        }`}
-                      >
-                        {category.name}
-                      </button>
-                    );
-                  }
-
-                  return (
-                    <div key={category.id} className="relative group">
-                      <button
-                        type="button"
-                        onClick={() => handleCategoryClick(category.id)}
-                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg transition-colors hover:bg-white/10 ${
-                          isActiveCat ? "bg-white/20 font-bold text-white" : "text-white/90"
-                        }`}
-                      >
-                        {category.name}
-                        <ChevronDown
-                          size={14}
-                          className="opacity-70 group-hover:rotate-180 transition-transform"
-                        />
-                      </button>
-
-                      <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <div className="bg-base-100 text-base-content rounded-xl shadow-xl border border-gray-100 p-2 min-w-[200px] space-y-1">
-                          <button
-                            type="button"
-                            onClick={() => handleCategoryClick(category.id)}
-                            className="w-full text-left px-3 py-2 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-colors border-b border-gray-100"
-                          >
-                            All in {category.name}
-                          </button>
-                          {category.subcategories?.map((sub) => (
-                            <button
-                              key={sub.id}
-                              type="button"
-                              onClick={() => handleCategoryClick(category.id, sub.id)}
-                              className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors hover:bg-gray-100 flex items-center justify-between ${
-                                activeSubcategoryId === sub.id
-                                  ? "bg-primary/10 text-primary font-bold"
-                                  : "text-gray-700"
-                              }`}
-                            >
-                              <span>{sub.name}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </nav>
-
               {/* Right: search + actions */}
               <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
                 <form onSubmit={handleSearchSubmit} className="hidden md:flex relative items-center">
@@ -334,6 +254,90 @@ function NavbarContent() {
                 )}
               </div>
             </div>
+            {/* Desktop category nav: its own row, so any number of categories
+                wraps instead of running over the logo. Not overflow-scrolling,
+                because that would clip the hover dropdowns. */}
+            <nav
+              aria-label="Product categories"
+              className="hidden lg:flex flex-wrap items-center justify-center gap-1 border-t border-white/10 py-1.5 font-medium text-sm"
+            >
+              <Link
+                href="/shop"
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setSelectedSubcategory(null);
+                }}
+                className={`whitespace-nowrap px-3 py-1.5 rounded-lg transition-colors hover:bg-white/10 ${
+                  !activeCategoryId ? "bg-white/15 font-semibold text-white" : "text-white/90"
+                }`}
+              >
+                All Products
+              </Link>
+
+              {categories.map((category) => {
+                const hasSub = category.subcategories && category.subcategories.length > 0;
+                const isActiveCat = activeCategoryId === category.id;
+
+                if (!hasSub) {
+                  return (
+                    <button
+                      key={category.id}
+                      type="button"
+                      onClick={() => handleCategoryClick(category.id)}
+                      className={`whitespace-nowrap px-3 py-1.5 rounded-lg transition-colors hover:bg-white/10 ${
+                        isActiveCat ? "bg-white/20 font-bold text-white" : "text-white/90"
+                      }`}
+                    >
+                      {category.name}
+                    </button>
+                  );
+                }
+
+                return (
+                  <div key={category.id} className="relative group">
+                    <button
+                      type="button"
+                      onClick={() => handleCategoryClick(category.id)}
+                      className={`flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-lg transition-colors hover:bg-white/10 ${
+                        isActiveCat ? "bg-white/20 font-bold text-white" : "text-white/90"
+                      }`}
+                    >
+                      {category.name}
+                      <ChevronDown
+                        size={14}
+                        className="opacity-70 group-hover:rotate-180 transition-transform"
+                      />
+                    </button>
+
+                    <div className="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      <div className="bg-base-100 text-base-content rounded-xl shadow-xl border border-gray-100 p-2 min-w-[200px] space-y-1">
+                        <button
+                          type="button"
+                          onClick={() => handleCategoryClick(category.id)}
+                          className="w-full text-left px-3 py-2 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-colors border-b border-gray-100"
+                        >
+                          All in {category.name}
+                        </button>
+                        {category.subcategories?.map((sub) => (
+                          <button
+                            key={sub.id}
+                            type="button"
+                            onClick={() => handleCategoryClick(category.id, sub.id)}
+                            className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors hover:bg-gray-100 flex items-center justify-between ${
+                              activeSubcategoryId === sub.id
+                                ? "bg-primary/10 text-primary font-bold"
+                                : "text-gray-700"
+                            }`}
+                          >
+                            <span>{sub.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </nav>
           </div>
         </div>
       </div>

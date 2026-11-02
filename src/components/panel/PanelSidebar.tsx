@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -86,6 +86,18 @@ export default function PanelSidebar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, activeHref]);
 
+  // Bring the active row into view, e.g. a deep link to an item low in a long
+  // group. Waits for the 200ms group expand so the row has its final position.
+  const navRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      navRef.current
+        ?.querySelector('[aria-current="page"]')
+        ?.scrollIntoView({ block: "nearest" });
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [activeHref]);
+
   const activeClasses =
     theme === "dark" ? "bg-primary text-white" : "bg-primary text-primary-content";
   const inactiveClasses =
@@ -125,7 +137,7 @@ export default function PanelSidebar({
 
       {topSlot}
 
-      <nav className="flex-1 min-h-0 overflow-y-auto p-3">
+      <nav ref={navRef} className="flex-1 min-h-0 overflow-y-auto p-3">
         <ul className="space-y-1">
           {items.map((entry) => {
             if (isGroup(entry)) {
