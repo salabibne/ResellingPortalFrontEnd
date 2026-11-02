@@ -224,13 +224,13 @@ export default function InventoryMonitorPage() {
   const renderTxBadge = (type: InventoryTxType) => {
     if (type === "STOCK_IN") {
       return (
-        <span className="badge badge-success text-white gap-1 font-semibold text-xs py-2 px-3">
+        <span className="badge whitespace-nowrap badge-success text-white gap-1 font-semibold text-xs py-2 px-3">
           <ArrowDownLeft size={14} /> Stock In
         </span>
       );
     }
     return (
-      <span className="badge badge-error text-white gap-1 font-semibold text-xs py-2 px-3">
+      <span className="badge whitespace-nowrap badge-error text-white gap-1 font-semibold text-xs py-2 px-3">
         <ArrowUpRight size={14} /> Stock Out
       </span>
     );
@@ -239,15 +239,15 @@ export default function InventoryMonitorPage() {
   const renderPurposeBadge = (purpose: InventoryTxPurpose) => {
     switch (purpose) {
       case "PURCHASE":
-        return <span className="badge badge-info text-white text-xs px-2 py-1">PURCHASE</span>;
+        return <span className="badge whitespace-nowrap badge-info text-white text-xs px-2 py-1">PURCHASE</span>;
       case "SELL":
-        return <span className="badge badge-success text-white text-xs px-2 py-1">SELL</span>;
+        return <span className="badge whitespace-nowrap badge-success text-white text-xs px-2 py-1">SELL</span>;
       case "RETURN":
-        return <span className="badge badge-warning text-white text-xs px-2 py-1">RETURN</span>;
+        return <span className="badge whitespace-nowrap badge-warning text-white text-xs px-2 py-1">RETURN</span>;
       case "DAMAGE":
-        return <span className="badge badge-error text-white text-xs px-2 py-1">DAMAGE</span>;
+        return <span className="badge whitespace-nowrap badge-error text-white text-xs px-2 py-1">DAMAGE</span>;
       default:
-        return <span className="badge badge-neutral text-xs px-2 py-1">{purpose}</span>;
+        return <span className="badge whitespace-nowrap badge-neutral text-xs px-2 py-1">{purpose}</span>;
     }
   };
 
@@ -311,7 +311,7 @@ export default function InventoryMonitorPage() {
         >
           <AlertTriangle size={18} /> Low Stock Alerts
           {dashboardData?.lowStockCount ? (
-            <span className="badge badge-sm badge-error text-white font-bold ml-1">
+            <span className="badge whitespace-nowrap badge-sm badge-error text-white font-bold ml-1">
               {dashboardData.lowStockCount}
             </span>
           ) : null}
@@ -576,7 +576,7 @@ export default function InventoryMonitorPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="table w-full">
+                <table className="table table-sm w-full">
                   <thead className="bg-slate-50 text-slate-700">
                     <tr>
                       <th>Status</th>
@@ -595,12 +595,12 @@ export default function InventoryMonitorPage() {
                         <tr key={item.id} className="hover:bg-slate-50">
                           <td>
                             {isZero ? (
-                              <span className="badge badge-error text-white font-bold text-xs gap-1">
-                                <XCircle size={12} /> OUT OF STOCK
+                              <span className="badge whitespace-nowrap badge-error text-white font-bold text-xs gap-1">
+                                <XCircle size={12} className="shrink-0" /> OUT OF STOCK
                               </span>
                             ) : (
-                              <span className="badge badge-warning text-white font-bold text-xs gap-1">
-                                <AlertTriangle size={12} /> LOW STOCK
+                              <span className="badge whitespace-nowrap badge-warning text-white font-bold text-xs gap-1">
+                                <AlertTriangle size={12} className="shrink-0" /> LOW STOCK
                               </span>
                             )}
                           </td>
@@ -608,7 +608,7 @@ export default function InventoryMonitorPage() {
                             {item.product?.name || "Unknown Product"}
                           </td>
                           <td>
-                            <span className="badge badge-outline text-xs">
+                            <span className="badge whitespace-nowrap badge-outline text-xs">
                               {item.productSize?.size?.name || "Standard / N/A"}
                             </span>
                           </td>
@@ -861,7 +861,7 @@ export default function InventoryMonitorPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="table w-full">
+                <table className="table table-sm w-full">
                   <thead className="bg-slate-50 text-slate-700">
                     <tr>
                       <th>Type</th>
@@ -883,7 +883,7 @@ export default function InventoryMonitorPage() {
                             {tx.inventory?.product?.name || "Product"}
                           </div>
                           {tx.inventory?.productSize?.size?.name && (
-                            <span className="badge badge-ghost badge-xs text-slate-500 mt-0.5">
+                            <span className="badge whitespace-nowrap badge-ghost badge-xs text-slate-500 mt-0.5">
                               Size: {tx.inventory.productSize.size.name}
                             </span>
                           )}

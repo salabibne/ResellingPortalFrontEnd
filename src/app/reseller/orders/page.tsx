@@ -674,6 +674,14 @@ export default function ResellerOrdersPage() {
                   )}
                 </span>
               </div>
+              {selectedOrder.customerEmail && (
+                <div className="min-w-0">
+                  <span className="text-base-content/60 font-semibold block uppercase">Email:</span>
+                  <span className="block truncate font-bold text-sm text-base-content">
+                    {selectedOrder.customerEmail}
+                  </span>
+                </div>
+              )}
               <div>
                 <span className="text-base-content/60 font-semibold block uppercase">District & Thana:</span>
                 <span className="font-bold text-xs text-base-content">

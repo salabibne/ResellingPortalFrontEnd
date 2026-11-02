@@ -62,6 +62,7 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
     "Customer Name",
     "Customer Phone",
     "Customer Secondary Phone",
+    "Customer Email",
     "Customer District",
     "Customer Thana",
     "Shipping Address",
@@ -99,6 +100,7 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
     const customerName = ord.customerName || ord.customer?.name || "";
     const customerPhone = ord.customerPhone || ord.customer?.phone || "";
     const customerSecondaryPhone = ord.customerSecondaryPhone || "";
+    const customerEmail = ord.customerEmail || "";
     const customerDistrict = ord.customerDistrict || "";
     const customerThana = ord.customerThana || "";
     const shippingAddress = ord.shippingAddress || "";
@@ -172,6 +174,7 @@ export function exportOrdersToCSV(orders: Order[], filenamePrefix: string = "ord
       escapeCSVField(customerName),
       escapeCSVField(customerPhone),
       escapeCSVField(customerSecondaryPhone),
+      escapeCSVField(customerEmail),
       escapeCSVField(customerDistrict),
       escapeCSVField(customerThana),
       escapeCSVField(shippingAddress),

@@ -1124,6 +1124,12 @@ export default function OrdersPage() {
                         <Phone size={12} /> Sec: {selectedOrder.customerSecondaryPhone}
                       </div>
                     )}
+                    {selectedOrder.customerEmail && (
+                      <div className="text-slate-500 mt-1 flex min-w-0 items-center gap-1">
+                        <Mail size={12} className="shrink-0" />
+                        <span className="truncate">{selectedOrder.customerEmail}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div>

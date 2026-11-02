@@ -53,6 +53,7 @@ export interface CreateResellerOrderDto {
   customerName: string;
   customerPhone: string;
   customerSecondaryPhone?: string;
+  customerEmail?: string;
   customerDistrict: string;
   customerThana: string;
   shippingAddress: string;
@@ -96,6 +97,7 @@ export interface Order {
   customerName?: string | null;
   customerPhone?: string | null;
   customerSecondaryPhone?: string | null;
+  customerEmail?: string | null;
   customerDistrict?: string | null;
   customerThana?: string | null;
   resellerSubtotal?: number | null;

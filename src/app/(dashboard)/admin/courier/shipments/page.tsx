@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Copy,
   ExternalLink,
+  Eye,
   Filter,
   Package,
   PackageCheck,
@@ -544,8 +545,8 @@ export default function CourierShipmentsPage() {
             </select>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-            <Calendar size={14} className="text-primary" /> From:
+          <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-600">
+            <Calendar size={14} className="text-primary shrink-0" /> From:
             <input
               type="date"
               value={startDate}
@@ -553,7 +554,7 @@ export default function CourierShipmentsPage() {
                 setStartDate(e.target.value);
                 setPage(1);
               }}
-              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl"
+              className="input input-xs input-bordered bg-base-100 text-base-content font-bold rounded-xl min-w-0"
             />
             <span>To:</span>
             <input
@@ -607,16 +608,15 @@ export default function CourierShipmentsPage() {
           <PanelTable>
               <thead>
                 <tr>
-                  <th className="py-4 pl-6">Order</th>
-                  <th>Uddokta</th>
+                  <th className="py-3">Order</th>
                   <th>Customer</th>
                   <th>Delivery Address</th>
-                  <th>Steadfast Shipment</th>
+                  <th>Shipment</th>
                   <th>COD</th>
-                  <th>Courier Status</th>
-                  <th>Booking</th>
-                  <th>Last Updated</th>
-                  <th className="text-right pr-6">Actions</th>
+                  <th>Status</th>
+                  <th className="text-right !pr-4 whitespace-nowrap sticky right-0 bg-slate-50 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm">
@@ -631,21 +631,20 @@ export default function CourierShipmentsPage() {
 
                   return (
                     <tr key={order.id} className="hover:bg-slate-50/80 transition-colors align-top">
-                      <td className="pl-6 py-4">
+                      <td className="py-3 whitespace-nowrap">
                         <div className="font-mono font-bold text-indigo-600 text-xs">
                           {order.orderRef || `#${order.id.substring(0, 8).toUpperCase()}`}
                         </div>
                         <div className="text-[10px] text-slate-400 mt-1">
                           {new Date(order.createdAt).toLocaleDateString()}
                         </div>
-                      </td>
-
-                      <td className="text-xs text-slate-600 font-medium">
-                        {order.isResellerOrder
-                          ? order.reseller?.name ||
-                            order.customer?.name ||
-                            "Uddokta"
-                          : "Direct"}
+                        <div className="text-[11px] text-slate-600 font-medium mt-0.5 max-w-[140px] truncate">
+                          {order.isResellerOrder
+                            ? order.reseller?.name ||
+                              order.customer?.name ||
+                              "Uddokta"
+                            : "Direct"}
+                        </div>
                       </td>
 
                       <td>
@@ -657,7 +656,7 @@ export default function CourierShipmentsPage() {
                         </div>
                       </td>
 
-                      <td className="max-w-[220px]">
+                      <td className="min-w-[160px] max-w-[220px]">
                         <div
                           className="text-[11px] text-slate-600 line-clamp-2"
                           title={order.shippingAddress || ""}
@@ -712,73 +711,58 @@ export default function CourierShipmentsPage() {
                             <ExternalLink size={10} />
                           </a>
                         ) : null}
-                      </td>
 
-                      <td className="text-xs font-black text-indigo-950">
-                        ৳{codAmount.toLocaleString()}
-                      </td>
-
-                      <td>
-                        <CourierStatusBadge status={order.courierStatus} />
-                        {order.courierReturnStatus && (
-                          <div className="mt-1">
-                            <span className="badge badge-warning text-base-content text-[9px] font-bold uppercase py-1 px-1.5">
-                              Return: {order.courierReturnStatus}
+                        {canRefresh && (
+                          <div className="text-[10px] text-slate-500 mt-1 whitespace-nowrap">
+                            {formatDateTime(order.courierLastSyncedAt)}{" "}
+                            <span className={`font-bold ${stale ? "text-amber-600" : "text-emerald-600"}`}>
+                              · {stale ? "Stale" : "Recent"}
                             </span>
                           </div>
                         )}
                       </td>
 
-                      <td>
-                        {order.courierBookingState ? (
-                          <span
-                            className={`badge font-bold text-[10px] uppercase py-1.5 px-2 ${
-                              BOOKING_STATE_STYLES[order.courierBookingState] ||
-                              "badge-neutral text-white"
-                            }`}
-                          >
-                            {BOOKING_STATE_LABELS[order.courierBookingState] ||
-                              order.courierBookingState}
-                          </span>
-                        ) : order.courierConsignmentId ? (
-                          <span className="badge badge-success text-white font-bold text-[10px] uppercase py-1.5 px-2">
-                            Booked
-                          </span>
-                        ) : (
-                          <span className="badge badge-ghost text-slate-500 font-bold text-[10px] uppercase py-1.5 px-2">
-                            Not Booked
-                          </span>
-                        )}
+                      <td className="text-xs font-black text-indigo-950 whitespace-nowrap">
+                        ৳{codAmount.toLocaleString()}
                       </td>
 
-                      <td className="text-[11px] text-slate-600">
-                        {canRefresh ? (
-                          <>
-                            <div className="font-medium">
-                              {formatDateTime(order.courierLastSyncedAt)}
-                            </div>
-                            <div
-                              className={`text-[10px] font-bold mt-0.5 ${
-                                stale ? "text-amber-600" : "text-emerald-600"
+                      <td>
+                        <div className="flex flex-col items-start gap-1">
+                          <CourierStatusBadge status={order.courierStatus} />
+                          {order.courierBookingState ? (
+                            <span
+                              className={`badge whitespace-nowrap h-auto font-bold text-[10px] uppercase py-1 px-2 ${
+                                BOOKING_STATE_STYLES[order.courierBookingState] ||
+                                "badge-neutral text-white"
                               }`}
                             >
-                              {stale ? "Stale" : "Recent"}
-                            </div>
-                          </>
-                        ) : (
-                          <span className="text-[10px] text-slate-400 italic">
-                            Not booked
-                          </span>
-                        )}
+                              {BOOKING_STATE_LABELS[order.courierBookingState] ||
+                                order.courierBookingState}
+                            </span>
+                          ) : order.courierConsignmentId ? (
+                            <span className="badge whitespace-nowrap h-auto badge-success text-white font-bold text-[10px] uppercase py-1 px-2">
+                              Booked
+                            </span>
+                          ) : (
+                            <span className="badge whitespace-nowrap h-auto badge-ghost text-slate-500 font-bold text-[10px] uppercase py-1 px-2">
+                              Not Booked
+                            </span>
+                          )}
+                          {order.courierReturnStatus && (
+                            <span className="badge whitespace-nowrap h-auto badge-warning text-base-content text-[9px] font-bold uppercase py-1 px-1.5">
+                              Return: {order.courierReturnStatus}
+                            </span>
+                          )}
+                        </div>
                       </td>
 
-                      <td className="text-right pr-6">
-                        <div className="flex flex-col items-end gap-1.5">
+                      <td className="text-right !pr-4 align-middle whitespace-nowrap sticky right-0 bg-base-100 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
+                        <div className="flex flex-col items-stretch gap-1">
                           <button
                             type="button"
                             onClick={() => handleRefreshStatus(order)}
                             disabled={!canRefresh || isRefreshing}
-                            className="btn btn-xs btn-outline btn-primary rounded-lg font-bold gap-1"
+                            className="btn btn-xs btn-outline btn-primary rounded-lg font-bold gap-1 flex-nowrap whitespace-nowrap"
                             title={
                               canRefresh
                                 ? "Refresh status from Steadfast using the stored consignment ID"
@@ -787,9 +771,9 @@ export default function CourierShipmentsPage() {
                           >
                             <RefreshCw
                               size={12}
-                              className={isRefreshing ? "animate-spin" : ""}
+                              className={`shrink-0 ${isRefreshing ? "animate-spin" : ""}`}
                             />
-                            {isRefreshing ? "Refreshing..." : "Refresh Status"}
+                            {isRefreshing ? "Refreshing" : "Refresh"}
                           </button>
                           {canRefresh && !order.courierReturnStatus && (
                             <button
@@ -798,18 +782,20 @@ export default function CourierShipmentsPage() {
                                 setReturnOrder(order);
                                 setReturnReason("");
                               }}
-                              className="btn btn-xs btn-ghost text-amber-600 rounded-lg font-bold gap-1"
+                              className="btn btn-xs btn-ghost text-amber-600 rounded-lg font-bold gap-1 flex-nowrap whitespace-nowrap"
+                              title="Request a return from Steadfast"
                             >
-                              <RotateCcw size={12} /> Request Return
+                              <RotateCcw size={12} className="shrink-0" /> Return
                             </button>
                           )}
                           <Link
                             href={`/orders?search=${encodeURIComponent(
                               order.orderRef || order.id
                             )}`}
-                            className="btn btn-xs btn-ghost rounded-lg font-bold gap-1 text-slate-600"
+                            className="btn btn-xs btn-ghost rounded-lg font-bold gap-1 flex-nowrap whitespace-nowrap text-slate-600"
+                            title="Manage this order"
                           >
-                            Manage Order
+                            <Eye size={12} className="shrink-0" /> Manage
                           </Link>
                         </div>
                       </td>

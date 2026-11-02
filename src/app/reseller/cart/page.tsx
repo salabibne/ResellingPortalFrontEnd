@@ -45,6 +45,7 @@ export default function ResellerCartPage() {
   const [customerName, setCustomerName] = useState<string>("");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [customerSecondaryPhone, setCustomerSecondaryPhone] = useState<string>("");
+  const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerDistrict, setCustomerDistrict] = useState<string>("");
   const [customerThana, setCustomerThana] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<string>("");
@@ -117,6 +118,8 @@ export default function ResellerCartPage() {
         customerName: customerName.trim(),
         customerPhone: customerPhone.trim(),
         customerSecondaryPhone: customerSecondaryPhone.trim() || undefined,
+        // Left out entirely when blank so the courier never receives an empty email.
+        customerEmail: customerEmail.trim() || undefined,
         customerDistrict: customerDistrict.trim(),
         customerThana: customerThana.trim(),
         shippingAddress: shippingAddress.trim(),
@@ -374,6 +377,22 @@ export default function ResellerCartPage() {
                   className="input input-bordered w-full input-sm"
                   value={customerSecondaryPhone}
                   onChange={(e) => setCustomerSecondaryPhone(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="label text-xs font-bold text-base-content">
+                  Customer Email (Optional)
+                </label>
+                <input
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  maxLength={255}
+                  placeholder="e.g. customer@example.com"
+                  className="input input-bordered w-full input-sm"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
                 />
               </div>
 

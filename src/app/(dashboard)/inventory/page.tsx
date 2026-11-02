@@ -58,6 +58,8 @@ export default function InventoryPage() {
   const [lowStockItems, setLowStockItems] = useState<any[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
+  // Loads that failed on the last fetch, shown instead of silently empty tables.
+  const [loadErrors, setLoadErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
@@ -97,16 +99,29 @@ export default function InventoryPage() {
       setIsLoading(true);
       setLoadingProgress(25);
 
+      const errors: string[] = [];
+      const recordFailure = <T,>(label: string, fallback: T) => (err: any): T => {
+        const status = err?.response?.status;
+        const message = err?.response?.data?.message || err?.message || "Request failed";
+        errors.push(
+          `${label}: ${status ? `${status} ` : ""}${Array.isArray(message) ? message.join(", ") : message}`
+        );
+        return fallback;
+      };
+
       const [prodsData, catsData, txsData, lowStockData] = await Promise.all([
-        productApi.getAll().catch(() => []),
-        api.get("/categories").then((r) => r.data).catch(() => []),
-        inventoryApi.getTransactions().catch(() => []),
-        inventoryApi.getLowStock(1, 50).catch(() => ({ data: [], meta: { total: 0, page: 1, limit: 50, totalPages: 0 } })),
+        productApi.getAll().catch(recordFailure("Products", [] as Product[])),
+        api.get("/categories").then((r) => r.data).catch(recordFailure("Categories", [] as any[])),
+        inventoryApi.getTransactions().catch(recordFailure<any>("Audit log", [])),
+        inventoryApi
+          .getLowStock(1, 50)
+          .catch(recordFailure<any>("Low stock alerts", { data: [], meta: { total: 0, page: 1, limit: 50, totalPages: 0 } })),
       ]);
+      setLoadErrors(errors);
 
       setLoadingProgress(75);
 
-      setProducts(prodsData);
+      setProducts(Array.isArray(prodsData) ? prodsData : (prodsData as any)?.data || []);
       setCategories(Array.isArray(catsData) ? catsData : catsData?.data || []);
       setTransactions(Array.isArray(txsData) ? txsData : txsData?.data || []);
       setLowStockItems(
@@ -375,13 +390,30 @@ export default function InventoryPage() {
         </div>
       </div>
 
+      {loadErrors.length > 0 && (
+        <div role="alert" className="alert alert-error text-white text-xs font-bold shadow-sm flex items-start gap-2">
+          <AlertCircle size={16} className="shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p>Some inventory data could not be loaded:</p>
+            <ul className="mt-1 list-disc pl-4 font-medium break-words">
+              {loadErrors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          </div>
+          <button type="button" onClick={fetchData} className="btn btn-xs btn-ghost text-white shrink-0">
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* MAIN CONTENT AREA */}
       <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300 overflow-hidden flex flex-col">
         {/* Navigation Tabs */}
         <div className="bg-base-100 p-3 border-b border-base-300 flex flex-wrap justify-between items-center gap-3">
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto scrollbar-none max-w-full">
             <button
-              className={`btn btn-sm rounded-xl font-semibold gap-2 ${
+              className={`btn btn-sm rounded-xl font-semibold gap-2 shrink-0 whitespace-nowrap ${
                 activeTab === "overview" ? "btn-primary text-white shadow" : "btn-ghost text-base-content"
               }`}
               onClick={() => setActiveTab("overview")}
@@ -389,7 +421,7 @@ export default function InventoryPage() {
               <Package size={16} /> Products & Size Stock
             </button>
             <button
-              className={`btn btn-sm rounded-xl font-semibold gap-2 ${
+              className={`btn btn-sm rounded-xl font-semibold gap-2 shrink-0 whitespace-nowrap ${
                 activeTab === "history" ? "btn-primary text-white shadow" : "btn-ghost text-base-content"
               }`}
               onClick={() => setActiveTab("history")}
@@ -397,7 +429,7 @@ export default function InventoryPage() {
               <History size={16} /> Audit Log ({transactions.length})
             </button>
             <button
-              className={`btn btn-sm rounded-xl font-semibold gap-2 ${
+              className={`btn btn-sm rounded-xl font-semibold gap-2 shrink-0 whitespace-nowrap ${
                 activeTab === "low-stock" ? "btn-primary text-white shadow" : "btn-ghost text-base-content"
               }`}
               onClick={() => setActiveTab("low-stock")}
