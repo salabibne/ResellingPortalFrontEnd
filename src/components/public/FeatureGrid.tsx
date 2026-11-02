@@ -2,29 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import {
-  ShieldCheck,
-  Truck,
-  Sparkles,
-  Zap,
-  CheckCircle2,
-  Star,
-  Award,
-  ArrowRight,
-  Package,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useCMSStore } from "@/store/useCMSStore";
-
-const ICON_MAP: Record<string, any> = {
-  ShieldCheck,
-  Truck,
-  Sparkles,
-  Zap,
-  CheckCircle2,
-  Star,
-  Award,
-  Package,
-};
+import DynamicIcon from "@/components/homepage/DynamicIcon";
 
 interface FeatureGridProps {
   title?: string;
@@ -62,7 +42,6 @@ export default function FeatureGrid({ title: overrideTitle, description: overrid
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {features.map((item, idx) => {
-            const IconComponent = ICON_MAP[item.cardIcon] || Sparkles;
             return (
               <div
                 key={item.id || idx}
@@ -83,7 +62,7 @@ export default function FeatureGrid({ title: overrideTitle, description: overrid
                 <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
                   <div>
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                      <IconComponent size={28} />
+                      <DynamicIcon value={item.cardIcon} fallback="Sparkles" size={28} />
                     </div>
                     <h3 className="text-xl font-bold text-base-content mb-3">
                       {item.cardTitle}

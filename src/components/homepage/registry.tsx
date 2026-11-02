@@ -36,6 +36,10 @@ import { BenefitsRow, TrustBadges, TrustIconCards } from "./sections/TrustSectio
 import { FeaturedTestimonial, TestimonialCards } from "./sections/TestimonialSections";
 import { LogoCarousel } from "./sections/LogoSection";
 import { FaqAccordion } from "./sections/FaqSection";
+import { InlineStats, StatCards } from "./sections/StatsSections";
+import { NumberedSteps, TimelineSteps } from "./sections/StepsSections";
+import { ImageChecklist, TwoColumnChecklist } from "./sections/ChecklistSections";
+import { CardCta, GradientCta } from "./sections/CtaSections";
 
 export interface VariantDefinition {
   id: string;
@@ -236,6 +240,55 @@ export const SECTION_REGISTRY: Partial<Record<HomepageSectionType, SectionDefini
     defaultTitle: "Frequently asked questions",
     variants: [
       { id: "accordion", label: "Accordion", description: "Collapsible question list.", Component: FaqAccordion },
+    ],
+  },
+
+  stats: {
+    type: "stats",
+    label: "Stats & numbers",
+    category: "Trust & social proof",
+    description: "Key figures with an icon each. Enter real numbers only.",
+    defaultTitle: "",
+    variants: [
+      { id: "inline-row", label: "Inline row", description: "Icon, number and label in a row.", Component: InlineStats },
+      { id: "cards", label: "Stat cards", description: "A card per figure.", Component: StatCards },
+    ],
+  },
+
+  steps: {
+    type: "steps",
+    label: "How it works",
+    category: "Informational content",
+    description: "Numbered steps, each with an icon or emoji.",
+    defaultTitle: "Start in 4 easy steps",
+    defaultSubtitle: "How it works",
+    variants: [
+      { id: "numbered-cards", label: "Numbered cards", description: "A card per step with a number.", Component: NumberedSteps },
+      { id: "timeline", label: "Timeline", description: "Steps joined by a line.", Component: TimelineSteps },
+    ],
+  },
+
+  checklist: {
+    type: "checklist",
+    label: "Checklist",
+    category: "Informational content",
+    description: "What customers get, each line marked with your icon.",
+    defaultTitle: "What you get",
+    variants: [
+      { id: "two-column", label: "Two columns", description: "Checklist in two columns.", Component: TwoColumnChecklist },
+      { id: "with-image", label: "With image", description: "Checklist beside an image.", Component: ImageChecklist },
+    ],
+  },
+
+  cta: {
+    type: "cta",
+    label: "Call-to-action band",
+    category: "Hero & banners",
+    description: "Closing invitation with an icon and up to two buttons.",
+    defaultTitle: "Start today, for free!",
+    variants: [
+      { id: "gradient-band", label: "Gradient band", description: "Full-width coloured band.", Component: GradientCta },
+      { id: "centered-card", label: "Centered card", description: "Rounded card in the page flow.", Component: CardCta },
     ],
   },
 };

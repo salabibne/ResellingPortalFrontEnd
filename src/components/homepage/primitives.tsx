@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
 import type { HomepageSection } from "./types";
 import { alignmentClass } from "./SectionFrame";
+import DynamicIcon from "./DynamicIcon";
 
-export function Eyebrow({ text }: { text?: string }) {
+export function Eyebrow({ text, icon }: { text?: string; icon?: string }) {
   if (!text) return null;
   return (
     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2">
-      <Sparkles size={12} />
+      <DynamicIcon value={icon} fallback="Sparkles" size={12} />
       <span>{text}</span>
     </div>
   );
@@ -37,7 +37,7 @@ export function SectionHeading({
 
   return (
     <div className={`flex flex-col ${alignmentClass(alignment)} ${className}`}>
-      <Eyebrow text={section.subtitle} />
+      <Eyebrow text={section.subtitle} icon={section.settings.eyebrowIcon as string | undefined} />
       {section.title && (
         <Tag className={`${sizeClass} font-extrabold tracking-tight break-words`}>
           {section.title}
@@ -67,6 +67,8 @@ interface CtaButtonsProps {
 export function CtaButtons({ section, className = "" }: CtaButtonsProps) {
   const secondaryText = section.settings.secondaryButtonText as string | undefined;
   const secondaryLink = section.settings.secondaryButtonLink as string | undefined;
+  const buttonIcon = section.settings.buttonIcon as string | undefined;
+  const secondaryIcon = section.settings.secondaryButtonIcon as string | undefined;
   const secondaryStyle =
     BUTTON_STYLES[(section.settings.secondaryButtonStyle as string) || "outline"] ||
     "btn-outline";
@@ -81,14 +83,15 @@ export function CtaButtons({ section, className = "" }: CtaButtonsProps) {
           className="btn btn-primary rounded-full px-6 sm:px-8 w-full sm:w-auto justify-center gap-2"
         >
           <span className="break-words">{section.buttonText}</span>
-          <ArrowRight size={16} />
+          <DynamicIcon value={buttonIcon} fallback="ArrowRight" size={16} />
         </Link>
       )}
       {secondaryText && (
         <Link
           href={secondaryLink || "/about"}
-          className={`btn ${secondaryStyle} rounded-full px-6 sm:px-8 w-full sm:w-auto justify-center`}
+          className={`btn ${secondaryStyle} rounded-full px-6 sm:px-8 w-full sm:w-auto justify-center gap-2`}
         >
+          <DynamicIcon value={secondaryIcon} size={16} />
           <span className="break-words">{secondaryText}</span>
         </Link>
       )}

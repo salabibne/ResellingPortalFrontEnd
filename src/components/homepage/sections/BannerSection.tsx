@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import DynamicIcon from "../DynamicIcon";
 import type { SectionRenderProps } from "../types";
 import SectionFrame, { resolveColor } from "../SectionFrame";
 import SafeImage from "../SafeImage";
@@ -53,7 +53,7 @@ export function BannerSection({ section }: SectionRenderProps) {
           <div className="max-w-2xl w-full">
             {section.subtitle && (
               <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur-md">
-                <Sparkles size={12} />
+                <DynamicIcon value={section.settings.eyebrowIcon as string | undefined} fallback="Sparkles" size={12} />
                 <span>{section.subtitle}</span>
               </div>
             )}
@@ -73,7 +73,7 @@ export function BannerSection({ section }: SectionRenderProps) {
                 href={section.buttonLink}
                 className="btn btn-primary mt-4 gap-2 rounded-2xl font-bold"
               >
-                Shop now <ArrowRight size={16} />
+                Shop now <DynamicIcon value={section.settings.buttonIcon as string | undefined} fallback="ArrowRight" size={16} />
               </Link>
             )}
           </div>
@@ -106,7 +106,7 @@ export function TextOnlyBanner({ section, mode = "view" }: SectionRenderProps) {
               : "items-center text-center"
           }`}
         >
-          <Eyebrow text={section.subtitle} />
+          <Eyebrow text={section.subtitle} icon={section.settings.eyebrowIcon as string | undefined} />
           {section.title && (
             <h2 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-tight break-words">
               {section.title}

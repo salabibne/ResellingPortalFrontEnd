@@ -253,7 +253,7 @@ export function TextOnlyHero({ section, level = 1 }: SectionRenderProps) {
       {editorial ? (
         <div className="grid items-end gap-6 lg:grid-cols-12 lg:gap-10">
           <div className="flex flex-col items-start lg:col-span-7">
-            <Eyebrow text={section.subtitle} />
+            <Eyebrow text={section.subtitle} icon={section.settings.eyebrowIcon as string | undefined} />
             {section.title && <Tag className={titleSize}>{section.title}</Tag>}
             <div className="mt-5 h-1.5 w-20 rounded-full bg-primary" aria-hidden="true" />
           </div>
@@ -276,7 +276,7 @@ export function TextOnlyHero({ section, level = 1 }: SectionRenderProps) {
               : "items-center text-center"
           }`}
         >
-          <Eyebrow text={section.subtitle} />
+          <Eyebrow text={section.subtitle} icon={section.settings.eyebrowIcon as string | undefined} />
           {section.title && <Tag className={titleSize}>{section.title}</Tag>}
           <div className="mt-5 h-1 w-16 rounded-full bg-primary" aria-hidden="true" />
           {section.description && (

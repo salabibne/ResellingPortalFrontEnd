@@ -105,7 +105,7 @@ export function TextOnlyStory({ section }: SectionRenderProps) {
   return (
     <SectionFrame section={section}>
       <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-        <Eyebrow text={section.subtitle} />
+        <Eyebrow text={section.subtitle} icon={section.settings.eyebrowIcon as string | undefined} />
         {section.title && (
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight leading-tight break-words">
             {section.title}

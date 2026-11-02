@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import DynamicIcon from "../DynamicIcon";
 import type { PromoCard, SectionRenderProps } from "../types";
 import SectionFrame, { resolveColor } from "../SectionFrame";
 import SafeImage from "../SafeImage";
@@ -20,7 +21,7 @@ function PromoImageCard({ card }: { card: PromoCard }) {
       <div className="relative z-10 flex h-full flex-col justify-end p-4 sm:p-6 text-white">
         {card.eyebrow && (
           <span className="mb-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-white/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider backdrop-blur">
-            <Sparkles size={9} /> {card.eyebrow}
+            <DynamicIcon value={card.icon} fallback="Sparkles" size={9} /> {card.eyebrow}
           </span>
         )}
         <h3 className="text-base sm:text-xl font-extrabold leading-tight break-words">
@@ -125,7 +126,7 @@ export function PromotionBanner({ section, mode = "view" }: SectionRenderProps) 
         <div className="relative z-10 w-full max-w-2xl p-6 sm:p-10" style={{ color: textColor }}>
           {section.subtitle && (
             <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">
-              <Sparkles size={10} /> {section.subtitle}
+              <DynamicIcon value={section.settings.eyebrowIcon as string | undefined} fallback="Sparkles" size={10} /> {section.subtitle}
             </span>
           )}
           {section.title && (
@@ -184,7 +185,7 @@ export function TextOnlyPromotion({ section, mode = "view" }: SectionRenderProps
             <div>
               {card.eyebrow && (
                 <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
-                  <Sparkles size={9} /> {card.eyebrow}
+                  <DynamicIcon value={card.icon} fallback="Sparkles" size={9} /> {card.eyebrow}
                 </span>
               )}
               <h3 className="text-base sm:text-lg font-extrabold break-words">

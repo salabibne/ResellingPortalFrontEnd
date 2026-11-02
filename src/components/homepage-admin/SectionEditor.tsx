@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { HomepageSection, HomepageResources } from "@/components/homepage/types";
 import { productApi, type Product } from "@/services/product.api";
 import MediaField from "@/components/ui/MediaField";
+import ListEditor from "./ListEditor";
+import IconPicker from "./IconPicker";
+import IconSectionEditor, { ICON_SECTION_TYPES } from "./IconSectionEditors";
 import {
   CheckboxList,
   ColorField,
@@ -63,86 +65,6 @@ const PRODUCT_SOURCES = [
   { value: "manual", label: "Manually selected products" },
 ];
 
-const ICON_OPTIONS = [
-  { value: "Truck", label: "Truck" },
-  { value: "ShieldCheck", label: "Shield" },
-  { value: "Package", label: "Package" },
-  { value: "Sparkles", label: "Sparkles" },
-  { value: "Zap", label: "Zap" },
-  { value: "Star", label: "Star" },
-  { value: "Award", label: "Award" },
-  { value: "CheckCircle2", label: "Check" },
-];
-
-function ListEditor({
-  label,
-  items,
-  onChange,
-  createItem,
-  renderItem,
-  addLabel,
-  max = 12,
-}: {
-  label: string;
-  items: Record<string, unknown>[];
-  onChange: (items: Record<string, unknown>[]) => void;
-  createItem: () => Record<string, unknown>;
-  renderItem: (
-    item: Record<string, unknown>,
-    update: (patch: Record<string, unknown>) => void,
-  ) => ReactNode;
-  addLabel: string;
-  max?: number;
-}) {
-  const update = (index: number, patch: Record<string, unknown>) => {
-    onChange(items.map((item, i) => (i === index ? { ...item, ...patch } : item)));
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold">{label}</span>
-        <span className="text-[10px] text-base-content/50">{items.length}</span>
-      </div>
-
-      {items.length === 0 && (
-        <p className="rounded-lg border border-dashed border-base-300 p-3 text-center text-[11px] text-base-content/50">
-          Nothing added yet.
-        </p>
-      )}
-
-      {items.map((item, index) => (
-        <div key={index} className="space-y-1.5 rounded-xl border border-base-200 bg-base-100 p-2">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1 text-[10px] font-bold text-base-content/50">
-              <GripVertical size={12} /> #{index + 1}
-            </span>
-            <button
-              type="button"
-              onClick={() => onChange(items.filter((_, i) => i !== index))}
-              className="btn btn-ghost btn-xs text-error"
-              aria-label="Remove item"
-            >
-              <Trash2 size={12} />
-            </button>
-          </div>
-          {renderItem(item, (patch) => update(index, patch))}
-        </div>
-      ))}
-
-      {items.length < max && (
-        <button
-          type="button"
-          onClick={() => onChange([...items, createItem()])}
-          className="btn btn-xs btn-outline w-full gap-1"
-        >
-          <Plus size={12} /> {addLabel}
-        </button>
-      )}
-    </div>
-  );
-}
-
 export default function SectionEditor({
   section,
   resources,
@@ -187,9 +109,13 @@ export default function SectionEditor({
 
   const isTextOnly = TEXT_ONLY_VARIANTS.has(`${type}:${section.variant}`);
   const showMedia =
-    ["hero", "story", "banner", "promotion"].includes(type) && !isTextOnly;
-  const showButtons = ["hero", "story", "banner", "products"].includes(type);
-  const showSecondary = ["hero", "story", "banner"].includes(type);
+    (["hero", "story", "banner", "promotion"].includes(type) && !isTextOnly) ||
+    (type === "checklist" && section.variant === "with-image");
+  const showButtons = ["hero", "story", "banner", "products", "steps", "checklist", "cta"].includes(type);
+  const showSecondary = ["hero", "story", "banner", "cta"].includes(type);
+  // Product collections render their own "view all" link, not the shared CTA buttons.
+  const showButtonIcons = showButtons && type !== "products";
+  const showEyebrowIcon = Boolean(section.subtitle) && type !== "cta";
 
   return (
     <div className="space-y-3">
@@ -216,6 +142,15 @@ export default function SectionEditor({
           maxLength={200}
           onChange={(subtitle) => onChange({ subtitle })}
         />
+        {showEyebrowIcon && (
+          <IconPicker
+            label="Eyebrow / badge icon"
+            value={settings.eyebrowIcon as string}
+            defaultIcon="Sparkles"
+            allowNone
+            onChange={(eyebrowIcon) => onSettings({ eyebrowIcon })}
+          />
+        )}
         <TextArea
           label="Description"
           value={section.description}
@@ -320,6 +255,15 @@ export default function SectionEditor({
             mono
             onChange={(buttonLink) => onChange({ buttonLink })}
           />
+          {showButtonIcons && section.buttonText && (
+            <IconPicker
+              label="Primary button icon"
+              value={settings.buttonIcon as string}
+              defaultIcon="ArrowRight"
+              allowNone
+              onChange={(buttonIcon) => onSettings({ buttonIcon })}
+            />
+          )}
           {showSecondary && (
             <>
               <TextField
@@ -334,6 +278,14 @@ export default function SectionEditor({
                 mono
                 onChange={(secondaryButtonLink) => onSettings({ secondaryButtonLink })}
               />
+              {Boolean(settings.secondaryButtonText) && (
+                <IconPicker
+                  label="Secondary button icon"
+                  value={settings.secondaryButtonIcon as string}
+                  allowNone
+                  onChange={(secondaryButtonIcon) => onSettings({ secondaryButtonIcon })}
+                />
+              )}
               <SelectField
                 label="Secondary button style"
                 value={(settings.secondaryButtonStyle as string) || "outline"}
@@ -494,6 +446,14 @@ export default function SectionEditor({
                     value={item.eyebrow as string}
                     onChange={(eyebrow) => update({ eyebrow })}
                   />
+                  {Boolean(item.eyebrow) && (
+                    <IconPicker
+                      label="Eyebrow icon"
+                      value={item.icon as string}
+                      defaultIcon="Sparkles"
+                      onChange={(icon) => update({ icon })}
+                    />
+                  )}
                   <TextField
                     label="Title"
                     value={item.title as string}
@@ -548,10 +508,10 @@ export default function SectionEditor({
             addLabel="Add benefit"
             renderItem={(item, update) => (
               <>
-                <SelectField
+                <IconPicker
                   label="Icon"
-                  value={(item.icon as string) || "Truck"}
-                  options={ICON_OPTIONS}
+                  value={item.icon as string}
+                  defaultIcon="CheckCircle2"
                   onChange={(icon) => update({ icon })}
                 />
                 <TextField
@@ -569,6 +529,10 @@ export default function SectionEditor({
             )}
           />
         </FieldGroup>
+      )}
+
+      {ICON_SECTION_TYPES.has(type) && (
+        <IconSectionEditor section={section} onSettings={onSettings} />
       )}
 
       {type === "testimonials" && (

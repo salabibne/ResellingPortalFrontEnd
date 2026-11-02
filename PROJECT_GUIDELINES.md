@@ -255,7 +255,8 @@ The registry exists on **both** sides and they must match:
 2. Frontend `src/components/homepage/types.ts` + `registry.tsx`: render component per variant.
 3. `components/homepage/sections/*`: the component.
 4. `components/homepage-admin/VariantThumb.tsx` / `fields.tsx`: builder thumbnail and editor fields.
-5. Publishing triggers `/api/revalidate`, which calls `revalidatePath("/")` and is protected by the `x-revalidate-secret` header when `REVALIDATE_SECRET` is set.
+5. Icons: store icon fields as one string (a Lucide name, `emoji:…` or `none`), render them with `DynamicIcon` and edit them with `IconPicker`. To offer a new Lucide icon, add it to **both** `components/homepage/icon-library.ts` (import, `ICON_LIBRARY`, a category) and the backend's `src/homepage/icon-registry.ts` (`ALLOWED_ICON_NAMES`), or the backend replaces it with the fallback.
+6. Publishing triggers `/api/revalidate`, which calls `revalidatePath("/")` and is protected by the `x-revalidate-secret` header when `REVALIDATE_SECRET` is set.
 
 ---
 

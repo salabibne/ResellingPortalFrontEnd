@@ -2,7 +2,7 @@ import type { SectionRenderProps, TrustItem } from "../types";
 import SectionFrame from "../SectionFrame";
 import { EmptySection, SectionHeading } from "../primitives";
 import { gridClass } from "../layout";
-import { TrustIcon } from "../icons";
+import DynamicIcon from "../DynamicIcon";
 
 /** Variant: benefits-row */
 export function BenefitsRow({ section, mode = "view" }: SectionRenderProps) {
@@ -28,7 +28,7 @@ export function BenefitsRow({ section, mode = "view" }: SectionRenderProps) {
         {items.map((item, index) => (
           <div key={index} className="flex items-start gap-2 rounded-xl bg-base-200/60 p-3">
             <span className="shrink-0 rounded-full bg-primary/10 p-1.5 text-primary">
-              <TrustIcon name={item.icon} size={16} />
+              <DynamicIcon value={item.icon} fallback="CheckCircle2" size={16} />
             </span>
             <div className="min-w-0">
               <h3 className="text-xs font-bold break-words">{item.title}</h3>
@@ -69,7 +69,7 @@ export function TrustIconCards({ section, mode = "view" }: SectionRenderProps) {
             className="flex flex-col items-start gap-2 rounded-2xl border border-base-200 bg-base-100 p-4 shadow-sm"
           >
             <span className="rounded-xl bg-primary/10 p-2 text-primary">
-              <TrustIcon name={item.icon} size={20} />
+              <DynamicIcon value={item.icon} fallback="CheckCircle2" size={20} />
             </span>
             <h3 className="text-sm font-extrabold break-words">{item.title}</h3>
             {item.description && (
@@ -106,7 +106,7 @@ export function TrustBadges({ section, mode = "view" }: SectionRenderProps) {
             className="inline-flex items-center gap-1.5 rounded-full border border-base-200 bg-base-100 px-3 py-1.5 text-[11px] font-bold"
           >
             <span className="text-primary">
-              <TrustIcon name={item.icon} size={13} />
+              <DynamicIcon value={item.icon} fallback="CheckCircle2" size={13} />
             </span>
             {item.title}
           </span>

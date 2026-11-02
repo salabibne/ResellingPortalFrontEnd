@@ -269,6 +269,99 @@ export default function VariantThumb({ type, variant, className = "" }: VariantT
       );
     }
 
+    if (type === "stats") {
+      return (
+        <div className={`flex h-full items-center justify-around gap-1 ${variant === "cards" ? "" : "px-1"}`}>
+          {[0, 1, 2, 3].map((i) =>
+            variant === "cards" ? (
+              <div key={i} className="flex flex-1 items-center gap-1 rounded border border-base-content/15 p-1">
+                <div className="h-3 w-3 shrink-0 rounded bg-primary/40" />
+                <div className="flex flex-1 flex-col gap-0.5">
+                  <div className="h-2 w-2/3 rounded-sm bg-base-content/40" />
+                  <Line width="w-full" />
+                </div>
+              </div>
+            ) : (
+              <div key={i} className="flex flex-1 flex-col items-center gap-0.5">
+                <div className="h-3 w-3 rounded bg-primary/40" />
+                <div className="h-2 w-2/3 rounded-sm bg-base-content/40" />
+                <Line width="w-3/4" />
+              </div>
+            ),
+          )}
+        </div>
+      );
+    }
+
+    if (type === "steps") {
+      if (variant === "timeline") {
+        return (
+          <div className="relative flex h-full items-center justify-around">
+            <div className="absolute left-[12%] right-[12%] top-1/2 h-0.5 -translate-y-1/2 bg-primary/30" />
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="relative h-4 w-4 rounded-full bg-primary/70" />
+            ))}
+          </div>
+        );
+      }
+      return (
+        <div className="grid h-full grid-cols-4 gap-1">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="relative flex flex-col items-center justify-center gap-1 rounded bg-base-content/10 p-1">
+              <div className="absolute right-0.5 top-0.5 h-1.5 w-2 rounded-full bg-primary/50" />
+              <div className="h-3 w-3 rounded bg-primary/40" />
+              <Line width="w-full" />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (type === "checklist") {
+      const rows = (
+        <div className="flex flex-1 flex-col justify-center gap-1">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center gap-1">
+              <div className="h-2 w-2 shrink-0 rounded-full bg-primary/60" />
+              <Line width="w-full" />
+            </div>
+          ))}
+        </div>
+      );
+      if (variant === "with-image") {
+        return (
+          <div className="flex h-full gap-1.5">
+            <div className={`w-2/5 ${block}`} />
+            {rows}
+          </div>
+        );
+      }
+      return (
+        <div className="flex h-full gap-2">
+          {rows}
+          {rows}
+        </div>
+      );
+    }
+
+    if (type === "cta") {
+      const gradient = variant === "gradient-band";
+      return (
+        <div
+          className={`flex h-full flex-col items-center justify-center gap-1 rounded ${
+            gradient ? "bg-gradient-to-br from-primary/70 to-slate-800/70" : "border border-base-content/15"
+          }`}
+        >
+          <div className={`h-2.5 w-2.5 rounded ${gradient ? "bg-white/60" : "bg-primary/40"}`} />
+          <div className={`h-1.5 w-1/2 rounded-sm ${gradient ? "bg-white/70" : "bg-base-content/30"}`} />
+          <div className="flex gap-1">
+            <div className={`h-1.5 w-6 rounded-full ${gradient ? "bg-white" : "bg-primary/60"}`} />
+            <div className={`h-1.5 w-6 rounded-full border ${gradient ? "border-white/70" : "border-base-content/30"}`} />
+          </div>
+        </div>
+      );
+    }
+
     if (type === "testimonials") {
       return (
         <div className={`grid h-full gap-1 ${variant === "featured" ? "grid-cols-1" : "grid-cols-3"}`}>

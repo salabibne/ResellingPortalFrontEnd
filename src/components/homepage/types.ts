@@ -11,7 +11,11 @@ export type HomepageSectionType =
   | "testimonials"
   | "logos"
   | "faq"
-  | "banner";
+  | "banner"
+  | "stats"
+  | "steps"
+  | "checklist"
+  | "cta";
 
 export type SectionAnimation =
   | "default"
@@ -48,6 +52,23 @@ export interface PromoCard {
   buttonText?: string;
   buttonLink?: string;
   eyebrow?: string;
+  icon?: string;
+}
+
+export interface StatItem {
+  icon?: string;
+  value: string;
+  label: string;
+}
+
+export interface StepItem {
+  icon?: string;
+  title: string;
+  description?: string;
+}
+
+export interface ChecklistItem {
+  text: string;
 }
 
 export interface SectionSettings {
@@ -76,7 +97,13 @@ export interface SectionSettings {
   showProductCount?: boolean;
   showAddToCart?: boolean;
   grayscale?: boolean;
-  items?: TrustItem[] | TestimonialItem[] | FaqItem[];
+  /** Icon values: a Lucide name, "emoji:…" or "none" (see icon-library.ts). */
+  eyebrowIcon?: string;
+  buttonIcon?: string;
+  secondaryButtonIcon?: string;
+  icon?: string;
+  itemIcon?: string;
+  items?: TrustItem[] | TestimonialItem[] | FaqItem[] | StatItem[] | StepItem[] | ChecklistItem[];
   cards?: PromoCard[];
   [key: string]: unknown;
 }
