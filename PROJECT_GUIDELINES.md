@@ -170,7 +170,7 @@ src/
 │   ├── panel/          # shared admin + reseller design system (see §3.3)
 │   ├── shared/         # Header, Footer, Navbar wrapper, AttributeManager, modals
 │   ├── homepage/       # storefront section registry + renderer
-│   ├── homepage-admin/ # Homepage Builder (list, library, variants, editor, preview)
+│   ├── homepage-admin/ # Homepage & custom page builder (list, library, variants, editor, preview)
 │   ├── courier/        # Steadfast track / pickups / returns / invoices panels
 │   ├── cms/, public/, ui/
 ├── services/           # axios instance + one `<area>.api.ts` per backend area
@@ -250,6 +250,8 @@ npm run prisma:generate
 5. Any filters (`PanelTabs`) and CSV exports that list statuses.
 
 ### Add a Homepage Builder section or variant
+Custom pages use the same engine: `BuilderShell pageId=…` at `/admin/custom-pages/[id]/builder`, the backend `page-builder` routes (same `HomepageService`, scoped by page id) and `HomepageRenderer` on `/pages/[slug]`. A new section type therefore appears on both automatically.
+
 The registry exists on **both** sides and they must match:
 1. Backend `src/homepage/section-registry.ts`: type, variants, allowed settings fields and defaults.
 2. Frontend `src/components/homepage/types.ts` + `registry.tsx`: render component per variant.

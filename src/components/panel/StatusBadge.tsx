@@ -26,7 +26,9 @@ const STATUS_STYLES: Record<string, string> = {
   CANCELLED: "badge-error",
   FAILED: "badge-error",
   CLOSED: "badge-neutral",
+  PUBLISHED: "badge-success",
   DRAFT: "badge-ghost",
+  ARCHIVED: "badge-ghost",
   DISABLED: "badge-ghost",
   INACTIVE: "badge-ghost",
 };

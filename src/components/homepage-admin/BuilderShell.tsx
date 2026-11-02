@@ -11,7 +11,7 @@ import {
   Type,
 } from "lucide-react";
 import { PanelTabs } from "@/components/panel";
-import homepageApi from "@/services/homepage.api";
+import homepageApi, { pageBuilderApi } from "@/services/homepage.api";
 import type {
   HomepageConfig,
   HomepageResources,
@@ -81,7 +81,14 @@ type MobileView = "panel" | "preview";
 type PanelView = "list" | "section";
 type EditorTab = "content" | "design";
 
-export default function BuilderShell() {
+interface BuilderShellProps {
+  /** A custom page to edit. Without it the builder edits the homepage. */
+  pageId?: string;
+}
+
+export default function BuilderShell({ pageId }: BuilderShellProps = {}) {
+  const builderApi = useMemo(() => (pageId ? pageBuilderApi(pageId) : homepageApi), [pageId]);
+
   const [page, setPage] = useState<HomepageConfig["page"] | null>(null);
   const [sections, setSections] = useState<HomepageSection[]>([]);
   const [resources, setResources] = useState<HomepageResources>(EMPTY_RESOURCES);
@@ -131,7 +138,7 @@ export default function BuilderShell() {
     setLoading(true);
     setLoadError(null);
     try {
-      const data = await homepageApi.getAdmin();
+      const data = await builderApi.getAdmin();
       const list = sortSections((data.sections || []).map(normalizeRow));
       setPage(data.page);
       setSections(list);
@@ -152,7 +159,7 @@ export default function BuilderShell() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [builderApi]);
 
   useEffect(() => {
     load();
@@ -191,7 +198,7 @@ export default function BuilderShell() {
 
   const persistOrder = async (list: HomepageSection[]) => {
     try {
-      await homepageApi.reorder(
+      await builderApi.reorder(
         list.map((section, index) => ({ id: section.id, sortOrder: index + 1 })),
       );
       setHasUnpublished(true);
@@ -230,7 +237,7 @@ export default function BuilderShell() {
   const handleAdd = async (type: HomepageSectionType, variant: string) => {
     setAdding(true);
     try {
-      const row = await homepageApi.createSection({ type, variant });
+      const row = await builderApi.createSection({ type, variant });
       const section = normalizeRow(row);
       setSections((current) => sortSections([...current, section]));
       openSection(section.id);
@@ -255,7 +262,7 @@ export default function BuilderShell() {
     );
 
     try {
-      await homepageApi.updateSection(section.id, { isEnabled: nextEnabled });
+      await builderApi.updateSection(section.id, { isEnabled: nextEnabled });
       setHasUnpublished(true);
       showToast(`“${section.title}” is now ${nextEnabled ? "visible" : "hidden"}.`);
     } catch (err: any) {
@@ -273,7 +280,7 @@ export default function BuilderShell() {
   const handleDuplicate = async (section: HomepageSection) => {
     setPendingId(section.id);
     try {
-      const row = await homepageApi.duplicateSection(section.id);
+      const row = await builderApi.duplicateSection(section.id);
       const copy = normalizeRow(row);
       setSections((current) => sortSections([...current, copy]));
       setSelectedId(copy.id);
@@ -291,7 +298,7 @@ export default function BuilderShell() {
     if (!confirm(`Remove “${section.title || section.type}” from the draft?`)) return;
     setPendingId(section.id);
     try {
-      await homepageApi.deleteSection(section.id);
+      await builderApi.deleteSection(section.id);
       setSections((current) => sortSections(current.filter((entry) => entry.id !== section.id)));
       setDirtyIds((current) => current.filter((id) => id !== section.id));
       setNewIds((current) => current.filter((id) => id !== section.id));
@@ -317,7 +324,7 @@ export default function BuilderShell() {
       const section = sections.find((entry) => entry.id === id);
       if (!section) continue;
       try {
-        await homepageApi.updateSection(id, {
+        await builderApi.updateSection(id, {
           variant: section.variant,
           title: section.title,
           subtitle: section.subtitle,
@@ -353,16 +360,18 @@ export default function BuilderShell() {
     if (!(await saveDraft())) return;
     setPublishing(true);
     try {
-      await homepageApi.publish();
-      try {
-        await fetch("/api/revalidate", { method: "POST" });
-      } catch {
-        // The storefront is force-dynamic, so this is only a cache hint.
+      await builderApi.publish();
+      if (!pageId) {
+        try {
+          await fetch("/api/revalidate", { method: "POST" });
+        } catch {
+          // The storefront is force-dynamic, so this is only a cache hint.
+        }
       }
       const index = sections.findIndex((section) => section.id === selectedId);
       await load(index >= 0 ? index : undefined);
       setHasUnpublished(false);
-      showToast("Published — the live homepage is updated.");
+      showToast(pageId ? "Published — the live page is updated." : "Published — the live homepage is updated.");
     } catch (err: any) {
       showToast(errorMessage(err, "Publishing failed. Your draft is still intact."), "error");
     } finally {
@@ -380,7 +389,7 @@ export default function BuilderShell() {
     }
     setDiscarding(true);
     try {
-      await homepageApi.discard();
+      await builderApi.discard();
       await load();
       showToast("Draft discarded. The published layout was reloaded.");
     } catch (err: any) {
@@ -394,7 +403,7 @@ export default function BuilderShell() {
     if (!confirm("Replace the draft with the factory section layout?")) return;
     setResetting(true);
     try {
-      const data = await homepageApi.reset();
+      const data = await builderApi.reset!();
       const list = sortSections((data.sections || []).map(normalizeRow));
       setPage(data.page);
       setSections(list);
@@ -449,7 +458,10 @@ export default function BuilderShell() {
         onSave={() => void saveDraft()}
         onPublish={() => void handlePublish()}
         onDiscard={() => void handleDiscard()}
-        onReset={() => void handleReset()}
+        onReset={builderApi.reset ? () => void handleReset() : undefined}
+        title={pageId ? page?.title || "Custom page" : "Homepage Builder"}
+        backHref={pageId ? "/admin/custom-pages" : undefined}
+        viewHref={pageId ? (page?.slug ? `/pages/${page.slug}` : undefined) : "/"}
       />
 
       <div className="flex gap-1 rounded-xl border border-base-200 bg-base-100 p-1 lg:hidden">
