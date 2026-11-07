@@ -477,7 +477,7 @@ export default function OrdersPage() {
   const handleCancelOrder = async () => {
     if (!selectedOrder) return;
     const confirmed = window.confirm(
-      "Cancel this order?\n\nStock is NOT restored automatically — restock the items manually from the Inventory page."
+      "Cancel this order?\n\nThe ordered items will be put back into stock automatically."
     );
     if (!confirmed) return;
     try {
@@ -488,7 +488,7 @@ export default function OrdersPage() {
         courierStatus: updated.courierStatus,
         paymentStatus: updated.paymentStatus,
       });
-      setUpdateSuccessMsg("Order cancelled. Remember to restock the items from Inventory.");
+      setUpdateSuccessMsg("Order cancelled. The items were put back into stock.");
       fetchOrders();
     } catch (err: any) {
       console.error("Failed to cancel order:", err);
@@ -1433,7 +1433,7 @@ export default function OrdersPage() {
                       <div className="flex items-start gap-2 text-[11px] text-slate-600 font-medium">
                         <ShieldAlert size={14} className="shrink-0 text-amber-600 mt-0.5" />
                         <span>
-                          Cancelling does not restore stock. Restock the items manually from the Inventory page.
+                          Cancelling puts the ordered items back into stock automatically. Do not restock them by hand.
                         </span>
                       </div>
                       <button
