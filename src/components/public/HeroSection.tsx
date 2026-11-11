@@ -5,6 +5,9 @@ import Link from "next/link";
 import { ChevronRight, Sparkles } from "lucide-react";
 import { useCMSStore } from "@/store/useCMSStore";
 import { safeLink } from "@/utils/links";
+import { resolveImageUrl } from "@/components/homepage/SafeImage";
+
+const HERO_PLACEHOLDER = "/placeholders/hero.svg";
 
 interface HeroSectionProps {
   title?: string;
@@ -48,7 +51,7 @@ export default function HeroSection({
   const btn1Link = safeLink(overrideButtonLink || hero?.buttonLink1, "/shop");
   const btn2Text = content?.buttonText2 ?? hero?.buttonText2 ?? "Explore Categories";
   const btn2Link = safeLink(content?.buttonLink2 ?? hero?.buttonLink2, "/about");
-  const image = overrideImageUrl || hero?.imageUrl || "/api/image?name=hero";
+  const image = resolveImageUrl(overrideImageUrl || hero?.imageUrl) || HERO_PLACEHOLDER;
 
   if (loading) {
     return (
@@ -67,7 +70,9 @@ export default function HeroSection({
             alt={title}
             className="w-full h-full object-cover rounded-2xl hover:scale-105 transition-transform duration-500"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = "/api/image?name=hero";
+              const img = e.currentTarget;
+              img.onerror = null; // never loop if the placeholder itself fails
+              img.src = HERO_PLACEHOLDER;
             }}
           />
         </div>

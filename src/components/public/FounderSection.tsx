@@ -3,6 +3,9 @@
 import React from "react";
 import { Play, BookOpen, Quote } from "lucide-react";
 import { useCMSStore } from "@/store/useCMSStore";
+import { resolveImageUrl } from "@/components/homepage/SafeImage";
+
+const AVATAR_PLACEHOLDER = "/placeholders/avatar.svg";
 
 function getYouTubeEmbedUrl(url: string): string {
   if (!url) return "";
@@ -45,11 +48,13 @@ export default function FounderSection({ title: overrideTitle, description: over
           <div className="flex flex-col lg:flex-row items-center gap-6 sm:gap-10 lg:gap-12 bg-base-200/50 p-5 sm:p-8 md:p-12 rounded-3xl border border-base-300">
             <div className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 rounded-full overflow-hidden shadow-2xl border-4 border-primary/20 shrink-0">
               <img
-                src={profile.imageUrl || "/api/image?name=founder"}
+                src={resolveImageUrl(profile.imageUrl) || AVATAR_PLACEHOLDER}
                 alt={profile.title}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80";
+                  const img = e.currentTarget;
+                  img.onerror = null; // never loop if the placeholder itself fails
+                  img.src = AVATAR_PLACEHOLDER;
                 }}
               />
             </div>

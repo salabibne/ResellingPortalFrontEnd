@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F4F6FC"/>
+      <stop offset="1" stop-color="#DCE2F5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <circle cx="980" cy="160" r="220" fill="#001C94" opacity="0.06"/>
+  <circle cx="180" cy="760" r="260" fill="#001C94" opacity="0.05"/>
+  <!-- clothes hanger -->
+  <g fill="none" stroke="#001C94" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" opacity="0.35">
+    <path d="M600 300 a40 40 0 1 1 40 40 q-40 0 -40 40 v30"/>
+    <path d="M600 410 L360 560 q-30 20 0 30 h480 q30 -10 0 -30 Z"/>
+  </g>
+</svg>

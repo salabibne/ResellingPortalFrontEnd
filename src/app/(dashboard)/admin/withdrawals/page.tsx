@@ -644,7 +644,7 @@ export default function AdminWithdrawalsPage() {
                 </label>
                 <input
                   type="url"
-                  placeholder="https://... or /api/image?name=receipt"
+                  placeholder="https://... or /uploads/..."
                   value={completeForm.proofImageUrl}
                   onChange={(e) =>
                     setCompleteForm((prev) => ({ ...prev, proofImageUrl: e.target.value }))

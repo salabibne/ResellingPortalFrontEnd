@@ -65,7 +65,7 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
       { name: "buttonLink1", label: "Primary Button Link", type: "text", required: true, placeholder: 'e.g. "/shop"' },
       { name: "buttonText2", label: "Secondary Button Text", type: "text", required: false, placeholder: 'e.g. "Explore Categories"' },
       { name: "buttonLink2", label: "Secondary Button Link", type: "text", required: false, placeholder: 'e.g. "/about"' },
-      { name: "imageUrl", label: "Image / Banner Asset URL", type: "url", required: true, placeholder: "https://images.unsplash.com/... or /api/image?name=hero" },
+      { name: "imageUrl", label: "Image / Banner Asset URL", type: "url", required: true, placeholder: "https://... or /uploads/..." },
     ],
   },
   about: {
