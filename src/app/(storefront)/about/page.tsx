@@ -8,7 +8,7 @@ export default function AboutPage() {
 
       <div className="bg-primary/10 py-12 px-4 text-center border-b border-primary/20">
         <h1 className="text-4xl md:text-5xl font-extrabold text-base-content mb-2">
-          About Aarham Apparel
+          About Online Uddokta Platform
         </h1>
         <p className="text-base-content/70 max-w-2xl mx-auto text-base">
           Our vision, story, leadership, and core values.

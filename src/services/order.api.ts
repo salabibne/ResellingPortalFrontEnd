@@ -134,7 +134,7 @@ export interface Order {
   updatedAt: string;
   orderItems: OrderItem[];
   customer?: { id: string; name: string; email: string; phone: string; role?: string; pageName?: string };
-  reseller?: { id: string; name: string; email: string; phone: string; pageName?: string };
+  reseller?: { id: string; name: string; email: string; phone: string; secondaryPhone?: string | null; pageName?: string };
 }
 
 export interface DeliveryOption {

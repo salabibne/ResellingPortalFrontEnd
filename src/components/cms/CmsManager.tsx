@@ -5,8 +5,10 @@ import { Plus, Edit2, Trash2, X, Loader2, AlertCircle, CheckCircle, ExternalLink
 import cmsApi, { CMSModuleType, CommonStatus } from "@/services/cms.api";
 import PanelCard from "@/components/panel/PanelCard";
 import PanelModal from "@/components/panel/PanelModal";
+import MediaField from "@/components/ui/MediaField";
+import type { ImageSizeKey } from "@/utils/imageSizes";
 
-export type FieldFieldType = "text" | "textarea" | "email" | "url" | "select";
+export type FieldFieldType = "text" | "textarea" | "email" | "url" | "select" | "image";
 
 export interface CMSFieldConfig {
   name: string;
@@ -14,6 +16,8 @@ export interface CMSFieldConfig {
   type: FieldFieldType;
   required?: boolean;
   placeholder?: string;
+  /** For type "image": where the image is shown (drives the size hint). */
+  imageSize?: ImageSizeKey;
 }
 
 export interface CMSModuleConfig {
@@ -40,18 +44,18 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
     fields: [
       { name: "whatsapp", label: "WhatsApp Floating Button (Mobile Number, Username, or Link)", type: "text", required: false, placeholder: 'e.g. "01577276367", "+8801577276367", or "wa.me/..."' },
       { name: "phone", label: "Customer Service Phone Number", type: "text", required: true, placeholder: 'e.g. "+8801700000000"' },
-      { name: "email", label: "Email Address", type: "email", required: true, placeholder: 'e.g. "support@aarhamapparel.com"' },
+      { name: "email", label: "Email Address", type: "email", required: true, placeholder: 'e.g. "support@example.com"' },
       { name: "address", label: "Physical Address", type: "textarea", required: true, placeholder: "Full office or store address..." },
-      { name: "telegram", label: "Telegram Link / Handle", type: "text", required: false, placeholder: 'e.g. "https://t.me/aarham"' },
-      { name: "facebook", label: "Facebook Page URL", type: "url", required: false, placeholder: "https://facebook.com/aarhamapparel" },
+      { name: "telegram", label: "Telegram Link / Handle", type: "text", required: false, placeholder: 'e.g. "https://t.me/yourhandle"' },
+      { name: "facebook", label: "Facebook Page URL", type: "url", required: false, placeholder: "https://facebook.com/yourpage" },
     ],
   },
   brand: {
     module: "brand",
     title: "Site Logo",
-    description: "Set the brand logo shown in the public site header and footer. Paste an image URL (absolute or site-relative).",
+    description: "Upload the brand logo shown in the public site header, footer and invoices.",
     fields: [
-      { name: "logoUrl", label: "Logo Image URL", type: "url", required: true, placeholder: "https://cdn.aarhamapparel.com/logo.png or /images/logo.png" },
+      { name: "logoUrl", label: "Logo", type: "image", required: true, imageSize: "logo" },
     ],
   },
   hero: {
@@ -65,7 +69,7 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
       { name: "buttonLink1", label: "Primary Button Link", type: "text", required: true, placeholder: 'e.g. "/shop"' },
       { name: "buttonText2", label: "Secondary Button Text", type: "text", required: false, placeholder: 'e.g. "Explore Categories"' },
       { name: "buttonLink2", label: "Secondary Button Link", type: "text", required: false, placeholder: 'e.g. "/about"' },
-      { name: "imageUrl", label: "Image / Banner Asset URL", type: "url", required: true, placeholder: "https://... or /uploads/..." },
+      { name: "imageUrl", label: "Hero Banner Image", type: "image", required: true, imageSize: "heroBanner" },
     ],
   },
   about: {
@@ -73,7 +77,7 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
     title: "About Section",
     description: "Manage introductory company story, mission details, and featured introductory video.",
     fields: [
-      { name: "title", label: "About Section Title", type: "text", required: true, placeholder: 'e.g. "About Aarham Apparel"' },
+      { name: "title", label: "About Section Title", type: "text", required: true, placeholder: 'e.g. "About Online Uddokta Platform"' },
       { name: "description", label: "Detailed Description", type: "textarea", required: true, placeholder: "Detailed overview of the brand..." },
       { name: "youtubeLink", label: "YouTube Video URL", type: "url", required: true, placeholder: "https://www.youtube.com/watch?v=..." },
       { name: "buttonText1", label: "Primary Button Text", type: "text", required: true, placeholder: 'e.g. "Read Full Story"' },
@@ -89,7 +93,7 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
     fields: [
       { name: "title", label: "Section Title / Heading", type: "text", required: true, placeholder: 'e.g. "Why Choose Us"' },
       { name: "description", label: "Section Description / Overview", type: "textarea", required: true, placeholder: "Summary text for this feature group..." },
-      { name: "imageUrl", label: "Banner / Card Image URL (Optional)", type: "url", required: false, placeholder: "https://images.unsplash.com/..." },
+      { name: "imageUrl", label: "Banner / Card Image (Optional)", type: "image", required: false, imageSize: "cardImage" },
       { name: "cardTitle", label: "Card Title", type: "text", required: true, placeholder: 'e.g. "Premium Fabric"' },
       { name: "cardIcon", label: "Card Icon Name", type: "text", required: true, placeholder: 'e.g. "ShieldCheck", "Truck", "Sparkles"' },
       { name: "cardDescription", label: "Card Body Description", type: "textarea", required: true, placeholder: "Specific card text..." },
@@ -104,7 +108,7 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
     fields: [
       { name: "title", label: "Heading / Title", type: "text", required: true, placeholder: 'e.g. "Founder\'s Vision"' },
       { name: "description", label: "Full Message / Quote", type: "textarea", required: true, placeholder: "Message from the founder..." },
-      { name: "imageUrl", label: "Founder Profile Picture URL", type: "url", required: true, placeholder: "https://..." },
+      { name: "imageUrl", label: "Founder Profile Picture", type: "image", required: true, imageSize: "profilePhoto" },
     ],
   },
   "founder-blog": {
@@ -113,7 +117,7 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
     description: "Manage blog posts, articles, and founder updates.",
     fields: [
       { name: "title", label: "Article Title", type: "text", required: true, placeholder: 'e.g. "Building Sustainable Fashion"' },
-      { name: "imageUrl", label: "Cover Image URL", type: "url", required: true, placeholder: "https://..." },
+      { name: "imageUrl", label: "Cover Image", type: "image", required: true, imageSize: "blogImage" },
       { name: "description", label: "Blog Content / Excerpt", type: "textarea", required: true, placeholder: "Article body content..." },
     ],
   },
@@ -134,7 +138,7 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
     fields: [
       { name: "name", label: "Full Name", type: "text", required: true, placeholder: 'e.g. "Sarah Jenkins"' },
       { name: "designation", label: "Designation / Role", type: "text", required: true, placeholder: 'e.g. "Head of Design"' },
-      { name: "imageUrl", label: "Profile Picture URL", type: "url", required: true, placeholder: "https://images.unsplash.com/... or profile image link" },
+      { name: "imageUrl", label: "Profile Picture", type: "image", required: true, imageSize: "profilePhoto" },
       { name: "message", label: "Personal Message / Statement", type: "textarea", required: true, placeholder: "Brief bio, message, or quote from the team member..." },
     ],
   },
@@ -159,6 +163,7 @@ export default function CmsManager({ module, onSaved }: Props) {
   // Feedback states
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   const fetchRecords = useCallback(async () => {
     try {
@@ -197,6 +202,7 @@ export default function CmsManager({ module, onSaved }: Props) {
       });
       setFormData(initialForm);
     }
+    setImageError(null);
     setIsFormOpen(true);
   };
 
@@ -212,6 +218,14 @@ export default function CmsManager({ module, onSaved }: Props) {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const missingImage = config.fields.find(
+      (f) => f.type === "image" && f.required && !String(formData[f.name] || "").trim(),
+    );
+    if (missingImage) {
+      setImageError(`Please upload: ${missingImage.label}`);
+      return;
+    }
+    setImageError(null);
     setIsSubmitting(true);
     setFeedback(null);
 
@@ -369,7 +383,7 @@ export default function CmsManager({ module, onSaved }: Props) {
                     <td className="font-semibold text-base-content/70">{index + 1}</td>
                     {config.fields.map((f) => {
                       const val = record[f.name];
-                      const isUrl = f.type === "url" || (typeof val === "string" && val.startsWith("http"));
+                      const isUrl = f.type === "url" || f.type === "image" || (typeof val === "string" && val.startsWith("http"));
                       return (
                         <td key={f.name} className="max-w-[200px] truncate">
                           {isUrl && val ? (
@@ -470,7 +484,23 @@ export default function CmsManager({ module, onSaved }: Props) {
             <p className="text-xs text-base-content/60 -mt-1">
               Fill out the required fields below. Click save to publish changes.
             </p>
-            {config.fields.map((field) => (
+            {imageError && (
+              <div className="alert alert-error text-xs py-2 rounded-lg">{imageError}</div>
+            )}
+            {config.fields.map((field) =>
+              field.type === "image" ? (
+                <MediaField
+                  key={field.name}
+                  label={field.label}
+                  required={field.required}
+                  size={field.imageSize}
+                  value={formData[field.name] || ""}
+                  onChange={(url) => {
+                    handleInputChange(field.name, url);
+                    setImageError(null);
+                  }}
+                />
+              ) : (
               <div className="form-control w-full" key={field.name}>
                 <label className="label py-1">
                   <span className="label-text font-semibold text-base-content">
@@ -497,7 +527,8 @@ export default function CmsManager({ module, onSaved }: Props) {
                   />
                 )}
               </div>
-            ))}
+              )
+            )}
 
             {/* Status Select */}
             <div className="form-control w-full">

@@ -45,7 +45,7 @@ export default function AboutSection({
 
   // Use customizer data when provided, otherwise fall back to CMS data
   const badge = overrideSubtitle || "About Us";
-  const title = overrideTitle || about?.title || "About Aarham Apparel";
+  const title = overrideTitle || about?.title || "About Online Uddokta Platform";
   const description = overrideDescription || about?.description || "";
   const youtubeLink = content?.youtubeLink || about?.youtubeLink || "";
   const buttonText1 = overrideButtonText || content?.buttonText1 || about?.buttonText1 || "Read Full Story";

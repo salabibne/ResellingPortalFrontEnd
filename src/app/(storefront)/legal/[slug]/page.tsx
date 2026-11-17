@@ -14,14 +14,14 @@ export async function generateMetadata({ params }: PageProps) {
   try {
     const doc = await legalDocumentsApi.getBySlug(params.slug);
     if (!doc || doc.status !== "PUBLISHED") {
-      return { title: "Document Not Found - Aarham Apparel" };
+      return { title: "Document Not Found - Online Uddokta Platform" };
     }
     return {
-      title: `${doc.title} | Aarham Apparel`,
-      description: `${doc.title} version ${doc.version} for Aarham Apparel Uddokta portal.`,
+      title: `${doc.title} | Online Uddokta Platform`,
+      description: `${doc.title} version ${doc.version} for Online Uddokta Platform Uddokta portal.`,
     };
   } catch (err) {
-    return { title: "Legal Policy - Aarham Apparel" };
+    return { title: "Legal Policy - Online Uddokta Platform" };
   }
 }
 

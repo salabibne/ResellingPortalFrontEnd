@@ -165,7 +165,7 @@ export default function SectionEditor({
             label="Main image"
             value={section.imageUrl}
             onChange={(imageUrl) => onChange({ imageUrl })}
-            helpText="Upload a file or paste a URL."
+            size={type === "hero" ? "heroBanner" : type === "story" ? "storyImage" : type === "checklist" ? "cardImage" : "wideBanner"}
           />
           <TextField
             label="Image alt text"
@@ -175,10 +175,10 @@ export default function SectionEditor({
           />
           {type === "hero" && (
             <>
-              <TextField
-                label="Mobile-only image URL (optional)"
+              <MediaField
+                label="Mobile-only image (optional)"
+                size="mobileBanner"
                 value={(settings.mobileImageUrl as string) || ""}
-                mono
                 onChange={(mobileImageUrl) => onSettings({ mobileImageUrl })}
               />
               <SelectField
@@ -469,7 +469,7 @@ export default function SectionEditor({
                     <MediaField
                       label="Image"
                       value={item.imageUrl as string}
-                      onChange={(imageUrl) => update({ imageUrl })}
+                      onChange={(imageUrl) => update({ imageUrl })} size="cardImage"
                     />
                   )}
                   <TextField

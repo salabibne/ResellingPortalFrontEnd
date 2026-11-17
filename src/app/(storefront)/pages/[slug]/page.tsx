@@ -27,10 +27,10 @@ async function loadPage(slug: string): Promise<PublicPageConfig | null> {
 export async function generateMetadata({ params }: PageProps) {
   const config = await loadPage(params.slug);
   if (!config) {
-    return { title: "Page Not Found - Aarham Apparel" };
+    return { title: "Page Not Found - Online Uddokta Platform" };
   }
   return {
-    title: config.page.metaTitle || `${config.page.title} - Aarham Apparel`,
+    title: config.page.metaTitle || `${config.page.title} - Online Uddokta Platform`,
     description: config.page.metaDescription || config.page.title,
   };
 }

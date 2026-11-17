@@ -28,6 +28,7 @@ import PanelPageHeader from "@/components/panel/PanelPageHeader";
 import PanelTabs from "@/components/panel/PanelTabs";
 import PanelEmpty from "@/components/panel/PanelEmpty";
 import PanelSkeleton from "@/components/panel/PanelSkeleton";
+import MediaField from "@/components/ui/MediaField";
 import PanelModal from "@/components/panel/PanelModal";
 
 export default function AdminNoticesPage() {
@@ -472,20 +473,12 @@ export default function AdminNoticesPage() {
               </div>
 
               {/* Optional Banner Image URL */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold text-slate-700">
-                    Banner Image URL (Optional)
-                  </span>
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://example.com/images/banner.jpg"
-                  className="input input-bordered w-full input-sm text-base-content"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                />
-              </div>
+              <MediaField
+                label="Banner Image (Optional)"
+                size="noticeImage"
+                value={imageUrl}
+                onChange={setImageUrl}
+              />
 
               {/* Action Button Details */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

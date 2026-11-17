@@ -299,7 +299,7 @@ export default function ProductDetailPage() {
             <div>
               <div className="flex items-center justify-between gap-2 text-xs text-base-content/60 mb-2">
                 <span className="badge badge-outline text-primary font-bold uppercase tracking-wider text-[11px] px-3 py-2">
-                  {product.brand?.name || "Aarham Apparel"}
+                  {product.brand?.name || "Online Uddokta Platform"}
                 </span>
                 {product.unit && (
                   <span className="font-semibold capitalize text-base-content/70">

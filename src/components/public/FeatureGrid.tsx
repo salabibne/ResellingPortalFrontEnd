@@ -26,7 +26,7 @@ export default function FeatureGrid({ title: overrideTitle, description: overrid
   if (features.length === 0) return null;
 
   const sectionTitle = overrideTitle || features.find((f) => f.title)?.title || features[0]?.title || "Why Choose Us";
-  const sectionDesc = overrideDescription || features.find((f) => f.description)?.description || features[0]?.description || "Discover the premium features and quality craftsmanship of Aarham Apparel.";
+  const sectionDesc = overrideDescription || features.find((f) => f.description)?.description || features[0]?.description || "Discover the premium features and quality craftsmanship of Online Uddokta Platform.";
 
   return (
     <section className="py-12 sm:py-20 px-4 sm:px-6 md:px-8 bg-base-200/60">

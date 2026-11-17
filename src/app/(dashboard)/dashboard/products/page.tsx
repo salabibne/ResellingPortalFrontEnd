@@ -23,8 +23,12 @@ import {
   ChevronRight,
   ChevronLeft,
   Lock,
+  Upload,
+  Link2,
 } from "lucide-react";
 import api from "@/services/axios";
+import mediaApi, { ACCEPTED_IMAGE_TYPES, MAX_UPLOAD_MB, uploadErrorMessage } from "@/services/media.api";
+import { describeImageSize } from "@/utils/imageSizes";
 import {
   productApi,
   Product,
@@ -95,6 +99,10 @@ export default function AdminProductsPage() {
   });
 
   const [newImageUrl, setNewImageUrl] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageMessages, setImageMessages] = useState<{ type: "error" | "warning"; text: string }[]>([]);
+  const [showImageLink, setShowImageLink] = useState(false);
+  const imageInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Fetch all metadata & products
   const fetchData = useCallback(async () => {
@@ -321,6 +329,30 @@ export default function AdminProductsPage() {
       images: [...(prev.images || []), { imageUrl: newImageUrl.trim(), isPrimary: isFirst }],
     }));
     setNewImageUrl("");
+  };
+
+  const handleUploadImages = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setImageUploading(true);
+    const messages: { type: "error" | "warning"; text: string }[] = [];
+    for (const file of Array.from(files)) {
+      try {
+        const { media, warning } = await mediaApi.uploadImage(file, "productImage");
+        setFormData((prev) => {
+          const isFirst = (prev.images || []).length === 0;
+          return {
+            ...prev,
+            images: [...(prev.images || []), { imageUrl: media.url, isPrimary: isFirst }],
+          };
+        });
+        if (warning) messages.push({ type: "warning", text: `${file.name}: ${warning}` });
+      } catch (err: any) {
+        messages.push({ type: "error", text: `${file.name}: ${uploadErrorMessage(err)}` });
+      }
+    }
+    setImageMessages(messages);
+    setImageUploading(false);
+    if (imageInputRef.current) imageInputRef.current.value = "";
   };
 
   const handleRemoveImage = (index: number) => {
@@ -1058,6 +1090,48 @@ export default function AdminProductsPage() {
               {/* TAB 4: IMAGES (Optional) */}
               {activeTab === "images" && (
                 <div className="space-y-6">
+                  <div className="rounded-box border-2 border-dashed border-base-300 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <button
+                      type="button"
+                      className="btn btn-primary text-white gap-2"
+                      disabled={imageUploading}
+                      onClick={() => imageInputRef.current?.click()}
+                    >
+                      {imageUploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
+                      {imageUploading ? "Uploading..." : "Upload Images"}
+                    </button>
+                    <div className="text-xs text-base-content/60 space-y-0.5">
+                      <p>{describeImageSize("productImage")}</p>
+                      <p>JPG, PNG, WebP or GIF · max {MAX_UPLOAD_MB} MB each · you can select several at once</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm gap-1 sm:ml-auto"
+                      onClick={() => setShowImageLink((v) => !v)}
+                    >
+                      <Link2 size={14} /> {showImageLink ? "Hide link" : "Use link"}
+                    </button>
+                    <input
+                      ref={imageInputRef}
+                      type="file"
+                      accept={ACCEPTED_IMAGE_TYPES}
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleUploadImages(e.target.files)}
+                    />
+                  </div>
+
+                  {imageMessages.length > 0 && (
+                    <div className="space-y-1">
+                      {imageMessages.map((m, i) => (
+                        <p key={i} className={`text-xs font-semibold ${m.type === "error" ? "text-error" : "text-warning"}`}>
+                          {m.text}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {showImageLink && (
                   <div className="flex gap-2 items-center">
                     <input
                       type="url"
@@ -1074,11 +1148,12 @@ export default function AdminProductsPage() {
                       <Plus size={18} /> Add Image
                     </button>
                   </div>
+                  )}
 
                   {formData.images?.length === 0 ? (
                     <div className="p-8 text-center border-2 border-dashed rounded-box text-gray-400">
                       <ImageIcon className="mx-auto mb-2" size={36} />
-                      <p>No images added yet (Optional). Add image URLs above.</p>
+                      <p>No images added yet (Optional). Upload images above.</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

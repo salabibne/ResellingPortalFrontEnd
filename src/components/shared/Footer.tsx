@@ -15,15 +15,15 @@ export default function Footer() {
       <div className="footer p-6 sm:p-10 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 justify-items-center text-center">
         <aside className="max-w-xs mx-auto place-items-center">
           <Link href="/" className="flex items-center justify-center gap-2 text-2xl font-bold mb-3 text-base-content">
-            <BrandLogo className="h-10 sm:h-12 w-auto max-w-[60%] object-contain" alt="Aarham Apparel">
+            <BrandLogo className="h-10 sm:h-12 w-auto max-w-[60%] object-contain" alt="Online Uddokta Platform">
               <ShoppingBag className="text-primary" size={28} />
-              Aarham Apparel
+              Online Uddokta Platform
             </BrandLogo>
           </Link>
           <p className="text-sm text-base-content/70 leading-relaxed mb-4">
-            Aarham Apparel Ltd.
+            Online Uddokta Platform
             <br />
-            Providing premium quality clothing and modern fashion.
+            Start your online business and resell with your own selling price.
           </p>
 
           {/* Social Media Links from CMS */}
@@ -87,7 +87,7 @@ export default function Footer() {
           ) : (
             <div className="text-sm text-base-content/70">
               <p>Phone: +8801700000000</p>
-              <p>Email: support@aarhamapparel.com</p>
+              <p>Email: onlineuddoktaplatform@gmail.com</p>
             </div>
           )}
         </nav>
@@ -104,7 +104,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-base-300 py-4 px-10 text-center text-xs text-base-content/60">
-        &copy; {new Date().getFullYear()} Aarham Apparel Ltd. All rights reserved.
+        &copy; {new Date().getFullYear()} Online Uddokta Platform. All rights reserved.
       </div>
     </footer>
   );

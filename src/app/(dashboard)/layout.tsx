@@ -113,7 +113,7 @@ export default function DashboardLayout({
       theme="dark"
       brand={
         <h2 className="text-xl font-bold text-white tracking-wide truncate">
-          Aarham Apparel
+          Online Uddokta Platform
         </h2>
       }
       items={NAV_ITEMS}

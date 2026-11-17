@@ -30,6 +30,7 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
       pathname.startsWith("/dashboard") ||
       pathname.startsWith("/inventory") ||
       pathname.startsWith("/orders") ||
+      pathname.startsWith("/invoice") ||
       pathname.startsWith("/login") ||
       pathname.startsWith("/register")
     ) {

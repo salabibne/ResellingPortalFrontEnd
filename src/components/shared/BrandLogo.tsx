@@ -15,7 +15,7 @@ interface BrandLogoProps {
  * Falls back to the provided children (the default wordmark) when no valid
  * image URL is configured or the image cannot be loaded.
  */
-export default function BrandLogo({ children, alt = "Aarham Apparel", className = "" }: BrandLogoProps) {
+export default function BrandLogo({ children, alt = "Online Uddokta Platform", className = "" }: BrandLogoProps) {
   const logoUrl = useCMSStore((state) => state.brand?.logoUrl);
   const [failed, setFailed] = useState(false);
 

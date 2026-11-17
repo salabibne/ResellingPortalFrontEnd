@@ -33,7 +33,7 @@ export default function TeamSection({ title: overrideTitle, description: overrid
             <Users size={14} /> Our Dedicated Team
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-base-content tracking-tight">
-            {overrideTitle || "Meet The Minds Behind Aarham"}
+            {overrideTitle || "Meet The Minds Behind Online Uddokta Platform"}
           </h2>
           <p className="text-base-content/70 text-sm sm:text-base md:text-lg leading-relaxed">
             {overrideDescription || "Passionate visionaries, dedicated designers, and experienced leaders committed to delivering exceptional craftsmanship."}

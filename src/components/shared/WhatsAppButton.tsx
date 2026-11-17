@@ -31,7 +31,7 @@ export function formatWhatsAppUrl(rawInput?: string | null): string {
   // Case 3: If only digits, use as wa.me phone
   if (/^\d+$/.test(cleaned)) {
     return `https://wa.me/${cleaned}?text=${encodeURIComponent(
-      "Hello Aarham Apparel, I would like to inquire about your products."
+      "Hello Online Uddokta Platform, I would like to inquire about your products."
     )}`;
   }
 
@@ -105,7 +105,7 @@ export default function WhatsAppButton() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat with Aarham Apparel on WhatsApp"
+        aria-label="Chat with Online Uddokta Platform on WhatsApp"
         className="group relative flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-lg shadow-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400/40 motion-reduce:transition-none motion-reduce:hover:scale-100"
       >
         {/* Soft Pulse Background Ping */}

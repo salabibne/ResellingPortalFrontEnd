@@ -8,11 +8,13 @@ import PanelPageHeader from "@/components/panel/PanelPageHeader";
 import PanelTable from "@/components/panel/PanelTable";
 import PanelModal from "@/components/panel/PanelModal";
 import StatusBadge from "@/components/panel/StatusBadge";
+import MediaField from "@/components/ui/MediaField";
+import { resolveImageUrl } from "@/components/homepage/SafeImage";
 
 export type FieldConfig = {
   name: string;
   label: string;
-  type: "text" | "color" | "select";
+  type: "text" | "color" | "select" | "image";
   options?: { label: string; value: string }[];
   apiSource?: string;
 };
@@ -88,8 +90,14 @@ export default function AttributeManager({ config }: Props) {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const missingImage = config.fields.find(
+      (f) => f.type === "image" && !String(formData[f.name] || "").trim(),
+    );
+    if (missingImage) {
+      alert(`Please upload: ${missingImage.label}`);
+      return;
+    }
     setIsSubmitting(true);
-    console.log(config.fields)
     // Create a clean payload to avoid sending forbidden/read-only fields (like id, createdAt)
     const payload: any = {
       status: formData.status
@@ -132,6 +140,11 @@ export default function AttributeManager({ config }: Props) {
           {val}
         </div>
       );
+    }
+    if (f.type === 'image') {
+      if (!val) return '—';
+      // eslint-disable-next-line @next/next/no-img-element
+      return <img src={resolveImageUrl(val)} alt="" className="h-10 w-10 rounded-lg object-cover border border-base-300" />;
     }
     if (f.type === 'select') {
       const opts = f.apiSource ? dynamicOptions[f.name] : f.options;
@@ -259,7 +272,17 @@ export default function AttributeManager({ config }: Props) {
             }
           >
               <form id="attribute-form" onSubmit={handleSave} className="flex flex-col gap-4">
-                {config.fields.map((field) => (
+                {config.fields.map((field) =>
+                  field.type === "image" ? (
+                    <MediaField
+                      key={field.name}
+                      label={field.label}
+                      required
+                      size="square"
+                      value={formData[field.name] || ""}
+                      onChange={(url) => handleInputChange(field.name, url)}
+                    />
+                  ) : (
                   <div className="form-control w-full" key={field.name}>
                     <label className="label">
                       <span className="label-text font-semibold text-base-content">{field.label}</span>
@@ -309,7 +332,8 @@ export default function AttributeManager({ config }: Props) {
                       </select>
                     )}
                   </div>
-                ))}
+                  )
+                )}
                 
                 <div className="form-control w-full">
                   <label className="label">

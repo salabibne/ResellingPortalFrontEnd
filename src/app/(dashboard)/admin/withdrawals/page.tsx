@@ -34,6 +34,7 @@ import PanelTable from "@/components/panel/PanelTable";
 import PanelEmpty from "@/components/panel/PanelEmpty";
 import PanelSkeleton from "@/components/panel/PanelSkeleton";
 import PanelModal from "@/components/panel/PanelModal";
+import MediaField from "@/components/ui/MediaField";
 import StatusBadge from "@/components/panel/StatusBadge";
 
 export default function AdminWithdrawalsPage() {
@@ -639,21 +640,12 @@ export default function AdminWithdrawalsPage() {
 
               {/* Proof Document / Screenshot URL */}
               <div className="form-control">
-                <label className="label font-bold text-xs uppercase tracking-wider text-base-content">
-                  Proof Screenshot / Receipt Image URL
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://... or /uploads/..."
+                <MediaField
+                  label="Proof Screenshot / Receipt Image"
+                  size="paymentProof"
                   value={completeForm.proofImageUrl}
-                  onChange={(e) =>
-                    setCompleteForm((prev) => ({ ...prev, proofImageUrl: e.target.value }))
-                  }
-                  className="input input-bordered w-full bg-base-100 text-base-content text-xs"
+                  onChange={(url) => setCompleteForm((prev) => ({ ...prev, proofImageUrl: url }))}
                 />
-                <span className="text-[11px] text-base-content/50 mt-1">
-                  URL to payment confirmation receipt or screenshot.
-                </span>
 
                 {/* Proof Image Preview */}
                 {completeForm.proofImageUrl && (

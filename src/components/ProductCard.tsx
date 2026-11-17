@@ -117,7 +117,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Brand & Category */}
           <div className="flex items-center justify-between text-[10px] sm:text-xs text-base-content/60 mb-1">
             <span className="font-semibold text-primary/80 uppercase tracking-wider text-[9px] sm:text-[10px] truncate max-w-[50%]">
-              {product.brand?.name || "Aarham"}
+              {product.brand?.name || "Online Uddokta"}
             </span>
             <span className="text-[10px] sm:text-[11px] truncate max-w-[45%] text-right">
               {product.category?.name}

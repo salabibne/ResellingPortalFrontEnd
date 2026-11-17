@@ -66,7 +66,7 @@ function LoginForm() {
         <div className="card w-full max-w-md bg-base-100 shadow-xl">
           <div className="card-body">
             <h2 className="card-title text-2xl font-bold justify-center mb-6 text-primary">
-              Login to Aarham Apparel
+              Login to Online Uddokta Platform
             </h2>
 
             {error && (

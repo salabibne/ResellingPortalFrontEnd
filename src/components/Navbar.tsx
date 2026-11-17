@@ -101,7 +101,7 @@ function NavbarContent() {
                 )}
               </div>
               <div className="text-[10px] sm:text-[11px] text-white/70">
-                Welcome to <span className="font-semibold text-white">Aarham Apparel</span>
+                Welcome to <span className="font-semibold text-white">Online Uddokta Platform</span>
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@ function NavbarContent() {
                 <Link href="/" className="group flex min-w-0 items-center gap-2">
                   <BrandLogo
                     className="h-8 sm:h-11 w-auto max-w-[40vw] sm:max-w-[45vw] object-contain shrink-0"
-                    alt="Aarham Apparel"
+                    alt="Online Uddokta Platform"
                   >
                     <div className="bg-base-100 text-primary p-1.5 sm:p-2 rounded-xl group-hover:scale-105 transition-transform shrink-0">
                       <ShoppingBag size={18} className="stroke-[2.5] sm:hidden" />
@@ -134,10 +134,10 @@ function NavbarContent() {
                     </div>
                     <div className="flex min-w-0 flex-col">
                       <span className="truncate font-extrabold text-base sm:text-xl tracking-tight leading-none text-white">
-                        Aarham
+                        Online Uddokta
                       </span>
                       <span className="truncate text-[9px] sm:text-[10px] tracking-widest text-white/80 uppercase font-semibold">
-                        Apparel
+                        Platform
                       </span>
                     </div>
                   </BrandLogo>
@@ -149,7 +149,7 @@ function NavbarContent() {
                 <form onSubmit={handleSearchSubmit} className="hidden md:flex relative items-center">
                   <input
                     type="text"
-                    placeholder="Search apparel..."
+                    placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="input input-sm rounded-full bg-white/10 text-white placeholder-white/60 focus:bg-base-100 focus:text-gray-900 focus:outline-none pl-9 pr-4 w-40 lg:w-56 transition-all"

@@ -418,7 +418,7 @@ export default function AdminCustomPagesPage() {
                   type="text"
                   value={editing.metaTitle || ""}
                   onChange={(e) => update({ metaTitle: e.target.value })}
-                  placeholder="e.g. Eid Deals - Aarham Apparel"
+                  placeholder="e.g. Eid Deals - Online Uddokta Platform"
                   className="input input-bordered input-sm mt-1 rounded-xl"
                 />
               </label>

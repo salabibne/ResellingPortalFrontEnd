@@ -22,6 +22,7 @@ import productPageConfigsApi, {
   SaveProductPageConfigDto,
 } from "@/services/productPageConfigs.api";
 import { productApi } from "@/services/product.api";
+import MediaField from "@/components/ui/MediaField";
 
 export default function AdminProductPagesPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -444,18 +445,12 @@ export default function AdminProductPagesPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="label-text text-xs font-semibold text-base-content">Banner Image URL</label>
-                    <input
-                      type="text"
-                      value={config.bannerImageUrl || ""}
-                      onChange={(e) =>
-                        setConfig((prev) => ({ ...prev, bannerImageUrl: e.target.value }))
-                      }
-                      placeholder="https://cdn.aarhamapparel.com/banner.webp"
-                      className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
-                    />
-                  </div>
+                  <MediaField
+                    label="Banner Image"
+                    size="productLandingBanner"
+                    value={config.bannerImageUrl || ""}
+                    onChange={(url) => setConfig((prev) => ({ ...prev, bannerImageUrl: url }))}
+                  />
                   <div>
                     <label className="label-text text-xs font-semibold text-base-content">Video URL (YouTube/Vimeo)</label>
                     <input
@@ -498,7 +493,7 @@ export default function AdminProductPagesPage() {
                     type="text"
                     value={config.metaTitle || ""}
                     onChange={(e) => setConfig((prev) => ({ ...prev, metaTitle: e.target.value }))}
-                    placeholder="Buy Luxury Panjabi Online | Aarham Apparel"
+                    placeholder="Buy Luxury Panjabi Online | Online Uddokta Platform"
                     className="input input-bordered w-full text-sm mt-1 bg-base-100 text-base-content"
                   />
                 </div>
@@ -578,17 +573,15 @@ export default function AdminProductPagesPage() {
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="label-text text-[11px] font-medium text-base-content">Image URL</label>
-                        <input
-                          type="text"
+                        <MediaField
+                          label="Image"
+                          size="cardImage"
                           value={sec.imageUrl || ""}
-                          onChange={(e) => {
-                            const val = e.target.value;
+                          onChange={(url) =>
                             setSections((prev) =>
-                              prev.map((s, i) => (i === idx ? { ...s, imageUrl: val } : s))
-                            );
-                          }}
-                          className="input input-bordered input-xs w-full mt-1 bg-base-100 text-base-content"
+                              prev.map((s, i) => (i === idx ? { ...s, imageUrl: url } : s))
+                            )
+                          }
                         />
                       </div>
                       <div className="md:col-span-2">

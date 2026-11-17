@@ -12,7 +12,7 @@ import { useState, Suspense } from "react";
 const registerSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   email: z.string().email({ message: "Invalid email address" }),
-  phone: z.string().min(1, { message: "Phone is required" }),
+  phone: z.string().min(1, { message: "Business number is required" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
   role: z.enum(["USER", "RESELLER"]).default("USER"),
   organizationId: z.string().uuid({ message: "Organization ID (UUID) is required" }),
@@ -122,20 +122,24 @@ function RegisterForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
                 <label className="label"><span className="label-text">Full Name</span></label>
-                <input type="text" placeholder="Abdur Rahim" className={`input input-bordered text-base-content w-full ${errors.name ? "input-error" : ""}`} {...register("name")} />
+                <input type="text" placeholder="Uddokta Name" className={`input input-bordered text-base-content w-full ${errors.name ? "input-error" : ""}`} {...register("name")} />
                 {errors.name && <span className="label-text-alt text-error mt-1">{errors.name.message}</span>}
               </div>
 
               <div className="form-control">
                 <label className="label"><span className="label-text">Email</span></label>
-                <input type="email" placeholder="abdurrahim@gmail.com" className={`input input-bordered text-base-content w-full ${errors.email ? "input-error" : ""}`} {...register("email")} />
+                <input type="email" placeholder="example@gmail.com" className={`input input-bordered text-base-content w-full ${errors.email ? "input-error" : ""}`} {...register("email")} />
                 {errors.email && <span className="label-text-alt text-error mt-1">{errors.email.message}</span>}
               </div>
               
               <div className="form-control">
-                <label className="label"><span className="label-text">Phone Number</span></label>
+                <label className="label"><span className="label-text">Business Number</span></label>
                 <input type="tel" placeholder="01XXXXXXXXX" className={`input input-bordered text-base-content w-full ${errors.phone ? "input-error" : ""}`} {...register("phone")} />
-                {errors.phone && <span className="label-text-alt text-error mt-1">{errors.phone.message}</span>}
+                {errors.phone ? (
+                  <span className="label-text-alt text-error mt-1">{errors.phone.message}</span>
+                ) : (
+                  <span className="label-text-alt text-base-content/60 mt-1">এই নাম্বারটি ইনভয়েসে প্রিন্ট হবে</span>
+                )}
               </div>
 
               <div className="form-control">

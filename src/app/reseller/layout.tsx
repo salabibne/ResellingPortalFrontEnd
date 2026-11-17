@@ -123,7 +123,7 @@ export default function ResellerLayout({
               Uddokta Portal
             </p>
             <p className="text-[11px] text-base-content/60 font-medium truncate">
-              Aarham Apparel
+              Online Uddokta Platform
             </p>
           </div>
         </div>

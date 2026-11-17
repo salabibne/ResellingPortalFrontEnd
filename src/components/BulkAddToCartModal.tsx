@@ -146,7 +146,7 @@ export default function BulkAddToCartModal({ product, isOpen, onClose }: BulkAdd
               />
               <div>
                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                  {product.brand?.name || "Aarham Apparel"}
+                  {product.brand?.name || "Online Uddokta Platform"}
                 </span>
                 <h3 className="font-bold text-sm sm:text-base text-base-content leading-tight">
                   {product.name}

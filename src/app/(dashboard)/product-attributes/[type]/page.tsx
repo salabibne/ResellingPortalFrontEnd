@@ -9,7 +9,7 @@ export default function ProductAttributePage({ params }: { params: { type: strin
       apiEndpoint: "/categories",
       fields: [
         { name: "name", label: "Category Name", type: "text" },
-        { name: "imageUrl", label: "Image URL", type: "text" },
+        { name: "imageUrl", label: "Category Image", type: "image" },
       ],
     },
     subcategories: {
@@ -46,7 +46,7 @@ export default function ProductAttributePage({ params }: { params: { type: strin
       apiEndpoint: "/brands",
       fields: [
         { name: "name", label: "Brand Name", type: "text" },
-        { name: "imageUrl", label: "Image URL", type: "text" },
+        { name: "imageUrl", label: "Brand Logo", type: "image" },
       ],
     },
     colors: {

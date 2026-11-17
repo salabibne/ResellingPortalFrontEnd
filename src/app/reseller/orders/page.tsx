@@ -13,6 +13,7 @@ import {
   Copy,
   Check,
   AlertTriangle,
+  Printer,
 } from "lucide-react";
 import {
   orderApi,
@@ -32,6 +33,7 @@ import PanelEmpty from "@/components/panel/PanelEmpty";
 import PanelSkeleton from "@/components/panel/PanelSkeleton";
 import PanelModal from "@/components/panel/PanelModal";
 import { exportOrdersToCSV } from "@/utils/csvExporter";
+import { openOrderInvoice } from "@/utils/orderAmounts";
 
 export default function ResellerOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -400,12 +402,21 @@ export default function ResellerOrdersPage() {
                       </td>
                       <td><CourierStatusBadge status={order.courierStatus} /></td>
                       <td>
-                        <button
-                          className="btn btn-ghost btn-xs gap-1 text-primary"
-                          onClick={() => openOrderDetails(order)}
-                        >
-                          <Eye size={14} /> Details
-                        </button>
+                        <div className="flex items-center gap-1 whitespace-nowrap">
+                          <button
+                            className="btn btn-ghost btn-xs gap-1 text-primary"
+                            onClick={() => openOrderDetails(order)}
+                          >
+                            <Eye size={14} /> Details
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-xs gap-1 text-primary"
+                            onClick={() => openOrderInvoice(order.id)}
+                            title="View / Print Invoice"
+                          >
+                            <Printer size={14} /> Invoice
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -447,13 +458,22 @@ export default function ResellerOrdersPage() {
                       ).toLocaleString()}
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-outline btn-sm rounded-xl gap-2 w-full"
-                    onClick={() => openOrderDetails(order)}
-                  >
-                    <Eye size={16} /> View Details
-                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm rounded-xl gap-2 w-full"
+                      onClick={() => openOrderDetails(order)}
+                    >
+                      <Eye size={16} /> View Details
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-primary btn-sm rounded-xl gap-2 w-full"
+                      onClick={() => openOrderInvoice(order.id)}
+                    >
+                      <Printer size={16} /> Invoice
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -472,13 +492,22 @@ export default function ResellerOrdersPage() {
           }`}
           size="lg"
           footer={
-            <button
-              type="button"
-              className="btn btn-primary btn-sm rounded-xl"
-              onClick={closeOrderDetails}
-            >
-              Close
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="btn btn-outline btn-primary btn-sm rounded-xl gap-1.5"
+                onClick={() => openOrderInvoice(selectedOrder.id)}
+              >
+                <Printer size={14} /> Print Invoice
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm rounded-xl"
+                onClick={closeOrderDetails}
+              >
+                Close
+              </button>
+            </div>
           }
         >
           <div className="space-y-4">

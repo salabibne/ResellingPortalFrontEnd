@@ -101,7 +101,7 @@ export default function ProductDetailPage() {
     if (pageConfig || product) {
       const title = pageConfig?.metaTitle || pageConfig?.customTitle || product?.name;
       if (title) {
-        document.title = `${title} - Aarham Apparel`;
+        document.title = `${title} - Online Uddokta Platform`;
       }
     }
   }, [pageConfig, product]);
@@ -374,7 +374,7 @@ export default function ProductDetailPage() {
             <div>
               <div className="flex items-center justify-between gap-2 text-xs text-base-content/60 mb-2">
                 <span className="badge badge-outline text-primary font-bold uppercase tracking-wider text-[11px] px-3 py-2">
-                  {product.brand?.name || "Aarham Apparel"}
+                  {product.brand?.name || "Online Uddokta Platform"}
                 </span>
                 {product.unit && (
                   <span className="font-semibold capitalize text-base-content/70">
@@ -703,7 +703,7 @@ export default function ProductDetailPage() {
                 {
                   name: "Tanvir Ahmed",
                   rating: 5,
-                  comment: "Aarham Apparel has the best premium fabrics. Sizing matches the chart exactly, and shipping was completed within 2 days.",
+                  comment: "Online Uddokta Platform has the best premium fabrics. Sizing matches the chart exactly, and shipping was completed within 2 days.",
                   date: "3 days ago"
                 },
                 {
@@ -760,7 +760,7 @@ export default function ProductDetailPage() {
             <div className="max-w-3xl mx-auto space-y-4">
               {[
                 {
-                  q: "What makes Aarham Apparel products premium?",
+                  q: "What makes Online Uddokta Platform products premium?",
                   a: "Our products undergo strict quality checks. We select top-grade fabrics, execute precision stitching, and use durable color dyes that prevent fading after washes."
                 },
                 {

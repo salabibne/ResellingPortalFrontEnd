@@ -284,8 +284,10 @@ export default function ResellerCartPage() {
                             Selling Price (৳):
                           </span>
                           <input
-                            type="number"
-                            min={item.resellerPrice}
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="off"
+                            placeholder={String(item.resellerPrice)}
                             className={`input input-sm input-bordered w-full text-xs font-bold ${
                               isPriceBelowReseller ? "input-error" : ""
                             }`}
@@ -297,7 +299,9 @@ export default function ResellerCartPage() {
                                 : item.resellerPrice
                             }
                             onChange={(e) => {
-                              const val = e.target.value === "" ? 0 : Number(e.target.value);
+                              // Typed directly (no spinner); keep digits only.
+                              const digits = e.target.value.replace(/[^0-9]/g, "");
+                              const val = digits === "" ? 0 : Number(digits);
                               updateSellingPrice(item.id, val);
                             }}
                             onBlur={(e) => {

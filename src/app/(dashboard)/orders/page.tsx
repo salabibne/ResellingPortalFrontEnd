@@ -41,6 +41,7 @@ import {
   Copy,
   Check,
   ExternalLink,
+  Printer,
 } from "lucide-react";
 import {
   orderApi,
@@ -51,6 +52,7 @@ import {
 } from "@/services/order.api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { exportOrdersToCSV } from "@/utils/csvExporter";
+import { calculateDefaultCod, openOrderInvoice } from "@/utils/orderAmounts";
 
 
 export default function OrdersPage() {
@@ -327,18 +329,8 @@ export default function OrdersPage() {
       setCourierDeliveryType(selectedOrder.courierDeliveryType || 0);
       setCourierNote(selectedOrder.courierNotes || "");
 
-      // Precalculate default COD
-      let defaultCod = Number(selectedOrder.total || 0);
-      if (selectedOrder.isResellerOrder && selectedOrder.resellerSellPrice) {
-        defaultCod = Number(selectedOrder.resellerSellPrice) + Number(selectedOrder.courierCharge || 0);
-      }
-      if (selectedOrder.isAdvanceCourierPaid && selectedOrder.advanceCourierAmount) {
-        defaultCod -= Number(selectedOrder.advanceCourierAmount);
-      }
-      if (selectedOrder.paymentStatus === "PAID") {
-        defaultCod = 0;
-      }
-      setCourierCustomCod(Math.max(0, Math.round(defaultCod)).toString());
+      // Precalculate default COD (shared with the printable invoice)
+      setCourierCustomCod(calculateDefaultCod(selectedOrder).toString());
     }
   }, [selectedOrder]);
 
@@ -985,13 +977,22 @@ export default function OrdersPage() {
                         ৳{totalBillVal.toLocaleString()}
                       </td>
                       <td className="text-right !pr-5 align-middle py-3 whitespace-nowrap sticky right-0 bg-base-100 z-10 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.12)]">
-                        <button
-                          onClick={() => setSelectedOrder(ord)}
-                          className="btn btn-xs btn-primary gap-1 rounded-lg font-bold flex-nowrap whitespace-nowrap"
-                          title="Manage Order"
-                        >
-                          <Eye size={14} className="shrink-0" /> Manage
-                        </button>
+                        <div className="inline-flex items-center gap-1.5">
+                          <button
+                            onClick={() => openOrderInvoice(ord.id)}
+                            className="btn btn-xs btn-outline btn-primary gap-1 rounded-lg font-bold flex-nowrap whitespace-nowrap"
+                            title="View / Print Invoice"
+                          >
+                            <Printer size={14} className="shrink-0" /> Invoice
+                          </button>
+                          <button
+                            onClick={() => setSelectedOrder(ord)}
+                            className="btn btn-xs btn-primary gap-1 rounded-lg font-bold flex-nowrap whitespace-nowrap"
+                            title="Manage Order"
+                          >
+                            <Eye size={14} className="shrink-0" /> Manage
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -1049,12 +1050,21 @@ export default function OrdersPage() {
                   Order {selectedOrder.orderRef || `#${selectedOrder.id.substring(0, 8).toUpperCase()}`}
                 </h3>
               </div>
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/10"
-              >
-                <X size={20} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => openOrderInvoice(selectedOrder.id)}
+                  className="btn btn-sm bg-white/10 hover:bg-white/20 border-white/20 text-white gap-1.5 rounded-lg"
+                  title="View / Print Invoice"
+                >
+                  <Printer size={16} /> Print Invoice
+                </button>
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="btn btn-sm btn-circle btn-ghost text-white hover:bg-white/10"
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             {/* Drawer Body */}
@@ -1077,7 +1087,7 @@ export default function OrdersPage() {
                       <strong className="text-base-content">{selectedOrder.reseller?.name || selectedOrder.customer?.name || "Uddokta"}</strong>
                     </div>
                     <div>
-                      <span className="text-slate-500 font-medium">Phone:</span>{" "}
+                      <span className="text-slate-500 font-medium">Business Number:</span>{" "}
                       <strong className="text-base-content">{selectedOrder.reseller?.phone || selectedOrder.customer?.phone || "N/A"}</strong>
                     </div>
                     <div>

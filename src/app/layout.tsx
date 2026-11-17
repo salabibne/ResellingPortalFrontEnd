@@ -7,8 +7,8 @@ import NoticePopupModal from "@/components/shared/NoticePopupModal";
 const comfortaa = Comfortaa({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Aarham Apparel | Modern Fashion & Premium Clothing",
-  description: "Explore the finest collection of apparel and modern fashion at Aarham Apparel.",
+  title: "Online Uddokta Platform | Start Your Online Business",
+  description: "Start your online business with Online Uddokta Platform - source products and resell them at your own selling price.",
 };
 
 export default function RootLayout({
