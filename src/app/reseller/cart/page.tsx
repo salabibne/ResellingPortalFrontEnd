@@ -17,12 +17,15 @@ import {
   Package,
   AlertTriangle,
   Info,
+  ShieldAlert,
 } from "lucide-react";
 import PanelPage from "@/components/panel/PanelPage";
 import PanelPageHeader from "@/components/panel/PanelPageHeader";
 import PanelEmpty from "@/components/panel/PanelEmpty";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
 import { orderApi, CourierPolicy, PaymentMethod } from "@/services/order.api";
+import { isProfileNotVerifiedError } from "@/services/profile.api";
+import { useCanOrder, useResellerProfileStore } from "@/store/useResellerProfileStore";
 
 export default function ResellerCartPage() {
   const router = useRouter();
@@ -50,6 +53,7 @@ export default function ResellerCartPage() {
   const [customerThana, setCustomerThana] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
+  const { canOrder, verification } = useCanOrder();
 
   useEffect(() => {
     async function loadPolicy() {
@@ -68,15 +72,23 @@ export default function ResellerCartPage() {
 
   const defaultCourierCharge = Number(courierPolicy?.defaultCharge || 120);
 
-  // Validate item prices
+  // Validate item prices. The effective selling price falls back to the
+  // wholesale price when the reseller has not set a custom one.
   const invalidPriceItems = items.filter(
-    (i) => Number(i.resellerSellingPrice || 0) < Number(i.resellerPrice || 0)
+    (i) =>
+      Number(i.customSellingPrice || i.resellerSellingPrice || i.resellerPrice || 0) <
+      Number(i.resellerPrice || 0)
   );
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) {
       setErrorMsg("Your cart is empty. Please add products first.");
+      return;
+    }
+
+    if (!canOrder) {
+      setErrorMsg("অর্ডার করতে প্রথমে প্রোফাইল ভেরিফাই করুন।");
       return;
     }
 
@@ -135,6 +147,10 @@ export default function ResellerCartPage() {
       router.push("/reseller/orders?success=1");
     } catch (err: any) {
       console.error("Reseller checkout error:", err);
+      if (isProfileNotVerifiedError(err)) {
+        // Server says the profile is incomplete: refresh the badge everywhere.
+        useResellerProfileStore.getState().refresh().catch(() => undefined);
+      }
       setErrorMsg(
         err?.response?.data?.message ||
           "Failed to place uddokta order. Please verify your details."
@@ -607,6 +623,26 @@ export default function ResellerCartPage() {
               )}
             </div>
 
+            {!canOrder ? (
+              <div className="space-y-2">
+                <div className="rounded-xl bg-rose-50 p-3 text-[11px] text-rose-700 ring-1 ring-rose-200">
+                  <p className="flex items-center gap-1.5 font-bold">
+                    <ShieldAlert size={14} /> অর্ডার করতে প্রোফাইল ভেরিফাই করুন
+                  </p>
+                  {verification && verification.missing.length > 0 && (
+                    <p className="mt-1 leading-relaxed">
+                      বাকি তথ্য: {verification.missing.map((m) => m.label).join(", ")}
+                    </p>
+                  )}
+                </div>
+                <Link
+                  href="/reseller/profile"
+                  className="btn btn-sm w-full rounded-xl border-none bg-rose-600 font-bold text-white hover:bg-rose-700"
+                >
+                  <ShieldAlert size={14} /> ভেরিফাই করুন
+                </Link>
+              </div>
+            ) : (
             <button
               type="submit"
               disabled={submitting || invalidPriceItems.length > 0}
@@ -621,6 +657,7 @@ export default function ResellerCartPage() {
                 "Place Uddokta Order"
               )}
             </button>
+            )}
           </div>
         </div>
       </form>

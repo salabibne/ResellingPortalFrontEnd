@@ -5,6 +5,7 @@ import type { HomepageSection, HomepageResources } from "@/components/homepage/t
 import { productApi, type Product } from "@/services/product.api";
 import MediaField from "@/components/ui/MediaField";
 import ListEditor from "./ListEditor";
+import { getVideoEmbed } from "@/utils/videoEmbed";
 import IconPicker from "./IconPicker";
 import IconSectionEditor, { ICON_SECTION_TYPES } from "./IconSectionEditors";
 import {
@@ -58,6 +59,7 @@ const TEXT_ONLY_VARIANTS = new Set([
 ]);
 
 const PRODUCT_SOURCES = [
+  { value: "all", label: "All products (automatic — newest first)" },
   { value: "new", label: "New arrivals" },
   { value: "discount", label: "Discounted products" },
   { value: "category", label: "Products in selected categories" },
@@ -334,15 +336,16 @@ export default function SectionEditor({
         <FieldGroup title="Collection source">
           <SelectField
             label="Where do products come from?"
-            value={(settings.productSource as string) || "new"}
+            value={(settings.productSource as string) || "all"}
             options={PRODUCT_SOURCES}
             onChange={(productSource) => onSettings({ productSource })}
+            helpText="“All products” shows every active product automatically as soon as it is uploaded."
           />
           <NumberField
             label="Number of products"
             value={Number(settings.limit ?? 8)}
             min={1}
-            max={24}
+            max={48}
             onChange={(limit) => onSettings({ limit })}
           />
           <NumberField
@@ -609,6 +612,84 @@ export default function SectionEditor({
                 />
               </>
             )}
+          />
+        </FieldGroup>
+      )}
+
+      {type === "video" && (
+        <FieldGroup title="Videos">
+          <NumberField
+            label="Columns (grid layout)"
+            value={Number(settings.columns ?? 2)}
+            min={1}
+            max={3}
+            onChange={(columns) => onSettings({ columns })}
+          />
+          <ToggleField
+            label="Autoplay muted (first video)"
+            checked={Boolean(settings.autoplay)}
+            onChange={(autoplay) => onSettings({ autoplay })}
+          />
+          <p className="text-[10px] text-base-content/50">
+            Paste a YouTube, Facebook, Vimeo or direct .mp4 link. Other links are ignored.
+          </p>
+          <ListEditor
+            label="Video links"
+            items={(settings.videos as unknown as Record<string, unknown>[]) || []}
+            max={6}
+            onChange={(next) => onSettings({ videos: next })}
+            createItem={() => ({ url: "", title: "" })}
+            addLabel="Add video"
+            renderItem={(item, update) => {
+              const url = (item.url as string) || "";
+              const valid = !url || Boolean(getVideoEmbed(url));
+              return (
+                <>
+                  <TextField
+                    label="Video URL"
+                    value={url}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    onChange={(next) => update({ url: next })}
+                  />
+                  {!valid && (
+                    <p className="text-[10px] font-semibold text-error">
+                      This link is not a supported video.
+                    </p>
+                  )}
+                  <TextField
+                    label="Caption (optional)"
+                    value={item.title as string}
+                    onChange={(title) => update({ title })}
+                  />
+                </>
+              );
+            }}
+          />
+        </FieldGroup>
+      )}
+
+      {type === "team" && (
+        <FieldGroup title="Team members">
+          <p className="text-[11px] leading-relaxed text-base-content/60">
+            Members come from <strong>CMS → Our Team</strong> (name, photo, description).
+            Add, edit or reorder them there; this section updates automatically.
+          </p>
+          <a href="/cms?tab=team" className="btn btn-outline btn-xs rounded-lg">
+            Manage team members
+          </a>
+          <NumberField
+            label="Columns"
+            value={Number(settings.columns ?? 4)}
+            min={1}
+            max={4}
+            onChange={(columns) => onSettings({ columns })}
+          />
+          <NumberField
+            label="Maximum members"
+            value={Number(settings.limit ?? 12)}
+            min={1}
+            max={24}
+            onChange={(limit) => onSettings({ limit })}
           />
         </FieldGroup>
       )}

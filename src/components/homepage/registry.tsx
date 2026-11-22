@@ -40,6 +40,8 @@ import { InlineStats, StatCards } from "./sections/StatsSections";
 import { NumberedSteps, TimelineSteps } from "./sections/StepsSections";
 import { ImageChecklist, TwoColumnChecklist } from "./sections/ChecklistSections";
 import { CardCta, GradientCta } from "./sections/CtaSections";
+import { SingleVideo, VideoGrid } from "./sections/VideoSections";
+import { TeamCards, TeamCircles } from "./sections/TeamSections";
 
 export interface VariantDefinition {
   id: string;
@@ -289,6 +291,31 @@ export const SECTION_REGISTRY: Partial<Record<HomepageSectionType, SectionDefini
     variants: [
       { id: "gradient-band", label: "Gradient band", description: "Full-width coloured band.", Component: GradientCta },
       { id: "centered-card", label: "Centered card", description: "Rounded card in the page flow.", Component: CardCta },
+    ],
+  },
+
+  video: {
+    type: "video",
+    label: "Video",
+    category: "Media",
+    description: "Play YouTube, Facebook, Vimeo or .mp4 videos from a link — place it between image sections.",
+    defaultTitle: "",
+    variants: [
+      { id: "single", label: "Single video", description: "One large 16:9 player.", Component: SingleVideo },
+      { id: "grid", label: "Video grid", description: "Two or three players side by side.", Component: VideoGrid },
+    ],
+  },
+
+  team: {
+    type: "team",
+    label: "Our Team",
+    category: "Brand storytelling",
+    description: "Round photo, name and description of each member from CMS → Our Team.",
+    defaultTitle: "আমাদের টিম",
+    defaultSubtitle: "Our Team",
+    variants: [
+      { id: "circles", label: "Round photos", description: "Round photo with the description in a rounded box below.", Component: TeamCircles },
+      { id: "cards", label: "Cards", description: "A rounded card per member.", Component: TeamCards },
     ],
   },
 };

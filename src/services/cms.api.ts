@@ -74,7 +74,7 @@ export interface FounderVideoItem extends CMSBaseItem {
 
 export interface TeamMemberItem extends CMSBaseItem {
   name: string;
-  designation: string;
+  designation?: string;
   imageUrl: string;
   message: string;
   sortOrder?: number;

@@ -8,7 +8,7 @@ import PanelSidebar, {
   type PanelNavEntry,
   type PanelTheme,
 } from "./PanelSidebar";
-import MobileBottomNav, { type BottomNavItem } from "./MobileBottomNav";
+import MobileBottomNav, { type BottomNavAccent, type BottomNavItem } from "./MobileBottomNav";
 
 /** `"menu"` renders a slot that opens the sidebar drawer. */
 export type PanelBottomNavSlot = BottomNavItem | "menu";
@@ -16,6 +16,11 @@ export type PanelBottomNavSlot = BottomNavItem | "menu";
 export interface PanelBottomNav {
   homeHref: string;
   items: PanelBottomNavSlot[];
+  /** Optional overrides; defaults keep the storefront/admin look unchanged. */
+  homeLabel?: string;
+  showHomeLabel?: boolean;
+  menuLabel?: string;
+  accent?: BottomNavAccent;
 }
 
 interface PanelShellProps {
@@ -97,10 +102,13 @@ export default function PanelShell({
       {bottomNav && (
         <MobileBottomNav
           homeHref={bottomNav.homeHref}
+          homeLabel={bottomNav.homeLabel}
+          showHomeLabel={bottomNav.showHomeLabel}
+          accent={bottomNav.accent}
           items={bottomNav.items.map((slot) =>
             slot === "menu"
               ? {
-                  label: "Menu",
+                  label: bottomNav.menuLabel || "Menu",
                   icon: Menu,
                   onClick: () => setOpen(true),
                   expanded: open,

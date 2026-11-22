@@ -5,7 +5,7 @@ How to design, write and maintain the Aarham Apparel reselling platform. Read th
 | | Frontend | Backend |
 |---|---|---|
 | Folder | `ResellingPortalFrontEnd/` (its own git repo) | `ResllingPortalBackend-/` (its own git repo) |
-| Stack | Next.js 14.2 App Router, React 18, TypeScript 5 (strict), Tailwind 3.4, daisyUI 4.12, Zustand, Axios, React Hook Form + Zod, lucide-react | NestJS 10, Prisma 7 (`prisma-client` generator + `@prisma/adapter-pg`), PostgreSQL 16, class-validator, `@nestjs/schedule` |
+| Stack | Next.js 14.2 App Router, React 18, TypeScript 5 (strict), Tailwind 3.4, daisyUI 4.12, Zustand, Axios, React Hook Form + Zod, lucide-react | NestJS 10, Prisma 7 (`prisma-client` generator + `@prisma/adapter-mariadb`), MySQL 8 / MariaDB, class-validator, `@nestjs/schedule` |
 | Local port | `4000` | `3000` |
 | Hosting | Render web service | Render web service (`render.yaml` Blueprint), Render PostgreSQL `resellingplatform` |
 
@@ -121,7 +121,7 @@ Import them from the barrel: `import { PanelPage, PanelPageHeader, … } from "@
 - Admin sections live in the **left sidebar as collapsible groups under Dashboard**. Don't add horizontal nav bars for admin sections.
 - A new group should copy the existing pattern (for example "Products & Attributes"): chevron on the right, auto-opens when it holds the active route, the user can collapse it, animated open and close.
 - Nav row: `h-10 px-3 rounded-xl text-sm font-medium`, icon `size={18}` in a fixed `w-5` slot, label truncates with a `title` tooltip, badge `ml-auto` inside the same row.
-- **Phones get a bottom bar.** Below `lg`, every audience shows `MobileBottomNav`: storefront = Categories, Message (WhatsApp), Home, Cart, Login/Account; reseller = Menu, Catalog, Home, Cart, Orders; admin = Menu, Orders, Home, Products, Inventory. Everything else stays in the drawer. Pick slots for the most frequent tasks, keep labels to one short word, and keep the bar's z-index (`z-30`) below drawers and modals.
+- **Phones get a bottom bar.** Below `lg`, every audience shows `MobileBottomNav`: storefront = Categories, Message (WhatsApp), Home, Cart, Login/Account; reseller = অর্ডার, কার্ট, হোম, প্রফিট ক্যাশ, মেনু (teal accent, centre label shown — `accent`/`showHomeLabel`/`menuLabel` on `bottomNav`); admin = Menu, Orders, Home, Products, Inventory. Everything else stays in the drawer. Pick slots for the most frequent tasks, keep labels to one short word, and keep the bar's z-index (`z-30`) below drawers and modals.
 - **Catalogs are category-first.** `/shop` and `/reseller/products` open `CategoryDrawer` (`components/shared/CategoryDrawer.tsx`, names only) when no category is picked; picking one shows its products and a Categories button reopens it. The storefront has a single instance (`StorefrontCategoryDrawer`, opened via `useMobileMenuStore().setCategoriesOpen`) shared by `/shop` and the bottom-nav Category slot; the ☰ menu keeps its full contents.
 - Don't let daisyUI `.menu` focus or active styles leak (they leave the previous item lit after client-side navigation).
 
@@ -198,7 +198,9 @@ src/
 
 ### 5.1 Module layout
 
-Each feature is a Nest module folder: `x.module.ts`, `x.controller.ts`, `x.service.ts`, `dto/*.dto.ts`. Register new modules in `src/app.module.ts`. Current modules: `auth`, `metadata/*` (category, subcategory, child-category, brand, color, size, age-variant), `product`, `inventory` (+ `inventory-monitor`), `cart`, `order` (+ `steadfast.service`), `cms/*`, `homepage`, `media`, `user`, `support`, `withdrawal`, `prisma`.
+Each feature is a Nest module folder: `x.module.ts`, `x.controller.ts`, `x.service.ts`, `dto/*.dto.ts`. Register new modules in `src/app.module.ts`. Current modules: `auth`, `metadata/*` (category, subcategory, child-category, brand, color, size, age-variant), `product`, `inventory` (+ `inventory-monitor`), `cart`, `order` (+ `steadfast.service`), `cms/*` (incl. `cms/team`), `homepage`, `media`, `user` (+ self-service `profile` controller: `GET/PATCH /profile/me`), `support`, `withdrawal`, `prisma`.
+
+**Reseller verification.** A reseller is verified when every field in `REQUIRED_PROFILE_FIELDS` (`src/user/reseller-verification.ts`) is filled: photo, name, phone, NID, page/shop name, district, thana, full address. It is computed, never stored. `OrderService.createResellerOrder` rejects unverified resellers with 403 `PROFILE_NOT_VERIFIED`; the portal shows a green "ভেরিফাইড" light or a red "ভেরিফাই করুন" link (`components/reseller/VerifyBadge.tsx`).
 
 ### 5.2 Rules
 

@@ -14,6 +14,7 @@ import {
   Wallet,
   LifeBuoy,
   Truck,
+  ClipboardList,
 } from "lucide-react";
 import PanelShell from "@/components/panel/PanelShell";
 import PanelButton from "@/components/panel/PanelButton";
@@ -21,7 +22,9 @@ import type { PanelNavEntry } from "@/components/panel/PanelSidebar";
 import NoticePopupModal from "@/components/shared/NoticePopupModal";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
-import api from "@/services/axios";
+import { useResellerProfileStore } from "@/store/useResellerProfileStore";
+import VerifyBadge from "@/components/reseller/VerifyBadge";
+import { resolveImageUrl } from "@/components/homepage/SafeImage";
 
 export default function ResellerLayout({
   children,
@@ -34,6 +37,9 @@ export default function ResellerLayout({
   const [checkingStatus, setCheckingStatus] = useState(false);
   const cartItems = useResellerCartStore((state) => state.items);
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const profile = useResellerProfileStore((state) => state.profile);
+  const refreshProfile = useResellerProfileStore((state) => state.refresh);
+  const resetProfile = useResellerProfileStore((state) => state.reset);
 
   useEffect(() => {
     setMounted(true);
@@ -53,36 +59,36 @@ export default function ResellerLayout({
     }
 
     // The persisted role/status can be stale (e.g. a reseller suspended after
-    // login). Re-validate against the server before rendering the portal.
-    if (role === "RESELLER") {
-      let alive = true;
-      setCheckingStatus(true);
+    // login). Re-validate against the server before rendering the portal, and
+    // load the profile + verification status used across the portal.
+    let alive = true;
+    if (role === "RESELLER") setCheckingStatus(true);
 
-      api
-        .get("/auth/me")
-        .then((response) => {
-          if (!alive) return;
-          if (response.data?.status !== "ACTIVE") {
-            logout();
-            router.push("/login");
-          }
-        })
-        .catch((err: any) => {
-          if (!alive) return;
-          if (err?.response?.status === 403 || err?.response?.status === 401) {
-            logout();
-            router.push("/login");
-          }
-        })
-        .finally(() => {
-          if (alive) setCheckingStatus(false);
-        });
+    refreshProfile()
+      .then((fresh) => {
+        if (!alive) return;
+        if (role === "RESELLER" && fresh?.status !== "ACTIVE") {
+          resetProfile();
+          logout();
+          router.push("/login");
+        }
+      })
+      .catch((err: any) => {
+        if (!alive) return;
+        if (err?.response?.status === 403 || err?.response?.status === 401) {
+          resetProfile();
+          logout();
+          router.push("/login");
+        }
+      })
+      .finally(() => {
+        if (alive) setCheckingStatus(false);
+      });
 
-      return () => {
-        alive = false;
-      };
-    }
-  }, [hasHydrated, isAuthenticated, user, router, logout]);
+    return () => {
+      alive = false;
+    };
+  }, [hasHydrated, isAuthenticated, user, router, logout, refreshProfile, resetProfile]);
 
   if (!mounted || !hasHydrated || !isAuthenticated || checkingStatus) {
     return (
@@ -99,14 +105,17 @@ export default function ResellerLayout({
   }
 
   const navItems: PanelNavEntry[] = [
-    { href: "/reseller", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/reseller/products", label: "Product Catalog", icon: Package },
-    { href: "/reseller/cart", label: "My Cart", icon: ShoppingCart, badge: totalCartCount },
-    { href: "/reseller/orders", label: "My Orders", icon: ShoppingBag },
-    { href: "/reseller/track", label: "Track", icon: Truck },
-    { href: "/reseller/payouts", label: "Payouts & Wallet", icon: Wallet },
-    { href: "/reseller/support", label: "Support Tickets", icon: LifeBuoy },
+    { href: "/reseller", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
+    { href: "/reseller/products", label: "প্রোডাক্ট", icon: Package },
+    { href: "/reseller/cart", label: "কার্ট / চেকআউট", icon: ShoppingCart, badge: totalCartCount },
+    { href: "/reseller/orders", label: "আমার অর্ডার", icon: ShoppingBag },
+    { href: "/reseller/track", label: "ট্র্যাক", icon: Truck },
+    { href: "/reseller/payouts", label: "প্রফিট ক্যাশ / ওয়ালেট", icon: Wallet },
+    { href: "/reseller/profile", label: "প্রোফাইল ও ভেরিফাই", icon: UserCheck },
+    { href: "/reseller/support", label: "সাপোর্ট", icon: LifeBuoy },
   ];
+  const displayName = profile?.name || user?.name || "Uddokta";
+  const avatarUrl = resolveImageUrl(profile?.imageUrl);
 
   const canAccessAdmin = ["SUPER_ADMIN", "ADMIN", "MANAGER"].includes(role);
 
@@ -115,7 +124,7 @@ export default function ResellerLayout({
       theme="light"
       brand={
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 text-white flex items-center justify-center font-bold text-lg shadow-sm">
             R
           </div>
           <div className="min-w-0">
@@ -130,27 +139,33 @@ export default function ResellerLayout({
       }
       topSlot={
         <div className="mx-4 mt-3 rounded-xl bg-base-200/70 border border-base-300/50 px-3 py-2 flex items-center gap-3">
-          <div className="w-8 h-8 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs">
-            {user?.name ? user.name.charAt(0).toUpperCase() : "R"}
+          <div className="w-9 h-9 shrink-0 overflow-hidden rounded-full bg-teal-600/10 text-teal-700 flex items-center justify-center font-semibold text-xs">
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" />
+            ) : (
+              displayName.charAt(0).toUpperCase()
+            )}
           </div>
           <div className="overflow-hidden flex-1">
-            <p className="text-xs font-bold truncate text-base-content">
-              {user?.name || "Uddokta"}
-            </p>
-            <p className="text-[10px] text-success font-semibold flex items-center gap-1">
-              <UserCheck size={12} /> Verified Uddokta
-            </p>
+            <p className="text-xs font-bold truncate text-base-content">{displayName}</p>
+            <VerifyBadge variant="inline" />
           </div>
         </div>
       }
       items={navItems}
       bottomNav={{
         homeHref: "/reseller",
+        homeLabel: "হোম",
+        showHomeLabel: true,
+        accent: "teal",
+        menuLabel: "মেনু",
+        // অর্ডার · কার্ট · [হোম] · প্রফিট ক্যাশ · মেনু
         items: [
+          { href: "/reseller/orders", label: "অর্ডার", icon: ClipboardList },
+          { href: "/reseller/cart", label: "কার্ট", icon: ShoppingCart, badge: totalCartCount },
+          { href: "/reseller/payouts", label: "প্রফিট ক্যাশ", icon: Wallet },
           "menu",
-          { href: "/reseller/products", label: "Catalog", icon: Package },
-          { href: "/reseller/cart", label: "Cart", icon: ShoppingCart, badge: totalCartCount },
-          { href: "/reseller/orders", label: "Orders", icon: ShoppingBag },
         ],
       }}
       footer={
@@ -166,7 +181,10 @@ export default function ResellerLayout({
           <PanelButton
             variant="ghost"
             className="w-full text-error hover:bg-error/10"
-            onClick={logout}
+            onClick={() => {
+              resetProfile();
+              logout();
+            }}
           >
             <LogOut size={16} /> Logout
           </PanelButton>

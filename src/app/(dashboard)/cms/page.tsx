@@ -25,6 +25,7 @@ const MODULE_TABS: { id: CMSModuleType; label: string; icon: any }[] = [
   { id: "contact", label: "WhatsApp & Contact Info", icon: PhoneCall },
   { id: "brand", label: "Site Logo", icon: ImageIcon },
   { id: "social-media", label: "Social Media", icon: Share2 },
+  { id: "team", label: "Our Team", icon: Users },
 ];
 
 const CARD_CLASS =
@@ -49,6 +50,17 @@ export default function CMSDashboardPage() {
   useEffect(() => {
     loadWhatsAppConfig();
   }, [loadWhatsAppConfig]);
+
+  // Deep link from the homepage builder: /cms?tab=team
+  useEffect(() => {
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    if (tab && MODULE_TABS.some((entry) => entry.id === tab)) {
+      setActiveTab(tab as CMSModuleType);
+      requestAnimationFrame(() =>
+        editorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+      );
+    }
+  }, []);
 
   // After any contact edit: refresh this banner and the floating widget data.
   const handleContactSaved = useCallback(async () => {

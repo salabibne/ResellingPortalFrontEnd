@@ -157,6 +157,8 @@ export interface ResellerStats {
   inTransitOrders: number;
   deliveredOrders: number;
   cancelledOrders: number;
+  returnedOrders?: number;
+  todayOrders?: number;
   totalResellerProfit: number;
   pendingResellerProfit?: number;
   totalResellerSales: number;

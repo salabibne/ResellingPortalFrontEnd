@@ -22,13 +22,34 @@ export interface BottomNavItem {
   expanded?: boolean;
 }
 
+export type BottomNavAccent = "primary" | "teal";
+
 interface MobileBottomNavProps {
   /** Route of the raised centre button. */
   homeHref: string;
   homeLabel?: string;
+  /** Print the label under the raised centre button. */
+  showHomeLabel?: boolean;
+  /** Colour of the centre button and the active slot. */
+  accent?: BottomNavAccent;
   /** Exactly four slots: two left of the centre button, two right. */
   items: BottomNavItem[];
 }
+
+const ACCENT = {
+  primary: {
+    home: "bg-primary text-primary-content shadow-primary/30 focus-visible:ring-primary/50",
+    active: "text-primary",
+    activePill: "bg-primary/10",
+    shadow: "shadow-[0_8px_30px_rgba(0,28,148,0.15)]",
+  },
+  teal: {
+    home: "bg-gradient-to-br from-teal-500 to-teal-700 text-white shadow-teal-700/30 focus-visible:ring-teal-500/50",
+    active: "text-teal-700",
+    activePill: "bg-teal-500/10",
+    shadow: "shadow-[0_8px_30px_rgba(15,118,110,0.18)]",
+  },
+} as const;
 
 /**
  * Phone-only floating bottom navigation shared by the storefront, reseller
@@ -38,8 +59,11 @@ interface MobileBottomNavProps {
 export default function MobileBottomNav({
   homeHref,
   homeLabel = "Home",
+  showHomeLabel = false,
+  accent = "primary",
   items,
 }: MobileBottomNavProps) {
+  const colors = ACCENT[accent];
   const pathname = usePathname() || "/";
   const linkHrefs = items
     .filter((item) => item.href && !item.external)
@@ -56,32 +80,43 @@ export default function MobileBottomNav({
       aria-label="Quick navigation"
       className="lg:hidden fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pointer-events-none print:hidden"
     >
-      <div className="pointer-events-auto relative mx-auto max-w-md h-16 grid grid-cols-5 rounded-2xl bg-base-100 border border-base-200 shadow-[0_8px_30px_rgba(0,28,148,0.15)]">
+      <div className={`pointer-events-auto relative mx-auto max-w-md h-16 grid grid-cols-5 rounded-2xl bg-base-100 border border-base-200 ${colors.shadow}`}>
         {left.map((item) => (
           <Slot
             key={item.label}
             item={item}
+            accent={accent}
             active={!homeActive && !!item.href && item.href === activeHref}
           />
         ))}
 
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center">
           <Link
             href={homeHref}
             aria-label={homeLabel}
             aria-current={homeActive ? "page" : undefined}
-            className="-mt-7 w-[4.25rem] h-[4.25rem] shrink-0 rounded-full bg-primary text-primary-content border-4 border-base-100 shadow-lg shadow-primary/30 flex items-center justify-center transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+            className={`-mt-7 w-[4.25rem] h-[4.25rem] shrink-0 rounded-full border-4 border-base-100 shadow-lg flex items-center justify-center transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${colors.home}`}
           >
             <span className="w-12 h-12 rounded-full border-2 border-white/80 flex items-center justify-center">
               <Home size={24} />
             </span>
           </Link>
+          {showHomeLabel && (
+            <span
+              className={`-mt-0.5 text-[11px] font-semibold leading-none ${
+                homeActive ? colors.active : "text-base-content/60"
+              }`}
+            >
+              {homeLabel}
+            </span>
+          )}
         </div>
 
         {right.map((item) => (
           <Slot
             key={item.label}
             item={item}
+            accent={accent}
             active={!homeActive && !!item.href && item.href === activeHref}
           />
         ))}
@@ -90,17 +125,26 @@ export default function MobileBottomNav({
   );
 }
 
-function Slot({ item, active }: { item: BottomNavItem; active: boolean }) {
+function Slot({
+  item,
+  active,
+  accent,
+}: {
+  item: BottomNavItem;
+  active: boolean;
+  accent: BottomNavAccent;
+}) {
   const Icon = item.icon;
+  const colors = ACCENT[accent];
   const className = `flex flex-col items-center justify-center gap-1 min-w-0 rounded-2xl text-[11px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
-    active ? "text-primary" : "text-base-content/60 hover:text-base-content"
+    active ? colors.active : "text-base-content/60 hover:text-base-content"
   }`;
 
   const content = (
     <>
       <span
         className={`relative flex items-center justify-center w-10 h-7 rounded-full transition-colors ${
-          active ? "bg-primary/10" : ""
+          active ? colors.activePill : ""
         }`}
       >
         <Icon size={20} />

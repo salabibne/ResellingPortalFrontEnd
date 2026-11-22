@@ -134,12 +134,12 @@ export const MODULE_CONFIGS: Record<CMSModuleType, CMSModuleConfig> = {
   team: {
     module: "team",
     title: "Our Team",
-    description: "Manage team member profiles, designations, photos, and messages displayed on the homepage.",
+    description: "Team members shown in the homepage “Our Team” section: round photo, name and a description below it.",
     fields: [
-      { name: "name", label: "Full Name", type: "text", required: true, placeholder: 'e.g. "Sarah Jenkins"' },
-      { name: "designation", label: "Designation / Role", type: "text", required: true, placeholder: 'e.g. "Head of Design"' },
-      { name: "imageUrl", label: "Profile Picture", type: "image", required: true, imageSize: "profilePhoto" },
-      { name: "message", label: "Personal Message / Statement", type: "textarea", required: true, placeholder: "Brief bio, message, or quote from the team member..." },
+      { name: "name", label: "Name", type: "text", required: true, placeholder: 'e.g. "Saykot Chowdhury"' },
+      { name: "imageUrl", label: "Photo", type: "image", required: true, imageSize: "profilePhoto" },
+      { name: "message", label: "Description", type: "textarea", required: true, placeholder: "Short description shown under the photo..." },
+      { name: "designation", label: "Designation / Role (optional)", type: "text", required: false, placeholder: 'e.g. "Founder"' },
     ],
   },
 };

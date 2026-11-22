@@ -362,6 +362,38 @@ export default function VariantThumb({ type, variant, className = "" }: VariantT
       );
     }
 
+    if (type === "video") {
+      const count = variant === "grid" ? 2 : 1;
+      return (
+        <div className={`grid h-full gap-1 ${count === 2 ? "grid-cols-2" : "grid-cols-1 px-3"}`}>
+          {Array.from({ length: count }).map((_, i) => (
+            <div key={i} className="flex items-center justify-center rounded bg-base-content/20">
+              <div className="h-0 w-0 border-y-[5px] border-l-[8px] border-y-transparent border-l-primary/70" />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (type === "team") {
+      return (
+        <div className="grid h-full grid-cols-3 gap-1">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className={`flex flex-col items-center justify-center gap-1 ${
+                variant === "cards" ? "rounded bg-base-content/10 p-1" : ""
+              }`}
+            >
+              <div className="h-4 w-4 rounded-full bg-primary/50" />
+              <div className="h-1 w-3/4 rounded-sm bg-base-content/25" />
+              <div className="h-2 w-full rounded-full bg-primary/15" />
+            </div>
+          ))}
+        </div>
+      );
+    }
+
     if (type === "testimonials") {
       return (
         <div className={`grid h-full gap-1 ${variant === "featured" ? "grid-cols-1" : "grid-cols-3"}`}>

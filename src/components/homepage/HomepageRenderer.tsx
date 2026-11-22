@@ -25,6 +25,8 @@ const TYPE_DEFAULTS: Partial<Record<HomepageSectionType, RevealVariant>> = {
   testimonials: "fade-up",
   faq: "fade-up",
   logos: "none",
+  video: "fade-up",
+  team: "fade-up",
 };
 
 function resolveAnimation(section: SectionRenderProps["section"]): RevealVariant {

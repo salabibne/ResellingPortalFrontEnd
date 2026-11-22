@@ -15,7 +15,9 @@ export type HomepageSectionType =
   | "stats"
   | "steps"
   | "checklist"
-  | "cta";
+  | "cta"
+  | "video"
+  | "team";
 
 export type SectionAnimation =
   | "default"
@@ -71,6 +73,20 @@ export interface ChecklistItem {
   text: string;
 }
 
+export interface VideoItem {
+  url: string;
+  title?: string;
+}
+
+/** Row from CMS → Our Team, resolved by the API for `team` sections. */
+export interface TeamMember {
+  id: string;
+  name: string;
+  designation?: string | null;
+  imageUrl?: string | null;
+  message?: string | null;
+}
+
 export interface SectionSettings {
   animation?: SectionAnimation;
   alignment?: "left" | "center" | "right";
@@ -92,7 +108,7 @@ export interface SectionSettings {
   categoryIds?: string[];
   productIds?: string[];
   brandIds?: string[];
-  productSource?: "new" | "discount" | "category" | "brand" | "manual";
+  productSource?: "all" | "new" | "discount" | "category" | "brand" | "manual";
   limit?: number;
   showProductCount?: boolean;
   showAddToCart?: boolean;
@@ -105,6 +121,8 @@ export interface SectionSettings {
   itemIcon?: string;
   items?: TrustItem[] | TestimonialItem[] | FaqItem[] | StatItem[] | StepItem[] | ChecklistItem[];
   cards?: PromoCard[];
+  videos?: VideoItem[];
+  autoplay?: boolean;
   [key: string]: unknown;
 }
 
@@ -140,6 +158,7 @@ export interface HomepageResources {
   categories: Category[];
   brands: BrandLogo[];
   productBrands?: BrandOption[];
+  team?: TeamMember[];
 }
 
 export interface HomepagePage {
