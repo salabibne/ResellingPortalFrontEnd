@@ -282,7 +282,7 @@ export default function InventoryPage() {
   });
 
   return (
-    <div className="p-6 w-full flex flex-col h-full bg-base-200 text-base-content relative space-y-6">
+    <div className="w-full flex flex-col bg-base-200 text-base-content relative space-y-6">
       {/* Top Global Progress Bar */}
       {isLoading && (
         <div className="fixed top-0 left-0 right-0 z-50">

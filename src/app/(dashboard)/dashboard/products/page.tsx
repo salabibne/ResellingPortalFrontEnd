@@ -27,6 +27,8 @@ import {
   Link2,
 } from "lucide-react";
 import api from "@/services/axios";
+import { inventoryApi } from "@/services/inventory.api";
+import { useAuthStore } from "@/store/useAuthStore";
 import mediaApi, { ACCEPTED_IMAGE_TYPES, MAX_UPLOAD_MB, uploadErrorMessage } from "@/services/media.api";
 import { describeImageSize } from "@/utils/imageSizes";
 import {
@@ -100,6 +102,11 @@ export default function AdminProductsPage() {
 
   const [newImageUrl, setNewImageUrl] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+  // Opening stock for a new product. Not sent with the product itself: after the
+  // product is created it is booked through Adjust Stock (STOCK_IN / PURCHASE).
+  const [initialStock, setInitialStock] = useState<number | string>(0);
+  const { user } = useAuthStore();
+
   const [imageMessages, setImageMessages] = useState<{ type: "error" | "warning"; text: string }[]>([]);
   const [showImageLink, setShowImageLink] = useState(false);
   const imageInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -256,6 +263,7 @@ export default function AdminProductsPage() {
       });
     }
 
+    setInitialStock(0);
     setIsFormOpen(true);
   };
 
@@ -375,6 +383,44 @@ export default function AdminProductsPage() {
     }));
   };
 
+  // Book the opening stock through the existing Adjust Stock endpoint, once per
+  // inventory record the backend created (one per size, or one with no size).
+  const bookInitialStock = async (created: Product) => {
+    const qty = Math.max(0, Math.floor(Number(initialStock) || 0));
+    const inventories = created.inventories || [];
+    if (qty === 0 || inventories.length === 0) return;
+
+    if (!user?.id) {
+      alert("Product created, but initial stock was not added: user ID not found. Please re-login and use Adjust Stock.");
+      return;
+    }
+
+    const failed: string[] = [];
+    for (const inv of inventories) {
+      try {
+        await inventoryApi.adjustStock({
+          productId: created.id,
+          productSizeId: inv.productSizeId || undefined,
+          transactionQuantity: qty,
+          stockType: "STOCK_IN",
+          purpose: "PURCHASE",
+          performedBy: user.id,
+          notes: "Initial stock on product creation",
+        });
+      } catch (err) {
+        console.error("Failed to book initial stock", err);
+        failed.push(inv.productSize?.size?.name || "Standard");
+      }
+    }
+
+    if (failed.length) {
+      alert(
+        `Product created, but initial stock could not be added for: ${failed.join(", ")}. ` +
+          "Please add it from Inventory Adjust."
+      );
+    }
+  };
+
   // Form Submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -409,7 +455,8 @@ export default function AdminProductsPage() {
         delete payload.stockLimitAlert;
         await productApi.update(currentProduct.id, payload);
       } else {
-        await productApi.create(payload);
+        const created = await productApi.create(payload);
+        await bookInitialStock(created);
       }
 
       await fetchData();
@@ -847,6 +894,26 @@ export default function AdminProductsPage() {
                     />
                   </div>
 
+                  {!currentProduct && (
+                    <div className="form-control">
+                      <label className="label font-semibold text-base-content">
+                        Initial Stock <span className="text-xs text-gray-400 font-normal">(Optional)</span>
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        className="input input-bordered w-full bg-base-100 text-base-content"
+                        placeholder="e.g. 50"
+                        value={initialStock}
+                        onChange={(e) => setInitialStock(e.target.value)}
+                      />
+                      <span className="text-xs text-gray-500 mt-1">
+                        Recorded as PURCHASE (New Stock Received). If sizes are selected, each size gets this quantity.
+                      </span>
+                    </div>
+                  )}
+
                   <div className="form-control">
                     <label className="label font-semibold text-base-content">
                       Video URL <span className="text-xs text-gray-400 font-normal">(Optional)</span>
@@ -1207,7 +1274,7 @@ export default function AdminProductsPage() {
                   <div className="alert alert-info text-sm text-base-content bg-blue-50 border-blue-200">
                     <AlertCircle size={20} className="text-info" />
                     <span>
-                      Inventory records will be automatically seeded for each selected Size (or a primary inventory record if no size is chosen). Supplier details are optional.
+                      Inventory records will be automatically seeded for each selected Size (or a primary inventory record if no size is chosen), each starting with the Initial Stock from Basic Info, recorded as PURCHASE (New Stock Received). Supplier details are optional.
                     </span>
                   </div>
 
@@ -1275,8 +1342,12 @@ export default function AdminProductsPage() {
                     Cancel
                   </button>
 
+                  {/* Distinct keys: without them React reuses one <button> and flips
+                      its type to "submit" mid-click, so "Next Step" on the step
+                      before last would submit the form and skip the final step. */}
                   {!isLastStep ? (
                     <button
+                      key="next-step"
                       type="button"
                       className="btn btn-primary text-white gap-1"
                       disabled={
@@ -1293,6 +1364,7 @@ export default function AdminProductsPage() {
                     </button>
                   ) : (
                     <button
+                      key="save-product"
                       type="submit"
                       className="btn btn-success text-white px-8 flex items-center gap-2"
                       disabled={isSubmitting || !areAllRequiredStepsComplete || !isLastStep}

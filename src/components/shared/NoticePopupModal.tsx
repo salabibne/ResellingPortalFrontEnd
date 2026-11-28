@@ -117,12 +117,12 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
             <img
               src={notice.imageUrl!}
               alt={notice.title || "Uddokta announcement"}
-              className="w-[30vw] md:w-[40vw] max-w-full h-auto rounded-2xl shadow-2xl"
+              className="w-[90vw] sm:w-[70vw] md:w-[40vw] max-w-full max-h-[80vh] h-auto object-contain rounded-2xl shadow-2xl"
               onError={() => setImageFailed(true)}
             />
             <button
               onClick={handleClose}
-              className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all shadow-md backdrop-blur-sm"
+              className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-9 h-9 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-all shadow-md backdrop-blur-sm"
               aria-label="Close notice modal"
             >
               <X size={18} />
@@ -159,7 +159,7 @@ export default function NoticePopupModal({ audience }: NoticePopupModalProps) {
       <div className="absolute inset-0" onClick={handleClose} />
 
       <div
-        className="relative bg-base-100 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 z-10 transition-all transform scale-100 animate-scale-in duration-200"
+        className="relative bg-base-100 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-100 z-10 transition-all transform scale-100 animate-scale-in duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="notice-modal-title"
