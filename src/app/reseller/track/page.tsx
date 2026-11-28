@@ -16,11 +16,11 @@ import PanelSkeleton from "@/components/panel/PanelSkeleton";
 
 function getErrorMessage(err: any): string {
   if (!err?.response) {
-    return "Cannot reach the backend API. Make sure the backend server is running on port 3000.";
+    return "সার্ভারের সাথে সংযোগ করা যাচ্ছে না। ইন্টারনেট সংযোগ চেক করে আবার চেষ্টা করুন।";
   }
   const message = err?.response?.data?.message;
   if (Array.isArray(message)) return message.join(", ");
-  return message || err?.message || "Something went wrong";
+  return message || err?.message || "কিছু একটা সমস্যা হয়েছে";
 }
 
 export default function ResellerTrackPage() {
@@ -64,15 +64,15 @@ export default function ResellerTrackPage() {
       order.orderRef ||
       order.id,
     label: `${order.orderRef || `#${order.id.substring(0, 8).toUpperCase()}`} — ${
-      order.customerName || order.customer?.name || "Customer"
+      order.customerName || order.customer?.name || "কাস্টমার"
     } — #${order.courierConsignmentId || order.courierTrackingCode || "N/A"}`,
   }));
 
   return (
     <PanelPage width="narrow">
       <PanelPageHeader
-        title="Track a Parcel"
-        subtitle="Select one of your booked consignments to see its current Steadfast status and journey."
+        title="পার্সেল ট্র্যাক করুন"
+        subtitle="আপনার বুক করা যেকোনো কনসাইনমেন্ট বেছে নিয়ে Steadfast-এর বর্তমান স্ট্যাটাস ও পার্সেলের যাত্রা দেখুন।"
         icon={Truck}
         actions={
           <button
@@ -82,7 +82,7 @@ export default function ResellerTrackPage() {
             className="btn btn-outline btn-sm rounded-xl gap-2"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-            Refresh
+            রিফ্রেশ
           </button>
         }
       />
@@ -95,6 +95,7 @@ export default function ResellerTrackPage() {
             type="button"
             className="btn btn-ghost btn-xs text-white"
             onClick={() => setErrorMsg(null)}
+            aria-label="বন্ধ করুন"
           >
             ✕
           </button>
@@ -107,11 +108,11 @@ export default function ResellerTrackPage() {
         <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm">
           <PanelEmpty
             icon={Truck}
-            title="No booked consignments yet"
-            text="Once the admin places one of your orders with Steadfast, its consignment ID will appear here."
+            title="এখনো কোনো কনসাইনমেন্ট বুক হয়নি"
+            text="অ্যাডমিন আপনার কোনো অর্ডার Steadfast-এ বুক করলে তার কনসাইনমেন্ট আইডি এখানে দেখা যাবে।"
             action={
               <Link href="/reseller/orders" className="btn btn-primary btn-sm rounded-xl">
-                View My Orders
+                আমার অর্ডার দেখুন
               </Link>
             }
           />
@@ -121,8 +122,8 @@ export default function ResellerTrackPage() {
           presetOptions={options}
           presetLoading={loading}
           allowManual={false}
-          title="Track Your Parcel"
-          description="Choose one of your booked consignments. Tracking is read-only and only includes your own orders."
+          title="আপনার পার্সেল ট্র্যাক করুন"
+          description="আপনার বুক করা একটি কনসাইনমেন্ট বেছে নিন। এখানে শুধু আপনার নিজের অর্ডারগুলোর ট্র্যাকিং দেখা যাবে।"
         />
       )}
     </PanelPage>

@@ -8,6 +8,7 @@ import { authApi } from "@/services/auth.api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -101,8 +102,7 @@ function LoginForm() {
                 <label className="label">
                   <span className="label-text">Password</span>
                 </label>
-                <input
-                  type="password"
+                <PasswordInput
                   placeholder="********"
                   className={`input input-bordered text-base-content w-full ${
                     errors.password ? "input-error" : ""

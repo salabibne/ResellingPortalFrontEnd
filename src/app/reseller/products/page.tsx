@@ -9,6 +9,7 @@ import {
   Package,
   ArrowRight,
   LayoutGrid,
+  Clock,
 } from "lucide-react";
 import PanelPage from "@/components/panel/PanelPage";
 import PanelPageHeader from "@/components/panel/PanelPageHeader";
@@ -110,9 +111,11 @@ export default function ResellerProductsPage() {
     return true;
   });
 
-  const { canOrder, loaded: profileLoaded } = useCanOrder();
+  const { canOrder, pending, verification, loaded: profileLoaded } = useCanOrder();
 
   const handleAddToCart = (product: Product) => {
+    // Pending (not yet approved) resellers may browse but not add to cart.
+    if (pending) return;
     const sel = productSelections[product.id] || { quantity: 1 };
     const primaryImg =
       product.images?.find((img) => img.isPrimary)?.imageUrl ||
@@ -145,8 +148,8 @@ export default function ResellerProductsPage() {
   return (
     <PanelPage className="pb-24">
       <PanelPageHeader
-        title="Uddokta Products"
-        subtitle="Compare retail prices with wholesale uddokta costs and add items to your cart."
+        title="উদ্যোক্তা প্রোডাক্ট"
+        subtitle="খুচরা দামের সাথে উদ্যোক্তা পাইকারি দাম মিলিয়ে দেখুন এবং প্রোডাক্ট কার্টে যোগ করুন।"
         icon={Package}
         actions={
           <Link
@@ -154,12 +157,12 @@ export default function ResellerProductsPage() {
             className="btn btn-primary btn-sm rounded-xl gap-2"
           >
             <ShoppingCart size={16} />
-            <span>My Cart ({totalCartCount})</span>
+            <span>আমার কার্ট ({totalCartCount})</span>
           </Link>
         }
       />
 
-      {profileLoaded && !canOrder && (
+      {profileLoaded && !canOrder && !verification?.isVerified && (
         <Link
           href="/reseller/profile"
           className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 px-4 py-2.5 text-xs font-semibold text-amber-900 ring-1 ring-amber-200 hover:bg-amber-100"
@@ -178,7 +181,7 @@ export default function ResellerProductsPage() {
           />
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="প্রোডাক্ট খুঁজুন..."
             className="input input-bordered input-sm rounded-xl pl-10 w-full"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -194,7 +197,7 @@ export default function ResellerProductsPage() {
         >
           <LayoutGrid size={16} className="shrink-0" />
           <span className="truncate">
-            {selectedCategory === "ALL" ? "All Categories" : selectedCategory}
+            {selectedCategory === "ALL" ? "সব ক্যাটাগরি" : selectedCategory}
           </span>
         </button>
       </div>
@@ -209,6 +212,9 @@ export default function ResellerProductsPage() {
           setCategoryDrawerOpen(false);
         }}
         loading={loading}
+        title="ক্যাটাগরি"
+        emptyText="এখনো কোনো ক্যাটাগরি নেই"
+        closeLabel="ক্যাটাগরি বন্ধ করুন"
       />
 
       {/* Product Grid */}
@@ -217,8 +223,8 @@ export default function ResellerProductsPage() {
       ) : filteredProducts.length === 0 ? (
         <PanelEmpty
           icon={Package}
-          title="No products found"
-          text="Try searching for something else or reset your filter."
+          title="কোনো প্রোডাক্ট পাওয়া যায়নি"
+          text="অন্য কিছু লিখে খুঁজুন অথবা ফিল্টার রিসেট করুন।"
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -256,11 +262,11 @@ export default function ResellerProductsPage() {
                     />
                     {discountPct > 0 && (
                       <span className="absolute top-2 left-2 bg-error text-white text-[10px] font-extrabold px-2 py-1 rounded-md shadow-sm">
-                        Uddokta Discount {discountPct}% OFF
+                        উদ্যোক্তা ছাড় {discountPct}%
                       </span>
                     )}
                     <span className="absolute bottom-2 right-2 bg-base-100/90 backdrop-blur-md text-base-content text-[11px] font-semibold px-2.5 py-1 rounded-md border border-base-200">
-                      {product.category?.name || "General"}
+                      {product.category?.name || "সাধারণ"}
                     </span>
                   </div>
 
@@ -271,7 +277,7 @@ export default function ResellerProductsPage() {
                         {product.name}
                       </h3>
                       <p className="text-xs text-base-content/60 line-clamp-2 mt-0.5">
-                        {product.description || "High quality product"}
+                        {product.description || "উন্নত মানের প্রোডাক্ট"}
                       </p>
                     </div>
 
@@ -279,7 +285,7 @@ export default function ResellerProductsPage() {
                     <div className="p-3 bg-base-200/60 rounded-xl border border-base-300/40 space-y-1">
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-base-content/60 font-medium">
-                          Retail Market Price:
+                          খুচরা বাজার মূল্য:
                         </span>
                         <span className="line-through text-base-content/50 font-semibold">
                           ৳{retailPrice.toLocaleString()}
@@ -287,7 +293,7 @@ export default function ResellerProductsPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-primary">
-                          Uddokta Wholesale Rate:
+                          উদ্যোক্তা পাইকারি মূল্য:
                         </span>
                         <span className="text-lg font-black text-primary">
                           ৳{resellerPrice.toLocaleString()}
@@ -301,7 +307,7 @@ export default function ResellerProductsPage() {
                       {product.sizes && product.sizes.length > 0 && (
                         <div>
                           <label className="text-[11px] font-semibold text-base-content/60 uppercase tracking-wider block mb-1">
-                            Size:
+                            সাইজ:
                           </label>
                           <div className="flex flex-wrap gap-1">
                             {product.sizes.map((s) => (
@@ -334,7 +340,7 @@ export default function ResellerProductsPage() {
                       {product.colors && product.colors.length > 0 && (
                         <div>
                           <label className="text-[11px] font-semibold text-base-content/60 uppercase tracking-wider block mb-1">
-                            Color:
+                            কালার:
                           </label>
                           <div className="flex flex-wrap gap-1">
                             {product.colors.map((c) => (
@@ -414,14 +420,20 @@ export default function ResellerProductsPage() {
                           : "btn-primary"
                       }`}
                       onClick={() => handleAddToCart(product)}
+                      disabled={pending}
+                      title={pending ? "অ্যাকাউন্ট অনুমোদনের পর অর্ডার করতে পারবেন" : undefined}
                     >
-                      {addedSuccessId === product.id ? (
+                      {pending ? (
                         <>
-                          <Check size={16} /> Added!
+                          <Clock size={16} /> অনুমোদনের অপেক্ষায়
+                        </>
+                      ) : addedSuccessId === product.id ? (
+                        <>
+                          <Check size={16} /> যোগ হয়েছে!
                         </>
                       ) : (
                         <>
-                          <ShoppingCart size={16} /> Add to Order
+                          <ShoppingCart size={16} /> অর্ডারে যোগ করুন
                         </>
                       )}
                     </button>
@@ -434,7 +446,7 @@ export default function ResellerProductsPage() {
       )}
 
       {/* Floating Bottom Drawer Link if Items in Cart */}
-      {totalCartCount > 0 && (
+      {totalCartCount > 0 && !pending && (
         <div className="fixed bottom-28 lg:bottom-4 left-1/2 -translate-x-1/2 z-40 bg-base-100 border border-primary/30 shadow-2xl rounded-2xl p-4 flex items-center justify-between gap-6 max-w-lg w-[92vw]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary text-primary-content flex items-center justify-center font-bold">
@@ -442,10 +454,10 @@ export default function ResellerProductsPage() {
             </div>
             <div>
               <p className="text-xs text-base-content/60 font-medium">
-                {totalCartCount} item(s) selected
+                {totalCartCount}টি আইটেম নির্বাচিত
               </p>
               <p className="text-sm font-extrabold text-base-content">
-                Wholesale Total: ৳{totalWholesaleCost.toLocaleString()}
+                পাইকারি মোট: ৳{totalWholesaleCost.toLocaleString()}
               </p>
             </div>
           </div>
@@ -453,7 +465,7 @@ export default function ResellerProductsPage() {
             href="/reseller/cart"
             className="btn btn-primary btn-sm rounded-xl gap-2"
           >
-            Checkout Order <ArrowRight size={16} />
+            চেকআউট করুন <ArrowRight size={16} />
           </Link>
         </div>
       )}

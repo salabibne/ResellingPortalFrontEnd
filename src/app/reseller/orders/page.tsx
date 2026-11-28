@@ -35,6 +35,17 @@ import PanelModal from "@/components/panel/PanelModal";
 import { exportOrdersToCSV } from "@/utils/csvExporter";
 import { openOrderInvoice } from "@/utils/orderAmounts";
 
+// Bangla labels for the status filter tabs (raw values stay unchanged for logic/API).
+const STATUS_TAB_LABELS_BN: Record<string, string> = {
+  ALL: "সব",
+  ORDER_PLACED: "অর্ডার প্লেসড",
+  PENDING: "পেন্ডিং",
+  IN_TRANSIT: "ডেলিভারির পথে",
+  DELIVERED: "ডেলিভারড",
+  PARTIAL: "আংশিক ডেলিভারড",
+  CANCELLED: "বাতিল",
+};
+
 export default function ResellerOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -95,7 +106,7 @@ export default function ResellerOrdersPage() {
       setCourierTrackError(
         Array.isArray(message)
           ? message.join(", ")
-          : message || err?.message || "Could not fetch courier status"
+          : message || err?.message || "কুরিয়ার স্ট্যাটাস আনা যায়নি"
       );
     } finally {
       setCourierTrackLoading(false);
@@ -117,7 +128,7 @@ export default function ResellerOrdersPage() {
       exportOrdersToCSV(data, "reseller_orders_export");
     } catch (err) {
       console.error("Failed to export reseller orders CSV:", err);
-      alert("Failed to export CSV. Please try again.");
+      alert("CSV এক্সপোর্ট করা যায়নি। আবার চেষ্টা করুন।");
     } finally {
       setExporting(false);
     }
@@ -180,8 +191,8 @@ export default function ResellerOrdersPage() {
   return (
     <PanelPage>
       <PanelPageHeader
-        title="My Uddokta Orders"
-        subtitle="Track fulfillment status, end-customer information, and uddokta profit for all orders placed."
+        title="আমার অর্ডারসমূহ"
+        subtitle="আপনার সব অর্ডারের ডেলিভারি স্ট্যাটাস, কাস্টমারের তথ্য ও উদ্যোক্তা প্রফিট এখানে দেখুন।"
         icon={ShoppingBag}
         actions={
           <button
@@ -195,7 +206,7 @@ export default function ResellerOrdersPage() {
             ) : (
               <FileSpreadsheet size={16} />
             )}
-            Export CSV
+            CSV এক্সপোর্ট
           </button>
         }
       />
@@ -209,7 +220,7 @@ export default function ResellerOrdersPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40" size={18} />
             <input
               type="text"
-              placeholder="Search ref, customer name, address..."
+              placeholder="রেফ, কাস্টমারের নাম, ঠিকানা দিয়ে খুঁজুন..."
               className="input input-bordered pl-10 w-full input-sm"
               value={search}
               onChange={(e) => {
@@ -221,7 +232,7 @@ export default function ResellerOrdersPage() {
 
           {/* Date Range Filter */}
           <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold text-base-content/70">
-            <span>From:</span>
+            <span>শুরু:</span>
             <input
               type="date"
               className="input input-bordered input-sm text-xs flex-1 sm:flex-none"
@@ -231,7 +242,7 @@ export default function ResellerOrdersPage() {
                 setPage(1);
               }}
             />
-            <span>To:</span>
+            <span>শেষ:</span>
             <input
               type="date"
               className="input input-bordered input-sm text-xs flex-1 sm:flex-none"
@@ -245,7 +256,7 @@ export default function ResellerOrdersPage() {
 
           {/* Customer Mobile Filter */}
           <div className="flex items-center gap-1.5 text-xs font-semibold text-base-content/70">
-            <span>Mobile:</span>
+            <span>মোবাইল:</span>
             <input
               type="text"
               placeholder="017xxxxxxxx"
@@ -263,7 +274,7 @@ export default function ResellerOrdersPage() {
               onClick={clearFilters}
               className="btn btn-ghost btn-xs text-error font-bold self-end sm:self-center"
             >
-              Clear Filters
+              ফিল্টার মুছুন
             </button>
           )}
 
@@ -271,13 +282,16 @@ export default function ResellerOrdersPage() {
 
         {/* Status tabs */}
         <PanelTabs
-          ariaLabel="Filter orders by status"
+          ariaLabel="স্ট্যাটাস অনুযায়ী অর্ডার ফিল্টার করুন"
           value={selectedStatus}
           onChange={(id) => {
             setSelectedStatus(id as OrderStatusFilter);
             setPage(1);
           }}
-          tabs={COURIER_STATUS_FILTERS.map((opt) => ({ id: opt.value, label: opt.label }))}
+          tabs={COURIER_STATUS_FILTERS.map((opt) => ({
+            id: opt.value,
+            label: STATUS_TAB_LABELS_BN[opt.value] || opt.label,
+          }))}
         />
       </div>
 
@@ -288,8 +302,8 @@ export default function ResellerOrdersPage() {
         <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm">
           <PanelEmpty
             icon={ShoppingBag}
-            title="No uddokta orders found"
-            text="Placed orders on behalf of your customers will appear here."
+            title="কোনো অর্ডার পাওয়া যায়নি"
+            text="আপনার কাস্টমারদের জন্য করা অর্ডারগুলো এখানে দেখা যাবে।"
           />
         </div>
       ) : (
@@ -298,15 +312,15 @@ export default function ResellerOrdersPage() {
             <PanelTable>
               <thead>
                 <tr>
-                  <th>Order Ref</th>
-                  <th>Customer Info</th>
-                  <th>Tracking</th>
-                  <th>Location</th>
-                  <th>Selling Price</th>
-                  <th>Uddokta Profit</th>
-                  <th>Advance Courier</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th>অর্ডার রেফ</th>
+                  <th>কাস্টমারের তথ্য</th>
+                  <th>ট্র্যাকিং</th>
+                  <th>লোকেশন</th>
+                  <th>বিক্রয় মূল্য</th>
+                  <th>উদ্যোক্তা প্রফিট</th>
+                  <th>অগ্রিম কুরিয়ার চার্জ</th>
+                  <th>স্ট্যাটাস</th>
+                  <th>অ্যাকশন</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
@@ -355,13 +369,13 @@ export default function ResellerOrdersPage() {
                             </div>
                             {order.courierReturnStatus && (
                               <span className="badge badge-warning text-base-content text-[9px] font-bold uppercase py-1 px-1.5">
-                                Return: {order.courierReturnStatus}
+                                রিটার্ন: {order.courierReturnStatus}
                               </span>
                             )}
                           </div>
                         ) : (
                           <span className="text-[11px] text-base-content/40 italic">
-                            Not dispatched
+                            এখনো পাঠানো হয়নি
                           </span>
                         )}
                       </td>
@@ -378,25 +392,25 @@ export default function ResellerOrdersPage() {
                             <span className="font-extrabold text-xs text-emerald-600">
                               +৳{profit.toLocaleString()}
                             </span>
-                            <div className="text-[10px] font-bold text-emerald-600">Earned</div>
+                            <div className="text-[10px] font-bold text-emerald-600">অর্জিত</div>
                           </div>
                         ) : (
                           <div>
                             <span className="font-extrabold text-xs text-amber-600">
                               ৳{profit.toLocaleString()}
                             </span>
-                            <div className="text-[10px] font-semibold text-amber-600">Pending Delivery/Paid</div>
+                            <div className="text-[10px] font-semibold text-amber-600">ডেলিভারি/পেমেন্ট বাকি</div>
                           </div>
                         )}
                       </td>
                       <td>
                         {order.isAdvanceCourierPaid ? (
                           <span className="badge badge-success text-white badge-xs py-2 px-2 gap-1 font-semibold">
-                            <CheckCircle2 size={10} /> Paid
+                            <CheckCircle2 size={10} /> পরিশোধিত
                           </span>
                         ) : (
                           <span className="badge badge-ghost badge-xs py-2 px-2 font-semibold">
-                            Not Paid
+                            পরিশোধ হয়নি
                           </span>
                         )}
                       </td>
@@ -407,14 +421,14 @@ export default function ResellerOrdersPage() {
                             className="btn btn-ghost btn-xs gap-1 text-primary"
                             onClick={() => openOrderDetails(order)}
                           >
-                            <Eye size={14} /> Details
+                            <Eye size={14} /> বিস্তারিত
                           </button>
                           <button
                             className="btn btn-ghost btn-xs gap-1 text-primary"
                             onClick={() => openOrderInvoice(order.id)}
-                            title="View / Print Invoice"
+                            title="ইনভয়েস দেখুন / প্রিন্ট করুন"
                           >
-                            <Printer size={14} /> Invoice
+                            <Printer size={14} /> ইনভয়েস
                           </button>
                         </div>
                       </td>
@@ -450,7 +464,7 @@ export default function ResellerOrdersPage() {
                     <CourierStatusBadge status={order.courierStatus} />
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-base-content/60">Selling Price</span>
+                    <span className="text-base-content/60">বিক্রয় মূল্য</span>
                     <span className="font-bold text-base-content">
                       ৳
                       {(
@@ -464,14 +478,14 @@ export default function ResellerOrdersPage() {
                       className="btn btn-outline btn-sm rounded-xl gap-2 w-full"
                       onClick={() => openOrderDetails(order)}
                     >
-                      <Eye size={16} /> View Details
+                      <Eye size={16} /> বিস্তারিত দেখুন
                     </button>
                     <button
                       type="button"
                       className="btn btn-outline btn-primary btn-sm rounded-xl gap-2 w-full"
                       onClick={() => openOrderInvoice(order.id)}
                     >
-                      <Printer size={16} /> Invoice
+                      <Printer size={16} /> ইনভয়েস
                     </button>
                   </div>
                 </div>
@@ -486,7 +500,7 @@ export default function ResellerOrdersPage() {
         <PanelModal
           open={!!selectedOrder}
           onClose={closeOrderDetails}
-          title={`Order Details ${
+          title={`অর্ডারের বিস্তারিত ${
             selectedOrder.orderRef ||
             `#${selectedOrder.id.substring(0, 8).toUpperCase()}`
           }`}
@@ -498,14 +512,14 @@ export default function ResellerOrdersPage() {
                 className="btn btn-outline btn-primary btn-sm rounded-xl gap-1.5"
                 onClick={() => openOrderInvoice(selectedOrder.id)}
               >
-                <Printer size={14} /> Print Invoice
+                <Printer size={14} /> ইনভয়েস প্রিন্ট
               </button>
               <button
                 type="button"
                 className="btn btn-primary btn-sm rounded-xl"
                 onClick={closeOrderDetails}
               >
-                Close
+                বন্ধ করুন
               </button>
             </div>
           }
@@ -516,7 +530,7 @@ export default function ResellerOrdersPage() {
             <div className="bg-primary/5 p-4 rounded-xl border border-primary/20 space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
-                  <Truck size={14} /> Steadfast Courier
+                  <Truck size={14} /> Steadfast কুরিয়ার
                 </h4>
                 <CourierStatusBadge
                   status={courierTrack?.deliveryStatus || selectedOrder.courierStatus}
@@ -526,18 +540,18 @@ export default function ResellerOrdersPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-base-100 p-3 rounded-lg border border-base-200">
                 <div>
                   <span className="text-base-content/60 font-semibold block uppercase text-[10px]">
-                    Consignment ID:
+                    কনসাইনমেন্ট আইডি:
                   </span>
                   <span className="font-mono font-bold text-sm text-primary mt-0.5 block">
                     {selectedOrder.courierConsignmentId
                       ? `#${selectedOrder.courierConsignmentId}`
-                      : "Not assigned"}
+                      : "এখনো দেওয়া হয়নি"}
                   </span>
                 </div>
 
                 <div>
                   <span className="text-base-content/60 font-semibold block uppercase text-[10px]">
-                    Tracking Code:
+                    ট্র্যাকিং কোড:
                   </span>
                   {selectedOrder.courierTrackingCode ? (
                     <div className="flex items-center gap-2 mt-0.5">
@@ -548,7 +562,7 @@ export default function ResellerOrdersPage() {
                         type="button"
                         onClick={() => handleCopyTracking(selectedOrder.courierTrackingCode!)}
                         className="btn btn-ghost btn-xs text-primary px-1.5"
-                        title="Copy Code"
+                        title="কোড কপি করুন"
                       >
                         {copiedTrackingCode === selectedOrder.courierTrackingCode ? (
                           <Check size={13} className="text-success" />
@@ -559,7 +573,7 @@ export default function ResellerOrdersPage() {
                     </div>
                   ) : (
                     <span className="text-base-content/40 italic text-[11px] block mt-0.5">
-                      Not booked yet
+                      এখনো বুক করা হয়নি
                     </span>
                   )}
                 </div>
@@ -573,8 +587,8 @@ export default function ResellerOrdersPage() {
                   disabled={!selectedOrder.courierConsignmentId || courierTrackLoading}
                   title={
                     selectedOrder.courierConsignmentId
-                      ? "Fetch the live status from Steadfast"
-                      : "No consignment ID on this order yet"
+                      ? "Steadfast থেকে লাইভ স্ট্যাটাস দেখুন"
+                      : "এই অর্ডারে এখনো কোনো কনসাইনমেন্ট আইডি নেই"
                   }
                 >
                   {courierTrackLoading ? (
@@ -582,7 +596,7 @@ export default function ResellerOrdersPage() {
                   ) : (
                     <Truck size={14} />
                   )}
-                  {courierTrackLoading ? "Checking..." : "Show Courier Status"}
+                  {courierTrackLoading ? "চেক করা হচ্ছে..." : "কুরিয়ার স্ট্যাটাস দেখুন"}
                 </button>
                 {courierTrack && (
                   <button
@@ -591,12 +605,12 @@ export default function ResellerOrdersPage() {
                     onClick={handleShowCourierStatus}
                     disabled={courierTrackLoading}
                   >
-                    <RefreshCw size={13} /> Refresh
+                    <RefreshCw size={13} /> রিফ্রেশ
                   </button>
                 )}
                 {!selectedOrder.courierConsignmentId && (
                   <span className="text-[11px] text-base-content/50">
-                    Status is unavailable until this order has a consignment ID.
+                    কনসাইনমেন্ট আইডি না পাওয়া পর্যন্ত স্ট্যাটাস দেখা যাবে না।
                   </span>
                 )}
               </div>
@@ -613,13 +627,13 @@ export default function ResellerOrdersPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <CourierStatusBadge status={courierTrack.deliveryStatus} />
                     <span className="text-[11px] text-base-content/60">
-                      Matched by {courierTrack.matchedBy.toUpperCase()} ·{" "}
+                      মিলেছে {courierTrack.matchedBy.toUpperCase()} দিয়ে ·{" "}
                       {courierTrack.matchedIdentifier || courierTrack.identifier}
                     </span>
                   </div>
 
                   <h5 className="text-[10px] font-bold uppercase tracking-wider text-base-content/70 flex items-center gap-1">
-                    <MapPin size={12} /> Journey ({courierTrack.trackingEvents?.length || 0})
+                    <MapPin size={12} /> পার্সেলের যাত্রা ({courierTrack.trackingEvents?.length || 0})
                   </h5>
 
                   {courierTrack.trackingEvents?.length ? (
@@ -638,8 +652,8 @@ export default function ResellerOrdersPage() {
                     </ol>
                   ) : (
                     <p className="text-[11px] text-base-content/50">
-                      No tracking milestones returned yet. The badge above is the
-                      latest provider response.
+                      এখনো কোনো ট্র্যাকিং আপডেট আসেনি। উপরের ব্যাজটি কুরিয়ারের
+                      সর্বশেষ রেসপন্স।
                     </p>
                   )}
                 </div>
@@ -648,18 +662,18 @@ export default function ResellerOrdersPage() {
               <div className="flex flex-wrap items-center gap-2 text-[11px] text-base-content/60">
                 {selectedOrder.courierLastSyncedAt && (
                   <span>
-                    Last synced:{" "}
+                    সর্বশেষ সিঙ্ক:{" "}
                     {new Date(selectedOrder.courierLastSyncedAt).toLocaleString()}
                   </span>
                 )}
                 {selectedOrder.courierReturnStatus && (
                   <span className="badge badge-warning text-base-content font-bold uppercase text-[10px]">
-                    Return: {selectedOrder.courierReturnStatus}
+                    রিটার্ন: {selectedOrder.courierReturnStatus}
                   </span>
                 )}
                 {selectedOrder.courierReturnRequestedAt && (
                   <span>
-                    Return requested:{" "}
+                    রিটার্ন অনুরোধ:{" "}
                     {new Date(
                       selectedOrder.courierReturnRequestedAt
                     ).toLocaleString()}
@@ -672,14 +686,14 @@ export default function ResellerOrdersPage() {
                     rel="noopener noreferrer"
                     className="link link-primary font-bold"
                   >
-                    Open Steadfast Tracking
+                    Steadfast ট্র্যাকিং খুলুন
                   </a>
                 )}
               </div>
 
               {selectedOrder.courierReturnReason && (
                 <p className="text-[11px] text-base-content/60">
-                  Return reason: {selectedOrder.courierReturnReason}
+                  রিটার্নের কারণ: {selectedOrder.courierReturnReason}
                 </p>
               )}
             </div>
@@ -687,50 +701,50 @@ export default function ResellerOrdersPage() {
             {/* Customer & Shipping Details */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-base-200/50 p-4 rounded-xl text-xs">
               <div>
-                <span className="text-base-content/60 font-semibold block uppercase">End-Customer Name:</span>
+                <span className="text-base-content/60 font-semibold block uppercase">কাস্টমারের নাম:</span>
                 <span className="font-bold text-sm text-base-content">
                   {selectedOrder.customerName || selectedOrder.customer?.name || "N/A"}
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 font-semibold block uppercase">Phone Number:</span>
+                <span className="text-base-content/60 font-semibold block uppercase">ফোন নম্বর:</span>
                 <span className="font-bold text-sm text-base-content">
                   {selectedOrder.customerPhone || selectedOrder.customer?.phone || "N/A"}
                   {selectedOrder.customerSecondaryPhone && (
                     <span className="block text-xs font-normal text-base-content/60">
-                      Sec: {selectedOrder.customerSecondaryPhone}
+                      বিকল্প: {selectedOrder.customerSecondaryPhone}
                     </span>
                   )}
                 </span>
               </div>
               {selectedOrder.customerEmail && (
                 <div className="min-w-0">
-                  <span className="text-base-content/60 font-semibold block uppercase">Email:</span>
+                  <span className="text-base-content/60 font-semibold block uppercase">ইমেইল:</span>
                   <span className="block truncate font-bold text-sm text-base-content">
                     {selectedOrder.customerEmail}
                   </span>
                 </div>
               )}
               <div>
-                <span className="text-base-content/60 font-semibold block uppercase">District & Thana:</span>
+                <span className="text-base-content/60 font-semibold block uppercase">জেলা ও থানা:</span>
                 <span className="font-bold text-xs text-base-content">
                   {selectedOrder.customerDistrict || "N/A"} / {selectedOrder.customerThana || "N/A"}
                 </span>
               </div>
               <div>
-                <span className="text-base-content/60 font-semibold block uppercase">Advance Courier Received:</span>
+                <span className="text-base-content/60 font-semibold block uppercase">অগ্রিম কুরিয়ার চার্জ নেওয়া হয়েছে:</span>
                 {selectedOrder.isAdvanceCourierPaid ? (
                   <span className="font-bold text-xs text-success flex items-center gap-1 mt-0.5">
-                    <CheckCircle2 size={12} /> Yes (৳{Number(selectedOrder.advanceCourierAmount || 0).toLocaleString()} taken)
+                    <CheckCircle2 size={12} /> হ্যাঁ (৳{Number(selectedOrder.advanceCourierAmount || 0).toLocaleString()} নেওয়া হয়েছে)
                   </span>
                 ) : (
                   <span className="font-bold text-xs text-base-content/50 mt-0.5 block">
-                    No Advance Received
+                    কোনো অগ্রিম নেওয়া হয়নি
                   </span>
                 )}
               </div>
               <div className="sm:col-span-2">
-                <span className="text-base-content/60 font-semibold block uppercase">Delivery Address:</span>
+                <span className="text-base-content/60 font-semibold block uppercase">ডেলিভারি ঠিকানা:</span>
                 <span className="font-medium text-base-content">
                   {selectedOrder.shippingAddress || "N/A"}
                 </span>
@@ -740,7 +754,7 @@ export default function ResellerOrdersPage() {
             {/* Order Items */}
             <div className="space-y-2">
               <h4 className="font-bold text-xs uppercase tracking-wider text-base-content/70">
-                Ordered Items ({selectedOrder.orderItems.length})
+                অর্ডারকৃত প্রোডাক্ট ({selectedOrder.orderItems.length})
               </h4>
               <div className="divide-y divide-base-200 border border-base-200 rounded-xl overflow-hidden">
                 {selectedOrder.orderItems.map((item) => (
@@ -748,15 +762,15 @@ export default function ResellerOrdersPage() {
                     <div>
                       <p className="font-bold text-base-content">{item.product?.name}</p>
                       <p className="text-base-content/60">
-                        Qty: {item.quantity} | Size: {item.productSize?.size?.name || "N/A"} | Color: {item.productColor?.color?.name || "N/A"}
+                        পরিমাণ: {item.quantity} | সাইজ: {item.productSize?.size?.name || "N/A"} | কালার: {item.productColor?.color?.name || "N/A"}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-base-content">
-                        Sell Price: ৳{(item.resellerSellingPrice || item.snapshotPrice).toLocaleString()}
+                        বিক্রয় মূল্য: ৳{(item.resellerSellingPrice || item.snapshotPrice).toLocaleString()}
                       </p>
                       <p className="text-base-content/50">
-                        Cost: ৳{(item.resellerUnitCost || item.snapshotPrice).toLocaleString()}
+                        খরচ: ৳{(item.resellerUnitCost || item.snapshotPrice).toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -766,14 +780,14 @@ export default function ResellerOrdersPage() {
 
             {/* Profit Summary Block */}
             <div className="p-3.5 bg-base-200/60 rounded-xl flex items-center justify-between text-xs font-bold border border-base-300">
-              <span className="text-base-content/70">Calculated Uddokta Profit:</span>
+              <span className="text-base-content/70">হিসাবকৃত উদ্যোক্তা প্রফিট:</span>
               {isProfitEarned(selectedOrder) ? (
                 <span className="text-emerald-600 font-extrabold text-sm">
-                  +৳{Number(selectedOrder.resellerProfit || 0).toLocaleString()} (Earned)
+                  +৳{Number(selectedOrder.resellerProfit || 0).toLocaleString()} (অর্জিত)
                 </span>
               ) : (
                 <span className="text-amber-600 font-extrabold text-sm">
-                  ৳{Number(selectedOrder.resellerProfit || 0).toLocaleString()} (Pending Delivery & Payment)
+                  ৳{Number(selectedOrder.resellerProfit || 0).toLocaleString()} (ডেলিভারি ও পেমেন্ট বাকি)
                 </span>
               )}
             </div>
@@ -781,7 +795,7 @@ export default function ResellerOrdersPage() {
             {/* Optional Notes */}
             {selectedOrder.notes && (
               <div className="p-3 bg-base-200/60 rounded-xl text-xs space-y-1">
-                <span className="font-bold text-base-content/70 block">Optional Uddokta Notes:</span>
+                <span className="font-bold text-base-content/70 block">উদ্যোক্তার নোট:</span>
                 <p className="text-base-content">{selectedOrder.notes}</p>
               </div>
             )}

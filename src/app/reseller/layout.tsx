@@ -15,6 +15,7 @@ import {
   LifeBuoy,
   Truck,
   ClipboardList,
+  Clock,
 } from "lucide-react";
 import PanelShell from "@/components/panel/PanelShell";
 import PanelButton from "@/components/panel/PanelButton";
@@ -22,7 +23,10 @@ import type { PanelNavEntry } from "@/components/panel/PanelSidebar";
 import NoticePopupModal from "@/components/shared/NoticePopupModal";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
-import { useResellerProfileStore } from "@/store/useResellerProfileStore";
+import {
+  useResellerProfileStore,
+  usePendingReseller,
+} from "@/store/useResellerProfileStore";
 import VerifyBadge from "@/components/reseller/VerifyBadge";
 import { resolveImageUrl } from "@/components/homepage/SafeImage";
 
@@ -40,6 +44,7 @@ export default function ResellerLayout({
   const profile = useResellerProfileStore((state) => state.profile);
   const refreshProfile = useResellerProfileStore((state) => state.refresh);
   const resetProfile = useResellerProfileStore((state) => state.reset);
+  const isPending = usePendingReseller();
 
   useEffect(() => {
     setMounted(true);
@@ -67,7 +72,13 @@ export default function ResellerLayout({
     refreshProfile()
       .then((fresh) => {
         if (!alive) return;
-        if (role === "RESELLER" && fresh?.status !== "ACTIVE") {
+        // Pending resellers may browse (cart/order stay blocked); only a
+        // deactivated or otherwise inactive reseller is signed out.
+        if (
+          role === "RESELLER" &&
+          fresh?.status !== "ACTIVE" &&
+          fresh?.status !== "PENDING"
+        ) {
           resetProfile();
           logout();
           router.push("/login");
@@ -114,7 +125,7 @@ export default function ResellerLayout({
     { href: "/reseller/profile", label: "প্রোফাইল ও ভেরিফাই", icon: UserCheck },
     { href: "/reseller/support", label: "সাপোর্ট", icon: LifeBuoy },
   ];
-  const displayName = profile?.name || user?.name || "Uddokta";
+  const displayName = profile?.name || user?.name || "উদ্যোক্তা";
   const avatarUrl = resolveImageUrl(profile?.imageUrl);
 
   const canAccessAdmin = ["SUPER_ADMIN", "ADMIN", "MANAGER"].includes(role);
@@ -129,10 +140,10 @@ export default function ResellerLayout({
           </div>
           <div className="min-w-0">
             <p className="font-bold text-base leading-tight text-base-content truncate">
-              Uddokta Portal
+              উদ্যোক্তা পোর্টাল
             </p>
             <p className="text-[11px] text-base-content/60 font-medium truncate">
-              Online Uddokta Platform
+              অনলাইন উদ্যোক্তা প্ল্যাটফর্ম
             </p>
           </div>
         </div>
@@ -175,7 +186,7 @@ export default function ResellerLayout({
               href="/dashboard"
               className="btn btn-outline btn-sm w-full rounded-xl gap-2"
             >
-              <ArrowLeft size={16} /> Admin Panel
+              <ArrowLeft size={16} /> অ্যাডমিন প্যানেল
             </Link>
           )}
           <PanelButton
@@ -186,12 +197,27 @@ export default function ResellerLayout({
               logout();
             }}
           >
-            <LogOut size={16} /> Logout
+            <LogOut size={16} /> লগআউট
           </PanelButton>
         </div>
       }
       extra={<NoticePopupModal audience="RESELLER" />}
     >
+      {isPending && (
+        <div
+          role="status"
+          className="mb-4 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900"
+        >
+          <Clock size={20} className="mt-0.5 shrink-0" />
+          <div className="text-sm leading-relaxed">
+            <p className="font-bold">আপনার উদ্যোক্তা অ্যাকাউন্ট এখনো অনুমোদিত হয়নি</p>
+            <p>
+              আপনি প্রোডাক্ট দেখতে পারবেন, কিন্তু অ্যাডমিন অনুমোদন না দেওয়া পর্যন্ত কার্টে যোগ বা
+              অর্ডার করতে পারবেন না। খুব শীঘ্রই আমাদের টিম আপনার সাথে যোগাযোগ করবে।
+            </p>
+          </div>
+        </div>
+      )}
       {children}
     </PanelShell>
   );

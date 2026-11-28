@@ -155,7 +155,7 @@ export default function ResellerDashboardPage() {
 
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-teal-100/80">
-                Reseller Account
+                রিসেলার অ্যাকাউন্ট
               </p>
               <p className="text-xs text-teal-50/90">{greeting()},</p>
               <h1 className="truncate text-lg sm:text-2xl font-extrabold leading-tight">{name}</h1>
@@ -193,7 +193,12 @@ export default function ResellerDashboardPage() {
             </span>
             {profile?.status === "ACTIVE" && (
               <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-[11px] font-bold text-teal-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Active
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> সক্রিয়
+              </span>
+            )}
+            {profile?.status === "PENDING" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-800">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> অনুমোদনের অপেক্ষায়
               </span>
             )}
             <VerifyBadge variant="chip" onDark />
@@ -290,7 +295,7 @@ export default function ResellerDashboardPage() {
         </section>
 
         <p className="flex items-center justify-center gap-1 pb-2 text-[10px] text-base-content/40">
-          <LayoutDashboard size={11} /> Online Uddokta Platform
+          <LayoutDashboard size={11} /> অনলাইন উদ্যোক্তা প্ল্যাটফর্ম
         </p>
       </div>
     </PanelPage>

@@ -8,6 +8,8 @@ interface HeaderProps {
 
 export default function Header({ onToggleSidebar, sidebarOpen }: HeaderProps) {
   const user = useAuthStore((state) => state.user);
+  // Shared by the admin panel (English) and the reseller portal (Bangla).
+  const bn = (user?.role || "").toUpperCase() === "RESELLER";
 
   return (
     <header className="navbar bg-base-100 shadow-sm border-b border-base-200 px-3 sm:px-6 h-16 min-h-[4rem]">
@@ -26,14 +28,14 @@ export default function Header({ onToggleSidebar, sidebarOpen }: HeaderProps) {
 
       <div className="flex-1 min-w-0">
         <p className="text-lg font-semibold truncate text-base-content">
-          Welcome, {user?.name || "Admin"}
+          {bn ? `স্বাগতম, ${user?.name || "উদ্যোক্তা"}` : `Welcome, ${user?.name || "Admin"}`}
         </p>
       </div>
       <div className="flex-none flex items-center gap-2">
         <button
           type="button"
           className="btn btn-ghost btn-sm btn-square rounded-xl"
-          aria-label="Notifications"
+          aria-label={bn ? "নোটিফিকেশন" : "Notifications"}
         >
           <div className="indicator">
             <Bell size={18} />
@@ -58,10 +60,10 @@ export default function Header({ onToggleSidebar, sidebarOpen }: HeaderProps) {
             className="mt-3 z-[50] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 border border-base-200"
           >
             <li>
-              <a>Profile</a>
+              <a>{bn ? "প্রোফাইল" : "Profile"}</a>
             </li>
             <li>
-              <a>Settings</a>
+              <a>{bn ? "সেটিংস" : "Settings"}</a>
             </li>
           </ul>
         </div>

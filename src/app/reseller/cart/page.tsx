@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Info,
   ShieldAlert,
+  Clock,
 } from "lucide-react";
 import PanelPage from "@/components/panel/PanelPage";
 import PanelPageHeader from "@/components/panel/PanelPageHeader";
@@ -25,7 +26,12 @@ import PanelEmpty from "@/components/panel/PanelEmpty";
 import { useResellerCartStore } from "@/store/useResellerCartStore";
 import { orderApi, CourierPolicy, PaymentMethod } from "@/services/order.api";
 import { isProfileNotVerifiedError } from "@/services/profile.api";
-import { useCanOrder, useResellerProfileStore } from "@/store/useResellerProfileStore";
+import {
+  ACCOUNT_PENDING_MESSAGE,
+  isAccountPendingError,
+  useCanOrder,
+  useResellerProfileStore,
+} from "@/store/useResellerProfileStore";
 
 export default function ResellerCartPage() {
   const router = useRouter();
@@ -53,7 +59,7 @@ export default function ResellerCartPage() {
   const [customerThana, setCustomerThana] = useState<string>("");
   const [shippingAddress, setShippingAddress] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
-  const { canOrder, verification } = useCanOrder();
+  const { canOrder, pending, verification } = useCanOrder();
 
   useEffect(() => {
     async function loadPolicy() {
@@ -83,7 +89,12 @@ export default function ResellerCartPage() {
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) {
-      setErrorMsg("Your cart is empty. Please add products first.");
+      setErrorMsg("আপনার কার্ট খালি। আগে প্রোডাক্ট যোগ করুন।");
+      return;
+    }
+
+    if (pending) {
+      setErrorMsg(ACCOUNT_PENDING_MESSAGE);
       return;
     }
 
@@ -94,21 +105,21 @@ export default function ResellerCartPage() {
 
     if (invalidPriceItems.length > 0) {
       setErrorMsg(
-        `Custom selling price for item(s) cannot be less than the Admin wholesale uddokta price.`
+        `কোনো আইটেমের বিক্রয় মূল্য অ্যাডমিন নির্ধারিত উদ্যোক্তা পাইকারি মূল্যের চেয়ে কম হতে পারবে না।`
       );
       return;
     }
 
     if (!customerName.trim()) {
-      setErrorMsg("Please enter the customer name.");
+      setErrorMsg("কাস্টমারের নাম লিখুন।");
       return;
     }
     if (!customerPhone.trim()) {
-      setErrorMsg("Please enter the customer phone number.");
+      setErrorMsg("কাস্টমারের ফোন নম্বর লিখুন।");
       return;
     }
     if (!customerDistrict.trim() || !customerThana.trim() || !shippingAddress.trim()) {
-      setErrorMsg("Please provide full delivery address (District, Thana, Address).");
+      setErrorMsg("সম্পূর্ণ ডেলিভারি ঠিকানা দিন (জেলা, থানা, ঠিকানা)।");
       return;
     }
 
@@ -147,13 +158,16 @@ export default function ResellerCartPage() {
       router.push("/reseller/orders?success=1");
     } catch (err: any) {
       console.error("Reseller checkout error:", err);
-      if (isProfileNotVerifiedError(err)) {
+      if (isAccountPendingError(err)) {
+        // Server says the account is not approved yet: refresh the status.
+        useResellerProfileStore.getState().refresh().catch(() => undefined);
+      } else if (isProfileNotVerifiedError(err)) {
         // Server says the profile is incomplete: refresh the badge everywhere.
         useResellerProfileStore.getState().refresh().catch(() => undefined);
       }
       setErrorMsg(
         err?.response?.data?.message ||
-          "Failed to place uddokta order. Please verify your details."
+          "অর্ডার সম্পন্ন করা যায়নি। আপনার দেওয়া তথ্যগুলো যাচাই করে আবার চেষ্টা করুন।"
       );
     } finally {
       setSubmitting(false);
@@ -165,11 +179,11 @@ export default function ResellerCartPage() {
       <PanelPage width="narrow">
         <PanelEmpty
           icon={ShoppingBag}
-          title="Your Cart is Empty"
-          text="Browse the product catalog to add products and place orders on behalf of your customers."
+          title="আপনার কার্ট খালি"
+          text="প্রোডাক্ট ক্যাটালগ থেকে প্রোডাক্ট যোগ করুন এবং আপনার কাস্টমারের পক্ষে অর্ডার করুন।"
           action={
             <Link href="/reseller/products" className="btn btn-primary btn-sm rounded-xl">
-              Browse Product Catalog
+              প্রোডাক্ট ক্যাটালগ দেখুন
             </Link>
           }
         />
@@ -180,8 +194,8 @@ export default function ResellerCartPage() {
   return (
     <PanelPage width="narrow">
       <PanelPageHeader
-        title="Uddokta Order Checkout"
-        subtitle="Enter customer details & set your custom selling price for each item."
+        title="উদ্যোক্তা অর্ডার চেকআউট"
+        subtitle="কাস্টমারের তথ্য দিন এবং প্রতিটি আইটেমের বিক্রয় মূল্য নির্ধারণ করুন।"
         icon={ShoppingBag}
         backHref="/reseller/products"
         actions={
@@ -190,7 +204,7 @@ export default function ResellerCartPage() {
             onClick={clearCart}
             className="btn btn-ghost btn-sm rounded-xl gap-2 text-error hover:bg-error/10"
           >
-            <Trash2 size={16} /> Clear Cart
+            <Trash2 size={16} /> কার্ট খালি করুন
           </button>
         }
       />
@@ -209,7 +223,7 @@ export default function ResellerCartPage() {
           <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-4 sm:p-5 space-y-4">
             <h2 className="font-bold text-base flex items-center gap-2 text-base-content border-b border-base-200 pb-3">
               <Package size={18} className="text-primary" />
-              <span>Selected Products ({items.length})</span>
+              <span>নির্বাচিত প্রোডাক্ট ({items.length})</span>
             </h2>
 
             <div className="divide-y divide-base-200">
@@ -235,25 +249,25 @@ export default function ResellerCartPage() {
                         <div className="flex flex-wrap gap-2 text-xs text-base-content/60">
                           {item.sizeName && (
                             <span className="bg-base-200 px-2 py-0.5 rounded">
-                              Size: {item.sizeName}
+                              সাইজ: {item.sizeName}
                             </span>
                           )}
                           {item.colorName && (
                             <span className="bg-base-200 px-2 py-0.5 rounded">
-                              Color: {item.colorName}
+                              কালার: {item.colorName}
                             </span>
                           )}
                           <span className="text-primary font-bold">
-                            Uddokta Base Price: ৳{item.resellerPrice}
+                            উদ্যোক্তা মূল মূল্য: ৳{item.resellerPrice}
                           </span>
                           {item.purchasePrice !== undefined && (
                             <span className="text-slate-500 font-medium">
-                              (Purchase Price: ৳{item.purchasePrice})
+                              (ক্রয় মূল্য: ৳{item.purchasePrice})
                             </span>
                           )}
                         </div>
                         <div className="text-xs font-semibold text-slate-700 mt-1">
-                          Item Subtotal (Customer Sell):{" "}
+                          আইটেম সাবটোটাল (কাস্টমারের কাছে বিক্রি):{" "}
                           <strong className="text-sm font-black text-indigo-900">
                             ৳{(currentSellingPrice * item.quantity).toLocaleString()}
                           </strong>
@@ -264,6 +278,7 @@ export default function ResellerCartPage() {
                         type="button"
                         onClick={() => removeItem(item.id)}
                         className="btn btn-ghost btn-xs text-base-content/40 hover:text-error"
+                        aria-label="আইটেম মুছুন"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -272,7 +287,7 @@ export default function ResellerCartPage() {
                     {/* Quantity, Custom Selling Price Inputs & Profit Preview */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-base-200/50 p-3 rounded-xl border border-base-200">
                       <div className="flex items-center justify-between sm:justify-start gap-2">
-                        <span className="text-xs font-semibold text-base-content/70">Qty:</span>
+                        <span className="text-xs font-semibold text-base-content/70">পরিমাণ:</span>
                         <div className="join border border-base-300 rounded-lg bg-base-100">
                           <button
                             type="button"
@@ -297,7 +312,7 @@ export default function ResellerCartPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-semibold text-base-content/70 whitespace-nowrap">
-                            Selling Price (৳):
+                            বিক্রয় মূল্য (৳):
                           </span>
                           <input
                             type="text"
@@ -332,11 +347,11 @@ export default function ResellerCartPage() {
                         </div>
                         {isPriceBelowReseller ? (
                           <span className="text-[10px] text-error font-bold flex items-center gap-1">
-                            <AlertTriangle size={12} /> Selling price cannot be less than uddokta base price (৳{item.resellerPrice})
+                            <AlertTriangle size={12} /> বিক্রয় মূল্য উদ্যোক্তা মূল মূল্যের (৳{item.resellerPrice}) চেয়ে কম হতে পারবে না
                           </span>
                         ) : (
                           <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                            Profit: ৳
+                            লাভ: ৳
                             {(
                               (currentSellingPrice - Number(item.purchasePrice || 0)) *
                               item.quantity
@@ -355,17 +370,17 @@ export default function ResellerCartPage() {
           <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-5 space-y-4">
             <h2 className="font-bold text-base flex items-center gap-2 text-base-content border-b border-base-200 pb-3">
               <User size={18} className="text-primary" />
-              <span>Customer Information</span>
+              <span>কাস্টমারের তথ্য</span>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="label text-xs font-bold text-base-content">
-                  Customer Name *
+                  কাস্টমারের নাম *
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Rahat Ahmed"
+                  placeholder="যেমন: রাহাত আহমেদ"
                   className="input input-bordered w-full input-sm"
                   required
                   value={customerName}
@@ -375,11 +390,11 @@ export default function ResellerCartPage() {
 
               <div>
                 <label className="label text-xs font-bold text-base-content">
-                  Primary Phone Number *
+                  প্রধান ফোন নম্বর *
                 </label>
                 <input
                   type="tel"
-                  placeholder="e.g. 01700000000"
+                  placeholder="যেমন: 01700000000"
                   className="input input-bordered w-full input-sm"
                   required
                   value={customerPhone}
@@ -389,11 +404,11 @@ export default function ResellerCartPage() {
 
               <div>
                 <label className="label text-xs font-bold text-base-content">
-                  Secondary Phone (Optional)
+                  বিকল্প ফোন নম্বর (ঐচ্ছিক)
                 </label>
                 <input
                   type="tel"
-                  placeholder="e.g. 01800000000"
+                  placeholder="যেমন: 01800000000"
                   className="input input-bordered w-full input-sm"
                   value={customerSecondaryPhone}
                   onChange={(e) => setCustomerSecondaryPhone(e.target.value)}
@@ -402,14 +417,14 @@ export default function ResellerCartPage() {
 
               <div>
                 <label className="label text-xs font-bold text-base-content">
-                  Customer Email (Optional)
+                  কাস্টমারের ইমেইল (ঐচ্ছিক)
                 </label>
                 <input
                   type="email"
                   inputMode="email"
                   autoComplete="email"
                   maxLength={255}
-                  placeholder="e.g. customer@example.com"
+                  placeholder="যেমন: customer@example.com"
                   className="input input-bordered w-full input-sm"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
@@ -418,11 +433,11 @@ export default function ResellerCartPage() {
 
               <div>
                 <label className="label text-xs font-bold text-base-content">
-                  District *
+                  জেলা *
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Dhaka / Gazipur / Chittagong"
+                  placeholder="যেমন: ঢাকা / গাজীপুর / চট্টগ্রাম"
                   className="input input-bordered w-full input-sm"
                   required
                   value={customerDistrict}
@@ -432,11 +447,11 @@ export default function ResellerCartPage() {
 
               <div>
                 <label className="label text-xs font-bold text-base-content">
-                  Thana / Upazila *
+                  থানা / উপজেলা *
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Mirpur / Dhanmondi / Sadar"
+                  placeholder="যেমন: মিরপুর / ধানমন্ডি / সদর"
                   className="input input-bordered w-full input-sm"
                   required
                   value={customerThana}
@@ -446,11 +461,11 @@ export default function ResellerCartPage() {
 
               <div className="md:col-span-2">
                 <label className="label text-xs font-bold text-base-content">
-                  Full Delivery Address *
+                  সম্পূর্ণ ডেলিভারি ঠিকানা *
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="House no, Road no, Area details..."
+                  placeholder="বাসা নং, রোড নং, এলাকার বিবরণ..."
                   className="textarea textarea-bordered w-full text-xs"
                   required
                   value={shippingAddress}
@@ -467,25 +482,25 @@ export default function ResellerCartPage() {
           <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-5 space-y-4">
             <h2 className="font-bold text-base flex items-center gap-2 text-base-content border-b border-base-200 pb-3">
               <Truck size={18} className="text-primary" />
-              <span>Courier Charge Info</span>
+              <span>কুরিয়ার চার্জের তথ্য</span>
             </h2>
 
             {/* Display Admin configured courier charge in text format */}
             <div className="p-4 bg-primary/5 rounded-xl border border-primary/20 space-y-2">
               <div className="flex items-center gap-2 font-bold text-xs text-primary">
                 <Info size={16} />
-                <span>{courierPolicy?.title || "Courier Policy"}</span>
+                <span>{courierPolicy?.title || "কুরিয়ার পলিসি"}</span>
               </div>
               <p className="text-xs text-base-content/80 leading-relaxed font-medium">
                 {courierPolicy?.chargeText ||
-                  "Inside Dhaka City: ৳70 | Sub-Urban Dhaka: ৳100 | Outside Dhaka: ৳130. Advance courier fee is collected by uddokta if applicable."}
+                  "ঢাকা সিটির ভেতরে: ৳৭০ | ঢাকার আশেপাশে: ৳১০০ | ঢাকার বাইরে: ৳১৩০। প্রযোজ্য ক্ষেত্রে অগ্রিম কুরিয়ার চার্জ উদ্যোক্তা সংগ্রহ করবেন।"}
               </p>
             </div>
 
             {/* Advance Courier Charge Received (Yes / No) */}
             <div className="space-y-3 pt-2 border-t border-base-200">
               <label className="text-xs font-bold text-base-content block">
-                Advance Courier Charge Received from Customer?
+                কাস্টমারের কাছ থেকে অগ্রিম কুরিয়ার চার্জ নিয়েছেন?
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -495,7 +510,7 @@ export default function ResellerCartPage() {
                   }`}
                   onClick={() => setIsAdvancePaid(true)}
                 >
-                  <CheckCircle2 size={16} /> Yes
+                  <CheckCircle2 size={16} /> হ্যাঁ
                 </button>
                 <button
                   type="button"
@@ -504,7 +519,7 @@ export default function ResellerCartPage() {
                   }`}
                   onClick={() => setIsAdvancePaid(false)}
                 >
-                  No
+                  না
                 </button>
               </div>
 
@@ -512,12 +527,12 @@ export default function ResellerCartPage() {
               {isAdvancePaid && (
                 <div className="pt-2 space-y-1">
                   <label className="text-xs font-bold text-base-content block">
-                    How much advance courier charge did you receive? (৳)
+                    কত টাকা অগ্রিম কুরিয়ার চার্জ নিয়েছেন? (৳)
                   </label>
                   <input
                     type="number"
                     min="0"
-                    placeholder="e.g. 120"
+                    placeholder="যেমন: 120"
                     className="input input-bordered input-sm w-full font-bold text-xs"
                     value={advanceCourierAmount}
                     onChange={(e) => setAdvanceCourierAmount(Number(e.target.value))}
@@ -530,11 +545,11 @@ export default function ResellerCartPage() {
             <div className="space-y-1 pt-2 border-t border-base-200">
               <label className="text-xs font-bold text-base-content flex items-center gap-1">
                 <FileText size={14} className="text-base-content/60" />
-                <span>Optional Order Notes</span>
+                <span>অর্ডার নোট (ঐচ্ছিক)</span>
               </label>
               <textarea
                 rows={3}
-                placeholder="Write any special delivery instructions or notes..."
+                placeholder="ডেলিভারির বিশেষ নির্দেশনা বা নোট লিখুন..."
                 className="textarea textarea-bordered w-full text-xs"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -546,24 +561,24 @@ export default function ResellerCartPage() {
           <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-5 space-y-4">
             <div>
               <label className="text-xs font-bold text-base-content block mb-2">
-                Payment Method:
+                পেমেন্ট পদ্ধতি:
               </label>
               <select
                 className="select select-bordered select-sm w-full font-semibold"
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
               >
-                <option value="CASH_ON_DELIVERY">Cash On Delivery (COD)</option>
-                <option value="BKASH">bKash</option>
-                <option value="NAGAD">Nagad</option>
-                <option value="BANK_TRANSFER">Bank Transfer</option>
+                <option value="CASH_ON_DELIVERY">ক্যাশ অন ডেলিভারি (COD)</option>
+                <option value="BKASH">বিকাশ</option>
+                <option value="NAGAD">নগদ</option>
+                <option value="BANK_TRANSFER">ব্যাংক ট্রান্সফার</option>
               </select>
             </div>
 
             {/* Reseller Order Store Billing Preview */}
             <div className="p-4 bg-base-200/80 rounded-xl space-y-2 text-xs">
               <div className="flex justify-between font-medium text-base-content/80">
-                <span>Uddokta Subtotal:</span>
+                <span>উদ্যোক্তা সাবটোটাল:</span>
                 <span className="font-extrabold text-base-content">
                   ৳
                   {items
@@ -576,11 +591,11 @@ export default function ResellerCartPage() {
                 </span>
               </div>
               <div className="flex justify-between font-medium text-base-content/80">
-                <span>Courier Charge:</span>
+                <span>কুরিয়ার চার্জ:</span>
                 <span className="font-bold text-base-content">
                   {isAdvancePaid ? (
                     <span className="text-success">
-                      ৳0 (Advance fee collected by you)
+                      ৳0 (অগ্রিম চার্জ আপনি নিয়েছেন)
                     </span>
                   ) : (
                     `+৳${defaultCourierCharge}`
@@ -588,7 +603,7 @@ export default function ResellerCartPage() {
                 </span>
               </div>
               <div className="flex justify-between font-bold text-emerald-600 border-t border-dashed border-base-300 pt-1">
-                <span>Estimated Uddokta Profit:</span>
+                <span>আনুমানিক উদ্যোক্তা লাভ:</span>
                 <span>
                   +৳
                   {items
@@ -604,7 +619,7 @@ export default function ResellerCartPage() {
                 </span>
               </div>
               <div className="flex justify-between font-black text-sm text-base-content border-t border-base-300 pt-2">
-                <span>Total Bill:</span>
+                <span>মোট বিল:</span>
                 <span className="text-primary font-black text-base">
                   ৳
                   {(
@@ -618,12 +633,21 @@ export default function ResellerCartPage() {
               </div>
               {isAdvancePaid && (
                 <p className="text-[10px] text-base-content/60 font-medium italic pt-1">
-                  * Note: Courier charge of ৳{defaultCourierCharge} was collected in advance by you from your customer, so ৳0 is added to your total store bill.
+                  * নোট: ৳{defaultCourierCharge} কুরিয়ার চার্জ আপনি কাস্টমারের কাছ থেকে অগ্রিম নিয়েছেন, তাই আপনার মোট বিলে ৳0 যোগ হয়েছে।
                 </p>
               )}
             </div>
 
+            {pending && (
+              <div className="rounded-xl bg-amber-50 p-3 text-[11px] text-amber-900 ring-1 ring-amber-200">
+                <p className="flex items-center gap-1.5 font-bold">
+                  <Clock size={14} /> অ্যাকাউন্ট অনুমোদনের অপেক্ষায়
+                </p>
+                <p className="mt-1 leading-relaxed">{ACCOUNT_PENDING_MESSAGE}</p>
+              </div>
+            )}
             {!canOrder ? (
+              verification?.isVerified ? null : (
               <div className="space-y-2">
                 <div className="rounded-xl bg-rose-50 p-3 text-[11px] text-rose-700 ring-1 ring-rose-200">
                   <p className="flex items-center gap-1.5 font-bold">
@@ -642,6 +666,7 @@ export default function ResellerCartPage() {
                   <ShieldAlert size={14} /> ভেরিফাই করুন
                 </Link>
               </div>
+              )
             ) : (
             <button
               type="submit"
@@ -651,10 +676,10 @@ export default function ResellerCartPage() {
               {submitting ? (
                 <>
                   <span className="loading loading-spinner loading-xs"></span>
-                  Placing Order...
+                  অর্ডার হচ্ছে...
                 </>
               ) : (
-                "Place Uddokta Order"
+                "উদ্যোক্তা অর্ডার কনফার্ম করুন"
               )}
             </button>
             )}

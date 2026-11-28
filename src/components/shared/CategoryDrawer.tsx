@@ -28,6 +28,10 @@ interface CategoryDrawerProps {
   onSelectProduct?: (id: string) => void;
   /** Drawer heading; defaults to "Categories". */
   title?: string;
+  /** Text when there are no categories; defaults to "No categories yet". */
+  emptyText?: string;
+  /** Accessible label for the close buttons; defaults to "Close categories". */
+  closeLabel?: string;
   /** Extra content (search, links) shown above the category list. */
   header?: ReactNode;
 }
@@ -48,6 +52,8 @@ export default function CategoryDrawer({
   productsLoading = false,
   onSelectProduct,
   title = "Categories",
+  emptyText = "No categories yet",
+  closeLabel = "Close categories",
   header,
 }: CategoryDrawerProps) {
   // Callers often pass an inline onClose; a ref keeps the effect below stable.
@@ -143,7 +149,7 @@ export default function CategoryDrawer({
         type="button"
         className="absolute inset-0 h-full w-full bg-black/60 animate-fade-in motion-reduce:animate-none"
         onClick={onClose}
-        aria-label="Close categories"
+        aria-label={closeLabel}
       />
 
       <div
@@ -158,7 +164,7 @@ export default function CategoryDrawer({
             type="button"
             onClick={onClose}
             className="btn btn-ghost btn-sm btn-square rounded-xl"
-            aria-label={`Close ${title.toLowerCase()}`}
+            aria-label={closeLabel}
           >
             <X size={16} />
           </button>
@@ -182,7 +188,7 @@ export default function CategoryDrawer({
               ))}
             </ul>
           ) : categories.length === 0 ? (
-            <p className="px-4 py-6 text-sm text-base-content/60">No categories yet</p>
+            <p className="px-4 py-6 text-sm text-base-content/60">{emptyText}</p>
           ) : (
             <ul className="space-y-1">
               {categories.map((category) => {

@@ -32,8 +32,32 @@ import PanelEmpty from "@/components/panel/PanelEmpty";
 import PanelSkeleton from "@/components/panel/PanelSkeleton";
 import PanelModal from "@/components/panel/PanelModal";
 import StatusBadge from "@/components/panel/StatusBadge";
+import {
+  usePendingReseller,
+  ACCOUNT_PENDING_MESSAGE,
+  isAccountPendingError,
+} from "@/store/useResellerProfileStore";
+
+/** Display-only Bangla labels; raw enum values are still used in logic / API calls. */
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: "পেন্ডিং",
+  COMPLETED: "সম্পন্ন",
+  REJECTED: "প্রত্যাখ্যাত",
+  CANCELLED: "বাতিল",
+};
+
+const METHOD_LABELS: Record<string, string> = {
+  BKASH: "বিকাশ",
+  NAGAD: "নগদ",
+  ROCKET: "রকেট",
+  BANK_TRANSFER: "ব্যাংক ট্রান্সফার",
+  CASH: "ক্যাশ",
+};
+
+const methodLabel = (m: string) => METHOD_LABELS[m] || m.replace("_", " ");
 
 export default function ResellerPayoutsPage() {
+  const pending = usePendingReseller();
   const [summary, setSummary] = useState<ResellerWalletSummary | null>(null);
   const [withdrawals, setWithdrawals] = useState<WithdrawalItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,7 +104,7 @@ export default function ResellerPayoutsPage() {
       setTotalPages(res.meta.totalPages || 1);
     } catch (err) {
       console.error("Failed to load withdrawals:", err);
-      showToast("Failed to load withdrawal history", "error");
+      showToast("উইথড্র ইতিহাস লোড করা যায়নি", "error");
     } finally {
       setLoading(false);
     }
@@ -91,6 +115,10 @@ export default function ResellerPayoutsPage() {
   }, [loadData]);
 
   const handleOpenRequestModal = () => {
+    if (pending) {
+      showToast(ACCOUNT_PENDING_MESSAGE, "error");
+      return;
+    }
     setFormData({
       amount: "",
       payoutMethod: "BKASH",
@@ -108,23 +136,27 @@ export default function ResellerPayoutsPage() {
 
   const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (pending) {
+      showToast(ACCOUNT_PENDING_MESSAGE, "error");
+      return;
+    }
     const numAmount = Number(formData.amount);
 
     if (isNaN(numAmount) || numAmount < 100) {
-      showToast("Minimum withdrawal amount is ৳100.00", "error");
+      showToast("সর্বনিম্ন উইথড্র পরিমাণ ৳100.00", "error");
       return;
     }
 
     if (summary && numAmount > summary.withdrawableBalance) {
       showToast(
-        `Requested amount (৳${numAmount}) exceeds available balance (৳${summary.withdrawableBalance})`,
+        `অনুরোধকৃত পরিমাণ (৳${numAmount}) আপনার উত্তোলনযোগ্য ব্যালেন্সের (৳${summary.withdrawableBalance}) চেয়ে বেশি`,
         "error",
       );
       return;
     }
 
     if (!formData.accountDetails.trim()) {
-      showToast("Please provide recipient account / phone details", "error");
+      showToast("প্রাপকের অ্যাকাউন্ট / মোবাইল নম্বর দিন", "error");
       return;
     }
 
@@ -137,32 +169,40 @@ export default function ResellerPayoutsPage() {
         resellerNotes: formData.resellerNotes.trim() || undefined,
       });
 
-      showToast("Withdrawal request submitted successfully! Admin will review shortly.", "success");
+      showToast("উইথড্র অনুরোধ সফলভাবে জমা হয়েছে! অ্যাডমিন শীঘ্রই যাচাই করবেন।", "success");
       setIsRequestModalOpen(false);
       await loadData();
     } catch (err: any) {
       console.error("Failed to submit request:", err);
-      showToast(err.response?.data?.message || "Failed to submit withdrawal request.", "error");
+      if (isAccountPendingError(err)) {
+        showToast(ACCOUNT_PENDING_MESSAGE, "error");
+      } else {
+        showToast(err.response?.data?.message || "উইথড্র অনুরোধ জমা দেওয়া যায়নি।", "error");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleCancelRequest = async (id: string) => {
-    if (!confirm("Are you sure you want to cancel this pending withdrawal request?")) return;
+    if (!confirm("আপনি কি নিশ্চিতভাবে এই পেন্ডিং উইথড্র অনুরোধটি বাতিল করতে চান?")) return;
     try {
       await withdrawalApi.cancelWithdrawal(id);
-      showToast("Withdrawal request cancelled successfully.", "success");
+      showToast("উইথড্র অনুরোধ সফলভাবে বাতিল হয়েছে।", "success");
       await loadData();
     } catch (err: any) {
       console.error("Failed to cancel withdrawal:", err);
-      showToast(err.response?.data?.message || "Failed to cancel request.", "error");
+      if (isAccountPendingError(err)) {
+        showToast(ACCOUNT_PENDING_MESSAGE, "error");
+      } else {
+        showToast(err.response?.data?.message || "অনুরোধ বাতিল করা যায়নি।", "error");
+      }
     }
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    showToast("Copied to clipboard!", "success");
+    showToast("কপি করা হয়েছে!", "success");
   };
 
   const getMethodIcon = (method: PayoutMethod) => {
@@ -192,20 +232,27 @@ export default function ResellerPayoutsPage() {
       )}
 
       <PanelPageHeader
-        title="Withdrawals & Wallet"
-        subtitle="Request withdrawals for earned profits from completed orders, manage payout accounts, and review official transaction proof documents."
+        title="উইথড্র ও ওয়ালেট"
+        subtitle="সম্পন্ন অর্ডারের প্রফিট উইথড্রর অনুরোধ করুন, পেমেন্ট অ্যাকাউন্ট ম্যানেজ করুন এবং লেনদেনের প্রমাণপত্র দেখুন।"
         icon={Wallet}
         actions={
           <button
             type="button"
             onClick={handleOpenRequestModal}
-            disabled={!summary || summary.withdrawableBalance < 100}
+            disabled={pending || !summary || summary.withdrawableBalance < 100}
             className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
           >
-            <PlusCircle size={16} /> Request Payout
+            <PlusCircle size={16} /> উইথড্র অনুরোধ
           </button>
         }
       />
+
+      {pending && (
+        <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-semibold text-amber-800">
+          <Clock size={14} className="mt-0.5 shrink-0" />
+          <span>{ACCOUNT_PENDING_MESSAGE}</span>
+        </div>
+      )}
 
       {/* ─── WALLET BALANCE KPI METRIC CARDS ───────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -214,13 +261,13 @@ export default function ResellerPayoutsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
-                Available to Withdraw
+                উত্তোলনযোগ্য ব্যালেন্স
               </p>
               <h3 className="text-3xl font-black text-emerald-700 mt-1">
                 ৳{(summary?.withdrawableBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </h3>
               <p className="text-[11px] text-emerald-700/80 mt-1">
-                Net profit available right now
+                এই মুহূর্তে উত্তোলনযোগ্য নিট প্রফিট
               </p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/30">
@@ -234,13 +281,13 @@ export default function ResellerPayoutsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                Total Earned Profit
+                মোট অর্জিত প্রফিট
               </p>
               <h3 className="text-2xl font-black text-slate-800 mt-1">
                 ৳{(summary?.totalEarnedProfit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </h3>
               <p className="text-[11px] text-slate-500 mt-1">
-                From delivered & paid orders
+                ডেলিভারড ও পেইড অর্ডার থেকে
               </p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold border border-indigo-100">
@@ -254,13 +301,13 @@ export default function ResellerPayoutsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
-                Pending Withdrawals
+                পেন্ডিং উইথড্র
               </p>
               <h3 className="text-2xl font-black text-amber-600 mt-1">
                 ৳{(summary?.pendingWithdrawal || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </h3>
               <p className="text-[11px] text-slate-500 mt-1">
-                Under administrator verification
+                অ্যাডমিনের যাচাইয়ের অপেক্ষায়
               </p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold border border-amber-100">
@@ -274,13 +321,13 @@ export default function ResellerPayoutsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                Total Withdrawn
+                মোট উত্তোলন
               </p>
               <h3 className="text-2xl font-black text-slate-800 mt-1">
                 ৳{(summary?.totalWithdrawn || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </h3>
               <p className="text-[11px] text-slate-500 mt-1">
-                Successfully disbursed to you
+                সফলভাবে আপনাকে পরিশোধ করা হয়েছে
               </p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold border border-base-200">
@@ -296,33 +343,33 @@ export default function ResellerPayoutsPage() {
         <div className="p-4 border-b border-base-200 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <h2 className="font-extrabold text-base text-base-content">Payout History</h2>
-              <span className="badge badge-sm badge-neutral font-mono">{withdrawals.length} records</span>
+              <h2 className="font-extrabold text-base text-base-content">উইথড্র ইতিহাস</h2>
+              <span className="badge badge-sm badge-neutral font-mono">{withdrawals.length}টি রেকর্ড</span>
             </div>
             <button
               type="button"
               onClick={loadData}
               className="btn btn-ghost btn-sm btn-square rounded-xl"
-              aria-label="Refresh payouts"
-              title="Refresh"
+              aria-label="উইথড্র তালিকা রিফ্রেশ করুন"
+              title="রিফ্রেশ"
             >
               <RefreshCw size={16} />
             </button>
           </div>
 
           <PanelTabs
-            ariaLabel="Filter payouts by status"
+            ariaLabel="স্ট্যাটাস অনুযায়ী উইথড্র ফিল্টার করুন"
             value={statusFilter}
             onChange={(id) => {
               setStatusFilter(id);
               setPage(1);
             }}
             tabs={[
-              { id: "", label: "All" },
-              { id: "PENDING", label: "Pending" },
-              { id: "COMPLETED", label: "Completed" },
-              { id: "REJECTED", label: "Rejected" },
-              { id: "CANCELLED", label: "Cancelled" },
+              { id: "", label: "সব" },
+              { id: "PENDING", label: STATUS_LABELS.PENDING },
+              { id: "COMPLETED", label: STATUS_LABELS.COMPLETED },
+              { id: "REJECTED", label: STATUS_LABELS.REJECTED },
+              { id: "CANCELLED", label: STATUS_LABELS.CANCELLED },
             ]}
           />
         </div>
@@ -335,16 +382,16 @@ export default function ResellerPayoutsPage() {
         ) : withdrawals.length === 0 ? (
           <PanelEmpty
             icon={Wallet}
-            title="No withdrawal requests found"
-            text="You have not submitted any withdrawal requests yet. When you earn profit from delivered orders, you can withdraw funds here."
+            title="কোনো উইথড্র অনুরোধ পাওয়া যায়নি"
+            text="আপনি এখনো কোনো উইথড্র অনুরোধ করেননি। ডেলিভারড অর্ডার থেকে প্রফিট আসলে এখান থেকে টাকা উইথড্র করতে পারবেন।"
             action={
-              summary && summary.withdrawableBalance >= 100 ? (
+              !pending && summary && summary.withdrawableBalance >= 100 ? (
                 <button
                   type="button"
                   onClick={handleOpenRequestModal}
                   className="btn btn-primary btn-sm rounded-xl gap-2"
                 >
-                  <PlusCircle size={16} /> Request First Payout
+                  <PlusCircle size={16} /> প্রথম উইথড্র অনুরোধ করুন
                 </button>
               ) : undefined
             }
@@ -353,13 +400,13 @@ export default function ResellerPayoutsPage() {
           <PanelTable>
             <thead>
               <tr>
-                <th>Date & Request ID</th>
-                <th>Amount</th>
-                <th>Payout Method</th>
-                <th>Account Details</th>
-                <th>Status</th>
-                <th>Proof & Details</th>
-                <th className="text-right">Actions</th>
+                <th>তারিখ ও অনুরোধ আইডি</th>
+                <th>পরিমাণ</th>
+                <th>পেমেন্ট মাধ্যম</th>
+                <th>অ্যাকাউন্টের তথ্য</th>
+                <th>স্ট্যাটাস</th>
+                <th>প্রমাণ ও বিস্তারিত</th>
+                <th className="text-right">অ্যাকশন</th>
               </tr>
             </thead>
             <tbody>
@@ -383,7 +430,7 @@ export default function ResellerPayoutsPage() {
                     <td>
                       <div className="flex items-center gap-1.5 font-bold text-xs">
                         {getMethodIcon(w.payoutMethod)}
-                        <span>{w.payoutMethod.replace("_", " ")}</span>
+                        <span>{methodLabel(w.payoutMethod)}</span>
                       </div>
                     </td>
 
@@ -393,12 +440,12 @@ export default function ResellerPayoutsPage() {
                       </p>
                       {w.resellerNotes && (
                         <p className="text-[10px] text-base-content/60 italic mt-0.5">
-                          Note: &ldquo;{w.resellerNotes}&rdquo;
+                          নোট: &ldquo;{w.resellerNotes}&rdquo;
                         </p>
                       )}
                     </td>
 
-                    <td><StatusBadge status={w.status} /></td>
+                    <td><StatusBadge status={w.status} label={STATUS_LABELS[w.status]} /></td>
 
                     <td>
                       {w.status === "COMPLETED" ? (
@@ -406,14 +453,14 @@ export default function ResellerPayoutsPage() {
                           onClick={() => setSelectedProofWithdrawal(w)}
                           className="btn btn-xs btn-outline btn-success gap-1 font-semibold"
                         >
-                          <FileText size={12} /> View Proof
+                          <FileText size={12} /> প্রমাণ দেখুন
                         </button>
                       ) : w.status === "REJECTED" ? (
                         <div className="text-xs text-error font-medium">
-                          {w.adminNotes || "Rejected by Admin"}
+                          {w.adminNotes || "অ্যাডমিন প্রত্যাখ্যান করেছেন"}
                         </div>
                       ) : (
-                        <span className="text-xs text-base-content/40 italic">Awaiting Processing</span>
+                        <span className="text-xs text-base-content/40 italic">প্রসেসিংয়ের অপেক্ষায়</span>
                       )}
                     </td>
 
@@ -423,7 +470,7 @@ export default function ResellerPayoutsPage() {
                           onClick={() => handleCancelRequest(w.id)}
                           className="btn btn-xs btn-ghost text-error hover:bg-error/10"
                         >
-                          Cancel
+                          বাতিল করুন
                         </button>
                       ) : (
                         <span className="text-xs text-base-content/30">—</span>
@@ -439,7 +486,7 @@ export default function ResellerPayoutsPage() {
         {totalPages > 1 && (
           <div className="p-4 border-t border-base-200 flex items-center justify-between">
             <span className="text-xs text-base-content/60">
-              Page {page} of {totalPages}
+              পৃষ্ঠা {page} / {totalPages}
             </span>
             <div className="join">
               <button
@@ -447,14 +494,14 @@ export default function ResellerPayoutsPage() {
                 onClick={() => setPage((p) => p - 1)}
                 className="join-item btn btn-xs btn-outline"
               >
-                <ChevronLeft size={14} /> Prev
+                <ChevronLeft size={14} /> আগের
               </button>
               <button
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="join-item btn btn-xs btn-outline"
               >
-                Next <ChevronRight size={14} />
+                পরের <ChevronRight size={14} />
               </button>
             </div>
           </div>
@@ -466,7 +513,7 @@ export default function ResellerPayoutsPage() {
         <PanelModal
           open={isRequestModalOpen}
           onClose={() => setIsRequestModalOpen(false)}
-          title="Request Profit Payout"
+          title="প্রফিট উইথড্র অনুরোধ"
           size="md"
           footer={
             <>
@@ -475,12 +522,12 @@ export default function ResellerPayoutsPage() {
                 onClick={() => setIsRequestModalOpen(false)}
                 className="btn btn-ghost btn-sm rounded-xl"
               >
-                Cancel
+                বাতিল
               </button>
               <button
                 type="submit"
                 form="payout-request-form"
-                disabled={isSubmitting}
+                disabled={isSubmitting || pending}
                 className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
               >
                 {isSubmitting ? (
@@ -488,30 +535,38 @@ export default function ResellerPayoutsPage() {
                 ) : (
                   <PlusCircle size={16} />
                 )}
-                Submit Payout Request
+                উইথড্র অনুরোধ জমা দিন
               </button>
             </>
           }
         >
           <div className="space-y-4">
+            {pending && (
+              <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs font-semibold text-amber-800">
+                <Clock size={14} className="mt-0.5 shrink-0" />
+                <span>{ACCOUNT_PENDING_MESSAGE}</span>
+              </div>
+            )}
+
             {/* Current Balance Banner */}
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-center justify-between">
               <div>
                 <span className="text-xs font-semibold text-emerald-800 block">
-                  Available Withdrawable Balance
+                  উত্তোলনযোগ্য ব্যালেন্স
                 </span>
                 <strong className="text-2xl font-black text-emerald-700">
                   ৳{(summary?.withdrawableBalance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </strong>
               </div>
-              <span className="badge badge-success text-white text-xs font-bold">Live Wallet</span>
+              <span className="badge badge-success text-white text-xs font-bold">লাইভ ওয়ালেট</span>
             </div>
 
             <form id="payout-request-form" onSubmit={handleSubmitRequest} className="space-y-4">
+              <fieldset disabled={pending} className="space-y-4">
               {/* Amount Input */}
               <div className="form-control">
                 <label className="label font-bold text-xs uppercase tracking-wider text-base-content">
-                  Withdrawal Amount (৳) *
+                  উইথড্র পরিমাণ (৳) *
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-3 flex items-center text-base-content/50 font-bold">
@@ -522,7 +577,7 @@ export default function ResellerPayoutsPage() {
                     step="0.01"
                     min="100"
                     max={summary?.withdrawableBalance || 0}
-                    placeholder="e.g. 500.00"
+                    placeholder="যেমন: 500.00"
                     value={formData.amount}
                     onChange={(e) => setFormData((prev) => ({ ...prev, amount: e.target.value }))}
                     className="input input-bordered w-full pl-8 bg-base-100 text-base-content font-bold text-lg"
@@ -539,19 +594,19 @@ export default function ResellerPayoutsPage() {
                       onClick={() => handleQuickAmount(pct)}
                       className="btn btn-xs btn-outline flex-1 text-[11px] font-semibold"
                     >
-                      {pct === 100 ? "Max" : `${pct}%`}
+                      {pct === 100 ? "সর্বোচ্চ" : `${pct}%`}
                     </button>
                   ))}
                 </div>
                 <span className="text-[11px] text-base-content/60 mt-1">
-                  Minimum withdrawal threshold: ৳100.00
+                  সর্বনিম্ন উইথড্র: ৳100.00
                 </span>
               </div>
 
               {/* Payout Method */}
               <div className="form-control">
                 <label className="label font-bold text-xs uppercase tracking-wider text-base-content">
-                  Payout Method *
+                  পেমেন্ট মাধ্যম *
                 </label>
                 <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                   {(["BKASH", "NAGAD", "ROCKET", "BANK_TRANSFER", "CASH"] as PayoutMethod[]).map((m) => (
@@ -566,7 +621,7 @@ export default function ResellerPayoutsPage() {
                       }`}
                     >
                       {getMethodIcon(m)}
-                      <span className="text-[10px] mt-1">{m.replace("_", " ")}</span>
+                      <span className="text-[10px] mt-1">{methodLabel(m)}</span>
                     </button>
                   ))}
                 </div>
@@ -575,16 +630,16 @@ export default function ResellerPayoutsPage() {
               {/* Recipient Account Details */}
               <div className="form-control">
                 <label className="label font-bold text-xs uppercase tracking-wider text-base-content">
-                  Recipient Account Details *
+                  প্রাপকের অ্যাকাউন্টের তথ্য *
                 </label>
                 <textarea
                   rows={2}
                   placeholder={
                     formData.payoutMethod === "BANK_TRANSFER"
-                      ? "Account Name, Bank Name, Branch Name, Account Number, Routing Number"
+                      ? "অ্যাকাউন্টের নাম, ব্যাংকের নাম, শাখার নাম, অ্যাকাউন্ট নম্বর, রাউটিং নম্বর"
                       : formData.payoutMethod === "CASH"
-                      ? "Receiver Name, Mobile Number, Collection Location / Store Note"
-                      : `${formData.payoutMethod} Personal / Agent Mobile Number (e.g. 017xxxxxxxx)`
+                      ? "প্রাপকের নাম, মোবাইল নম্বর, সংগ্রহের স্থান / স্টোর নোট"
+                      : `${methodLabel(formData.payoutMethod)} পার্সোনাল / এজেন্ট মোবাইল নম্বর (যেমন: 017xxxxxxxx)`
                   }
                   value={formData.accountDetails}
                   onChange={(e) =>
@@ -598,11 +653,11 @@ export default function ResellerPayoutsPage() {
               {/* Reseller Note (Optional) */}
               <div className="form-control">
                 <label className="label font-bold text-xs uppercase tracking-wider text-base-content">
-                  Optional Note / Reference
+                  নোট / রেফারেন্স (ঐচ্ছিক)
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Please disburse to my primary bKash number"
+                  placeholder="যেমন: আমার প্রধান বিকাশ নম্বরে পাঠান"
                   value={formData.resellerNotes}
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, resellerNotes: e.target.value }))
@@ -610,7 +665,7 @@ export default function ResellerPayoutsPage() {
                   className="input input-sm input-bordered w-full bg-base-100 text-base-content text-xs"
                 />
               </div>
-
+              </fieldset>
             </form>
           </div>
         </PanelModal>
@@ -621,7 +676,7 @@ export default function ResellerPayoutsPage() {
         <PanelModal
           open={!!selectedProofWithdrawal}
           onClose={() => setSelectedProofWithdrawal(null)}
-          title="Transaction Proof Document"
+          title="লেনদেনের প্রমাণপত্র"
           size="md"
           footer={
             <button
@@ -629,7 +684,7 @@ export default function ResellerPayoutsPage() {
               onClick={() => setSelectedProofWithdrawal(null)}
               className="btn btn-primary btn-sm rounded-xl"
             >
-              Close
+              বন্ধ করুন
             </button>
           }
         >
@@ -637,15 +692,15 @@ export default function ResellerPayoutsPage() {
               {/* Amount & Method Summary */}
               <div className="bg-base-200/50 p-3.5 rounded-xl flex items-center justify-between">
                 <div>
-                  <span className="text-xs text-base-content/50 block">Amount Paid Out</span>
+                  <span className="text-xs text-base-content/50 block">পরিশোধিত পরিমাণ</span>
                   <strong className="text-2xl font-black text-emerald-600">
                     ৳{Number(selectedProofWithdrawal.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </strong>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-base-content/50 block">Method</span>
+                  <span className="text-xs text-base-content/50 block">মাধ্যম</span>
                   <span className="badge badge-outline font-bold text-xs">
-                    {selectedProofWithdrawal.payoutMethod}
+                    {methodLabel(selectedProofWithdrawal.payoutMethod)}
                   </span>
                 </div>
               </div>
@@ -654,7 +709,7 @@ export default function ResellerPayoutsPage() {
               {selectedProofWithdrawal.transactionId && (
                 <div className="p-3 bg-base-200/30 rounded-xl border border-base-200">
                   <span className="text-xs text-base-content/60 font-semibold block mb-1">
-                    Transaction ID / Reference (TrxID)
+                    ট্রানজেকশন আইডি / রেফারেন্স (TrxID)
                   </span>
                   <div className="flex items-center justify-between">
                     <span className="font-mono font-bold text-base text-primary">
@@ -664,7 +719,7 @@ export default function ResellerPayoutsPage() {
                       onClick={() => copyToClipboard(selectedProofWithdrawal.transactionId || "")}
                       className="btn btn-xs btn-ghost gap-1"
                     >
-                      <Copy size={13} /> Copy
+                      <Copy size={13} /> কপি
                     </button>
                   </div>
                 </div>
@@ -674,12 +729,12 @@ export default function ResellerPayoutsPage() {
               {selectedProofWithdrawal.proofImageUrl ? (
                 <div className="space-y-2">
                   <span className="text-xs text-base-content/60 font-semibold block">
-                    Proof Screenshot / Receipt Document:
+                    প্রমাণের স্ক্রিনশট / রসিদ:
                   </span>
                   <div className="rounded-xl overflow-hidden border border-base-300 max-h-72 bg-black/5 flex items-center justify-center">
                     <img
                       src={selectedProofWithdrawal.proofImageUrl}
-                      alt="Disbursement Proof"
+                      alt="পেমেন্টের প্রমাণ"
                       className="max-h-72 w-full object-contain"
                     />
                   </div>
@@ -689,12 +744,12 @@ export default function ResellerPayoutsPage() {
                     rel="noopener noreferrer"
                     className="text-xs text-primary font-bold inline-flex items-center gap-1 hover:underline"
                   >
-                    <ExternalLink size={13} /> Open full size proof document
+                    <ExternalLink size={13} /> পূর্ণ আকারে প্রমাণপত্র দেখুন
                   </a>
                 </div>
               ) : (
                 <div className="text-xs text-base-content/50 italic p-3 bg-base-200/20 rounded-xl">
-                  No proof document image was attached by administrator for this transaction.
+                  এই লেনদেনের জন্য অ্যাডমিন কোনো প্রমাণের ছবি সংযুক্ত করেননি।
                 </div>
               )}
 
@@ -702,7 +757,7 @@ export default function ResellerPayoutsPage() {
               {selectedProofWithdrawal.adminNotes && (
                 <div className="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-xs">
                   <strong className="text-indigo-900 block font-semibold mb-0.5">
-                    Admin Remarks:
+                    অ্যাডমিনের মন্তব্য:
                   </strong>
                   <p className="text-indigo-800">{selectedProofWithdrawal.adminNotes}</p>
                 </div>
@@ -711,13 +766,13 @@ export default function ResellerPayoutsPage() {
               {/* Audit Meta */}
               <div className="text-[11px] text-base-content/50 border-t border-base-200 pt-2 flex justify-between">
                 <span>
-                  Processed on:{" "}
+                  প্রসেসের তারিখ:{" "}
                   {selectedProofWithdrawal.processedAt
                     ? new Date(selectedProofWithdrawal.processedAt).toLocaleString()
                     : "—"}
                 </span>
                 <span>
-                  Processed by: {selectedProofWithdrawal.processedByUser?.name || "Admin"}
+                  প্রসেস করেছেন: {selectedProofWithdrawal.processedByUser?.name || "অ্যাডমিন"}
                 </span>
               </div>
             </div>

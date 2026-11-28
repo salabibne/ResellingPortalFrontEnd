@@ -8,39 +8,45 @@ import { authApi } from "@/services/auth.api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
+import { CheckCircle2 } from "lucide-react";
+import PasswordInput from "@/components/ui/PasswordInput";
 
 const registerSchema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  phone: z.string().min(1, { message: "Business number is required" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  name: z.string().min(1, { message: "পূর্ণ নাম দিন" }),
+  email: z.string().email({ message: "সঠিক ইমেইল ঠিকানা দিন" }),
+  phone: z.string().min(1, { message: "ব্যবসায়িক নম্বর দিন" }),
+  password: z.string().min(8, { message: "পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে" }),
   role: z.enum(["USER", "RESELLER"]).default("USER"),
-  organizationId: z.string().uuid({ message: "Organization ID (UUID) is required" }),
-  presentDistrict: z.string().min(1, { message: "Present District is required" }),
-  presentThana: z.string().min(1, { message: "Present Thana is required" }),
-  permanentDistrict: z.string().min(1, { message: "Permanent District is required" }),
-  permanentThana: z.string().min(1, { message: "Permanent Thana is required" }),
+  organizationId: z.string().uuid({ message: "অর্গানাইজেশন আইডি প্রয়োজন" }),
+  presentDistrict: z.string().min(1, { message: "বর্তমান জেলা দিন" }),
+  presentThana: z.string().min(1, { message: "বর্তমান থানা দিন" }),
+  permanentDistrict: z.string().min(1, { message: "স্থায়ী জেলা দিন" }),
+  permanentThana: z.string().min(1, { message: "স্থায়ী থানা দিন" }),
   secondaryPhone: z.string().optional(),
-  pageName: z.string().trim().min(1, { message: "Page Name is required" }),
+  pageName: z.string().trim().min(1, { message: "পেজের নাম দিন" }),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
+const RESELLER_SUCCESS_MESSAGE =
+  "ধন্যবাদ! আমরা আপনার উদ্যোক্তা হিসেবে যোগ দেওয়ার আবেদন পেয়েছি। খুব শীঘ্রই আমাদের টিম আপনার সাথে যোগাযোগ করবে।";
+
 function RegisterForm() {
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(
-    "Thank you for registering. Our representative will contact you within 24 to 72 hours.",
-  );
+  const [isResellerRequest, setIsResellerRequest] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
   const setAuth = useAuthStore((state) => state.setAuth);
-  
+
   const initialRole = searchParams.get("role") === "RESELLER" ? "RESELLER" : "USER";
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -48,8 +54,10 @@ function RegisterForm() {
       role: initialRole as any,
       organizationId: "550e8400-e29b-41d4-a716-446655440000",
       pageName: "",
-    }
+    },
   });
+
+  const wantsReseller = watch("role") === "RESELLER";
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
@@ -58,23 +66,18 @@ function RegisterForm() {
       const res = await authApi.register(data);
 
       // Reseller accounts are gated behind admin approval, so the API
-      // deliberately does not return tokens for them.
+      // deliberately does not return tokens for them. Show the confirmation
+      // and stay on this page (no redirect to login).
       if (res.requiresApproval || !res.accessToken) {
-        setSuccessMessage(
-          "Your uddokta account is awaiting approval. You will be able to log in once an administrator approves it.",
-        );
+        setSuccessMessage(RESELLER_SUCCESS_MESSAGE);
+        setIsResellerRequest(true);
         setIsSuccess(true);
-
-        setTimeout(() => {
-          router.push("/login");
-        }, 2600);
         return;
       }
 
       setAuth(res.user, res.accessToken, res.refreshToken);
-      setSuccessMessage(
-        "Thank you for registering. Our representative will contact you within 24 to 72 hours.",
-      );
+      setSuccessMessage("ধন্যবাদ! আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।");
+      setIsResellerRequest(false);
       setIsSuccess(true);
 
       const redirectParam = searchParams.get("redirect");
@@ -89,25 +92,47 @@ function RegisterForm() {
       }, 1500);
     } catch (err: any) {
       const message = err.response?.data?.message;
-      setError(Array.isArray(message) ? message.join(", ") : message || "Registration failed");
+      setError(
+        Array.isArray(message)
+          ? message.join(", ")
+          : message || "রেজিস্ট্রেশন সম্পন্ন হয়নি, আবার চেষ্টা করুন",
+      );
     }
   };
+
+  const inputClass = (hasError: boolean) =>
+    `input input-bordered text-base-content w-full ${hasError ? "input-error" : ""}`;
 
   return (
     <div className="flex-1 flex flex-col bg-base-200">
       <div className="flex-1 flex items-center justify-center p-4 py-12">
         <div className="card w-full max-w-2xl bg-base-100 shadow-xl">
           <div className="card-body">
-          <h2 className="card-title text-3xl font-bold justify-center mb-6 text-[#001C94]">Create an Account</h2>
-          
+          <h2 className="card-title text-3xl font-bold justify-center mb-6 text-[#001C94]">
+            {isSuccess && isResellerRequest ? "আবেদন গ্রহণ করা হয়েছে" : "নতুন অ্যাকাউন্ট খুলুন"}
+          </h2>
+
           {isSuccess ? (
-            <div className="text-center py-8 space-y-4">
-              <p className="text-xl font-semibold" style={{ color: "#001C94" }}>
+            <div className="text-center py-8 space-y-5">
+              <CheckCircle2 className="mx-auto text-success" size={56} />
+              <p className="text-lg sm:text-xl font-semibold leading-relaxed" style={{ color: "#001C94" }}>
                 {successMessage}
               </p>
-              <Link href="/login" className="btn btn-primary btn-sm rounded-full">
-                Go to login
-              </Link>
+              {isResellerRequest && (
+                <p className="text-sm text-base-content/70">
+                  অনুমোদনের আগে আপনি লগইন করে প্রোডাক্ট দেখতে পারবেন, তবে অনুমোদন পাওয়ার পর থেকে কার্ট ও অর্ডার করতে পারবেন।
+                </p>
+              )}
+              {isResellerRequest && (
+                <div className="flex flex-wrap justify-center gap-3">
+                  <Link href="/" className="btn btn-primary btn-sm rounded-full">
+                    হোমে ফিরে যান
+                  </Link>
+                  <Link href="/login" className="btn btn-outline btn-sm rounded-full">
+                    লগইন
+                  </Link>
+                </div>
+              )}
             </div>
           ) : (
             <>
@@ -118,23 +143,23 @@ function RegisterForm() {
               )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
-                <label className="label"><span className="label-text">Full Name</span></label>
-                <input type="text" placeholder="Uddokta Name" className={`input input-bordered text-base-content w-full ${errors.name ? "input-error" : ""}`} {...register("name")} />
+                <label className="label"><span className="label-text">পূর্ণ নাম</span></label>
+                <input type="text" placeholder="আপনার নাম" className={inputClass(!!errors.name)} {...register("name")} />
                 {errors.name && <span className="label-text-alt text-error mt-1">{errors.name.message}</span>}
               </div>
 
               <div className="form-control">
-                <label className="label"><span className="label-text">Email</span></label>
-                <input type="email" placeholder="example@gmail.com" className={`input input-bordered text-base-content w-full ${errors.email ? "input-error" : ""}`} {...register("email")} />
+                <label className="label"><span className="label-text">ইমেইল</span></label>
+                <input type="email" placeholder="example@gmail.com" className={inputClass(!!errors.email)} {...register("email")} />
                 {errors.email && <span className="label-text-alt text-error mt-1">{errors.email.message}</span>}
               </div>
-              
+
               <div className="form-control">
-                <label className="label"><span className="label-text">Business Number</span></label>
-                <input type="tel" placeholder="01XXXXXXXXX" className={`input input-bordered text-base-content w-full ${errors.phone ? "input-error" : ""}`} {...register("phone")} />
+                <label className="label"><span className="label-text">ব্যবসায়িক নম্বর</span></label>
+                <input type="tel" placeholder="01XXXXXXXXX" className={inputClass(!!errors.phone)} {...register("phone")} />
                 {errors.phone ? (
                   <span className="label-text-alt text-error mt-1">{errors.phone.message}</span>
                 ) : (
@@ -143,20 +168,26 @@ function RegisterForm() {
               </div>
 
               <div className="form-control">
-                <label className="label"><span className="label-text">Secondary Phone (Optional)</span></label>
-                <input type="tel" placeholder="01XXXXXXXXX" className={`input input-bordered text-base-content w-full ${errors.secondaryPhone ? "input-error" : ""}`} {...register("secondaryPhone")} />
+                <label className="label"><span className="label-text">বিকল্প ফোন নম্বর (ঐচ্ছিক)</span></label>
+                <input type="tel" placeholder="01XXXXXXXXX" className={inputClass(!!errors.secondaryPhone)} {...register("secondaryPhone")} />
                 {errors.secondaryPhone && <span className="label-text-alt text-error mt-1">{errors.secondaryPhone.message}</span>}
               </div>
 
               <div className="form-control">
-                <label className="label"><span className="label-text">Page Name</span></label>
-                <input type="text" placeholder="Your Page Name" className={`input input-bordered text-base-content w-full ${errors.pageName ? "input-error" : ""}`} {...register("pageName")} />
+                <label className="label"><span className="label-text">পেজের নাম</span></label>
+                <input type="text" placeholder="আপনার পেজের নাম" className={inputClass(!!errors.pageName)} {...register("pageName")} />
                 {errors.pageName && <span className="label-text-alt text-error mt-1">{errors.pageName.message}</span>}
               </div>
 
               <div className="form-control">
-                <label className="label"><span className="label-text">Password</span></label>
-                <input type="password" placeholder="********" className={`input input-bordered text-base-content w-full ${errors.password ? "input-error" : ""}`} {...register("password")} />
+                <label className="label"><span className="label-text">পাসওয়ার্ড</span></label>
+                <PasswordInput
+                  placeholder="********"
+                  showLabel="পাসওয়ার্ড দেখুন"
+                  hideLabel="পাসওয়ার্ড লুকান"
+                  className={inputClass(!!errors.password)}
+                  {...register("password")}
+                />
                 {errors.password && <span className="label-text-alt text-error mt-1">{errors.password.message}</span>}
               </div>
 
@@ -165,47 +196,70 @@ function RegisterForm() {
               <input type="hidden" {...register("role")} />
             </div>
 
-            <div className="divider text-base-content">Address Info</div>
+            <div className="divider text-base-content">ঠিকানা</div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-control">
-                <label className="label"><span className="label-text">Present District</span></label>
-                <input type="text" placeholder="Dhaka" className={`input input-bordered text-base-content w-full ${errors.presentDistrict ? "input-error" : ""}`} {...register("presentDistrict")} />
+                <label className="label"><span className="label-text">বর্তমান জেলা</span></label>
+                <input type="text" placeholder="ঢাকা" className={inputClass(!!errors.presentDistrict)} {...register("presentDistrict")} />
                 {errors.presentDistrict && <span className="label-text-alt text-error mt-1">{errors.presentDistrict.message}</span>}
               </div>
 
               <div className="form-control">
-                <label className="label"><span className="label-text">Present Thana</span></label>
-                <input type="text" placeholder="Mirpur" className={`input input-bordered text-base-content w-full ${errors.presentThana ? "input-error" : ""}`} {...register("presentThana")} />
+                <label className="label"><span className="label-text">বর্তমান থানা</span></label>
+                <input type="text" placeholder="মিরপুর" className={inputClass(!!errors.presentThana)} {...register("presentThana")} />
                 {errors.presentThana && <span className="label-text-alt text-error mt-1">{errors.presentThana.message}</span>}
               </div>
 
               <div className="form-control">
-                <label className="label"><span className="label-text">Permanent District</span></label>
-                <input type="text" placeholder="Dhaka" className={`input input-bordered text-base-content w-full ${errors.permanentDistrict ? "input-error" : ""}`} {...register("permanentDistrict")} />
+                <label className="label"><span className="label-text">স্থায়ী জেলা</span></label>
+                <input type="text" placeholder="ঢাকা" className={inputClass(!!errors.permanentDistrict)} {...register("permanentDistrict")} />
                 {errors.permanentDistrict && <span className="label-text-alt text-error mt-1">{errors.permanentDistrict.message}</span>}
               </div>
 
               <div className="form-control">
-                <label className="label"><span className="label-text">Permanent Thana</span></label>
-                <input type="text" placeholder="Mirpur" className={`input input-bordered text-base-content w-full ${errors.permanentThana ? "input-error" : ""}`} {...register("permanentThana")} />
+                <label className="label"><span className="label-text">স্থায়ী থানা</span></label>
+                <input type="text" placeholder="মিরপুর" className={inputClass(!!errors.permanentThana)} {...register("permanentThana")} />
                 {errors.permanentThana && <span className="label-text-alt text-error mt-1">{errors.permanentThana.message}</span>}
               </div>
             </div>
 
+            <label className="flex items-start gap-3 cursor-pointer rounded-xl border border-base-300 bg-base-200/60 p-4 mt-6">
+              <input
+                type="checkbox"
+                className="checkbox checkbox-primary mt-0.5"
+                checked={wantsReseller}
+                onChange={(e) =>
+                  setValue("role", e.target.checked ? "RESELLER" : "USER", { shouldDirty: true })
+                }
+              />
+              <span className="text-base-content">
+                <span className="font-semibold block">আমি উদ্যোক্তা (রিসেলার) হিসেবে যোগ দিতে আগ্রহী</span>
+                <span className="text-sm text-base-content/70">
+                  টিক দিলে আপনার আবেদন অ্যাডমিনের কাছে অনুমোদনের জন্য যাবে।
+                </span>
+              </span>
+            </label>
+
             <div className="form-control mt-8">
               <button type="submit" className="btn btn-primary w-full" disabled={isSubmitting}>
-                {isSubmitting ? <span className="loading loading-spinner"></span> : "Create Account"}
+                {isSubmitting ? (
+                  <span className="loading loading-spinner"></span>
+                ) : wantsReseller ? (
+                  "আবেদন জমা দিন"
+                ) : (
+                  "অ্যাকাউন্ট খুলুন"
+                )}
               </button>
             </div>
           </form>
 
-          <div className="divider mt-6">OR</div>
-          
+          <div className="divider mt-6">অথবা</div>
+
           <div className="text-center mt-2">
-            <span className="text-base-content/70">Already have an account? </span>
+            <span className="text-base-content/70">আগে থেকেই অ্যাকাউন্ট আছে? </span>
             <Link href="/login" className="link link-primary font-semibold">
-              Log in here
+              লগইন করুন
             </Link>
           </div>
           </>

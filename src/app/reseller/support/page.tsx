@@ -29,12 +29,20 @@ import PanelModal from "@/components/panel/PanelModal";
 import StatusBadge from "@/components/panel/StatusBadge";
 
 const REASONS: { id: SupportTicketReason; label: string; icon: any; color: string }[] = [
-  { id: "PAYMENT", label: "Payment / Payout", icon: CreditCard, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
-  { id: "ORDER", label: "Order / Delivery", icon: Package, color: "text-blue-600 bg-blue-50 border-blue-200" },
-  { id: "TECHNICAL", label: "Technical Issue", icon: Wrench, color: "text-amber-600 bg-amber-50 border-amber-200" },
-  { id: "PRODUCT", label: "Product / Catalog", icon: Tag, color: "text-purple-600 bg-purple-50 border-purple-200" },
-  { id: "OTHER", label: "Other Inquiries", icon: HelpCircle, color: "text-slate-600 bg-slate-50 border-slate-200" },
+  { id: "PAYMENT", label: "পেমেন্ট / পেআউট", icon: CreditCard, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+  { id: "ORDER", label: "অর্ডার / ডেলিভারি", icon: Package, color: "text-blue-600 bg-blue-50 border-blue-200" },
+  { id: "TECHNICAL", label: "টেকনিক্যাল সমস্যা", icon: Wrench, color: "text-amber-600 bg-amber-50 border-amber-200" },
+  { id: "PRODUCT", label: "প্রোডাক্ট / ক্যাটালগ", icon: Tag, color: "text-purple-600 bg-purple-50 border-purple-200" },
+  { id: "OTHER", label: "অন্যান্য জিজ্ঞাসা", icon: HelpCircle, color: "text-slate-600 bg-slate-50 border-slate-200" },
 ];
+
+// Bangla labels for the ticket status filter tabs (raw values stay unchanged for logic/API).
+const STATUS_TAB_LABELS_BN: Record<string, string> = {
+  ALL: "সব",
+  OPEN: "ওপেন",
+  IN_PROGRESS: "চলমান",
+  RESOLVED: "সমাধান হয়েছে",
+};
 
 export default function ResellerSupportPage() {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
@@ -86,7 +94,7 @@ export default function ResellerSupportPage() {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!createMessage.trim()) {
-      setCreateError("Please write your message or issue description.");
+      setCreateError("অনুগ্রহ করে আপনার মেসেজ বা সমস্যার বিবরণ লিখুন।");
       return;
     }
 
@@ -105,7 +113,7 @@ export default function ResellerSupportPage() {
       await fetchTickets();
     } catch (err: any) {
       console.error("Create ticket error:", err);
-      setCreateError(err.response?.data?.message || "Failed to create support ticket.");
+      setCreateError(err.response?.data?.message || "সাপোর্ট টিকেট তৈরি করা যায়নি।");
     } finally {
       setCreateSubmitting(false);
     }
@@ -121,7 +129,7 @@ export default function ResellerSupportPage() {
     return (
       REASONS.find((r) => r.id === reason) || {
         id: "OTHER",
-        label: "Other",
+        label: "অন্যান্য",
         icon: HelpCircle,
         color: "text-slate-600 bg-slate-50 border-slate-200",
       }
@@ -131,8 +139,8 @@ export default function ResellerSupportPage() {
   return (
     <PanelPage>
       <PanelPageHeader
-        title="Support Tickets"
-        subtitle="Have a question or facing an issue with payments, orders, or technical problems? Submit a ticket and receive a unique Ticket ID to track resolution."
+        title="সাপোর্ট টিকেট"
+        subtitle="পেমেন্ট, অর্ডার বা টেকনিক্যাল কোনো প্রশ্ন বা সমস্যা আছে? একটি টিকেট সাবমিট করুন এবং সমাধান ট্র্যাক করতে একটি ইউনিক টিকেট আইডি পান।"
         icon={LifeBuoy}
         actions={
           <button
@@ -143,7 +151,7 @@ export default function ResellerSupportPage() {
             }}
             className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
           >
-            <Plus size={16} /> Create Support Ticket
+            <Plus size={16} /> সাপোর্ট টিকেট তৈরি করুন
           </button>
         }
       />
@@ -151,23 +159,23 @@ export default function ResellerSupportPage() {
       {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
-          <p className="text-xs text-base-content/60 font-semibold uppercase">Total Tickets</p>
+          <p className="text-xs text-base-content/60 font-semibold uppercase">মোট টিকেট</p>
           <p className="text-2xl font-black text-base-content mt-1">{tickets.length}</p>
         </div>
         <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
-          <p className="text-xs text-amber-600 font-semibold uppercase">Open</p>
+          <p className="text-xs text-amber-600 font-semibold uppercase">ওপেন</p>
           <p className="text-2xl font-black text-amber-600 mt-1">
             {tickets.filter((t) => t.status === "OPEN").length}
           </p>
         </div>
         <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
-          <p className="text-xs text-blue-600 font-semibold uppercase">In Progress</p>
+          <p className="text-xs text-blue-600 font-semibold uppercase">চলমান</p>
           <p className="text-2xl font-black text-blue-600 mt-1">
             {tickets.filter((t) => t.status === "IN_PROGRESS").length}
           </p>
         </div>
         <div className="bg-base-100 border border-base-200 p-4 rounded-2xl shadow-sm">
-          <p className="text-xs text-emerald-600 font-semibold uppercase">Resolved</p>
+          <p className="text-xs text-emerald-600 font-semibold uppercase">সমাধান হয়েছে</p>
           <p className="text-2xl font-black text-emerald-600 mt-1">
             {tickets.filter((t) => t.status === "RESOLVED").length}
           </p>
@@ -177,26 +185,23 @@ export default function ResellerSupportPage() {
       {/* Filter and Search Bar */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <PanelTabs
-          ariaLabel="Filter tickets by status"
+          ariaLabel="স্ট্যাটাস অনুযায়ী টিকেট ফিল্টার করুন"
           value={selectedStatus}
           onChange={setSelectedStatus}
           tabs={["ALL", "OPEN", "IN_PROGRESS", "RESOLVED"].map((st) => ({
             id: st,
-            label:
-              st === "ALL"
-                ? "All"
-                : st.replace("_", " ").toLowerCase().replace(/^./, (c) => c.toUpperCase()),
+            label: STATUS_TAB_LABELS_BN[st] || st,
           }))}
         />
 
         <div className="flex flex-wrap items-center gap-2">
           <select
-            aria-label="Filter tickets by reason"
+            aria-label="কারণ অনুযায়ী টিকেট ফিল্টার করুন"
             className="select select-sm select-bordered rounded-xl text-xs font-semibold"
             value={selectedReason}
             onChange={(e) => setSelectedReason(e.target.value)}
           >
-            <option value="ALL">All Reasons</option>
+            <option value="ALL">সব কারণ</option>
             {REASONS.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.label}
@@ -211,7 +216,7 @@ export default function ResellerSupportPage() {
             />
             <input
               type="text"
-              placeholder="Search by Ticket ID..."
+              placeholder="টিকেট আইডি দিয়ে খুঁজুন..."
               className="input input-bordered input-sm rounded-xl pl-9 w-full text-xs"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -227,15 +232,15 @@ export default function ResellerSupportPage() {
         <div className="bg-base-100 border border-base-200 rounded-2xl shadow-sm">
           <PanelEmpty
             icon={LifeBuoy}
-            title="No support tickets found"
-            text="You haven't created any tickets matching your filter criteria. Click below to submit a support inquiry."
+            title="কোনো সাপোর্ট টিকেট পাওয়া যায়নি"
+            text="এই ফিল্টারের সাথে মেলে এমন কোনো টিকেট আপনি তৈরি করেননি। সাপোর্টের জন্য নিচে ক্লিক করে টিকেট সাবমিট করুন।"
             action={
               <button
                 type="button"
                 onClick={() => setIsCreateOpen(true)}
                 className="btn btn-primary btn-sm rounded-xl gap-2 text-white"
               >
-                <Plus size={16} /> Create Support Ticket
+                <Plus size={16} /> সাপোর্ট টিকেট তৈরি করুন
               </button>
             }
           />
@@ -258,7 +263,8 @@ export default function ResellerSupportPage() {
                       <button
                         onClick={() => copyToClipboard(t.ticketId)}
                         className="hover:text-primary-focus transition"
-                        title="Copy Ticket ID"
+                        title="টিকেট আইডি কপি করুন"
+                        aria-label="টিকেট আইডি কপি করুন"
                       >
                         <Copy size={13} />
                       </button>
@@ -292,7 +298,7 @@ export default function ResellerSupportPage() {
                 {t.adminNotes && (
                   <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3.5 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
-                      <ShieldCheck size={14} /> Admin Response:
+                      <ShieldCheck size={14} /> অ্যাডমিনের উত্তর:
                     </div>
                     <p className="text-xs text-emerald-900 leading-relaxed whitespace-pre-line">
                       {t.adminNotes}
@@ -305,7 +311,7 @@ export default function ResellerSupportPage() {
                     onClick={() => setViewTicket(t)}
                     className="btn btn-ghost btn-xs text-primary font-bold hover:bg-primary/10"
                   >
-                    View Full Details &rarr;
+                    সম্পূর্ণ বিস্তারিত দেখুন &rarr;
                   </button>
                 </div>
               </div>
@@ -319,7 +325,7 @@ export default function ResellerSupportPage() {
         <PanelModal
           open={isCreateOpen}
           onClose={() => setIsCreateOpen(false)}
-          title="Create Support Ticket"
+          title="সাপোর্ট টিকেট তৈরি করুন"
           size="md"
           footer={
             <>
@@ -329,7 +335,7 @@ export default function ResellerSupportPage() {
                 className="btn btn-ghost btn-sm rounded-xl"
                 disabled={createSubmitting}
               >
-                Cancel
+                বাতিল
               </button>
               <button
                 type="submit"
@@ -340,7 +346,7 @@ export default function ResellerSupportPage() {
                 {createSubmitting ? (
                   <span className="loading loading-spinner loading-xs"></span>
                 ) : (
-                  "Submit Ticket"
+                  "টিকেট সাবমিট করুন"
                 )}
               </button>
             </>
@@ -358,7 +364,7 @@ export default function ResellerSupportPage() {
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-bold text-base-content">
-                  What is the reason for your ticket? *
+                  টিকেটের কারণ কী? *
                 </span>
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -388,12 +394,12 @@ export default function ResellerSupportPage() {
             <div className="form-control">
               <label className="label">
                 <span className="label-text font-bold text-base-content">
-                  Describe your issue / question in detail *
+                  আপনার সমস্যা / প্রশ্ন বিস্তারিত লিখুন *
                 </span>
               </label>
               <textarea
                 rows={5}
-                placeholder="Provide all relevant details (e.g. order number, payout amount, transaction date, or error description)..."
+                placeholder="প্রয়োজনীয় সব তথ্য দিন (যেমন: অর্ডার নম্বর, পেআউটের পরিমাণ, লেনদেনের তারিখ বা এররের বিবরণ)..."
                 className="textarea textarea-bordered w-full text-sm"
                 value={createMessage}
                 onChange={(e) => setCreateMessage(e.target.value)}
@@ -401,7 +407,7 @@ export default function ResellerSupportPage() {
                 required
               />
               <span className="label-text-alt text-base-content/50 text-right mt-1">
-                {createMessage.length}/5000 characters
+                {createMessage.length}/5000 অক্ষর
               </span>
             </div>
           </form>
@@ -413,7 +419,7 @@ export default function ResellerSupportPage() {
         <PanelModal
           open={!!createdTicketId}
           onClose={() => setCreatedTicketId(null)}
-          title="Support Ticket Created!"
+          title="সাপোর্ট টিকেট তৈরি হয়েছে!"
           size="sm"
           footer={
             <button
@@ -421,7 +427,7 @@ export default function ResellerSupportPage() {
               onClick={() => setCreatedTicketId(null)}
               className="btn btn-primary btn-sm rounded-xl w-full"
             >
-              Done
+              ঠিক আছে
             </button>
           }
         >
@@ -431,13 +437,13 @@ export default function ResellerSupportPage() {
             </div>
 
             <p className="text-xs text-base-content/60 max-w-xs mx-auto">
-              Your support request has been logged. Our representative will investigate and reply promptly.
+              আপনার সাপোর্ট অনুরোধটি গ্রহণ করা হয়েছে। আমাদের প্রতিনিধি বিষয়টি দেখে দ্রুত উত্তর দেবেন।
             </p>
 
             {/* Generated Ticket ID Box */}
             <div className="bg-base-200/60 border border-base-200 rounded-2xl p-4 space-y-2">
               <p className="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">
-                Your Unique Ticket ID
+                আপনার ইউনিক টিকেট আইডি
               </p>
               <div className="flex items-center justify-center gap-2">
                 <span className="font-mono text-xl font-black text-primary tracking-widest select-all">
@@ -447,21 +453,21 @@ export default function ResellerSupportPage() {
                   type="button"
                   onClick={() => copyToClipboard(createdTicketId)}
                   className="btn btn-ghost btn-xs btn-square rounded-lg text-primary"
-                  title="Copy Ticket ID"
-                  aria-label="Copy Ticket ID"
+                  title="টিকেট আইডি কপি করুন"
+                  aria-label="টিকেট আইডি কপি করুন"
                 >
                   {copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
                 </button>
               </div>
               {copied && (
                 <p className="text-[10px] text-emerald-600 font-bold">
-                  Copied to clipboard!
+                  ক্লিপবোর্ডে কপি হয়েছে!
                 </p>
               )}
             </div>
 
             <p className="text-[11px] text-base-content/50">
-              Please save or quote this Ticket ID if contacting support directly.
+              সরাসরি সাপোর্টে যোগাযোগ করলে এই টিকেট আইডিটি সংরক্ষণ করুন বা উল্লেখ করুন।
             </p>
           </div>
         </PanelModal>
@@ -472,7 +478,7 @@ export default function ResellerSupportPage() {
         <PanelModal
           open={!!viewTicket}
           onClose={() => setViewTicket(null)}
-          title={`Ticket Details — ${viewTicket.ticketId}`}
+          title={`টিকেটের বিস্তারিত — ${viewTicket.ticketId}`}
           size="md"
           footer={
             <button
@@ -480,32 +486,32 @@ export default function ResellerSupportPage() {
               onClick={() => setViewTicket(null)}
               className="btn btn-ghost btn-sm rounded-xl"
             >
-              Close
+              বন্ধ করুন
             </button>
           }
         >
           <div className="space-y-4 text-xs">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-base-content/60">Status</span>
+              <span className="font-bold text-base-content/60">স্ট্যাটাস</span>
               <StatusBadge status={viewTicket.status} />
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="font-bold text-base-content/60">Reason</span>
+              <span className="font-bold text-base-content/60">কারণ</span>
               <span className="font-bold text-base-content">
                 {getReasonConfig(viewTicket.reason).label}
               </span>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="font-bold text-base-content/60">Submitted At</span>
+              <span className="font-bold text-base-content/60">সাবমিটের সময়</span>
               <span className="text-base-content/70">
                 {new Date(viewTicket.createdAt).toLocaleString()}
               </span>
             </div>
 
             <div className="space-y-1 pt-2 border-t border-base-200">
-              <span className="font-bold text-base-content/70">Your Message:</span>
+              <span className="font-bold text-base-content/70">আপনার মেসেজ:</span>
               <div className="bg-base-200/60 p-3 rounded-xl text-base-content leading-relaxed whitespace-pre-line border border-base-200">
                 {viewTicket.message}
               </div>
@@ -514,7 +520,7 @@ export default function ResellerSupportPage() {
             {viewTicket.adminNotes && (
               <div className="space-y-1 pt-2">
                 <span className="font-bold text-emerald-800 flex items-center gap-1">
-                  <ShieldCheck size={14} /> Support Team Response:
+                  <ShieldCheck size={14} /> সাপোর্ট টিমের উত্তর:
                 </span>
                 <div className="bg-emerald-50/80 p-3.5 rounded-xl text-emerald-950 leading-relaxed whitespace-pre-line border border-emerald-200">
                   {viewTicket.adminNotes}
